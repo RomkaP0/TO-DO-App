@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/todoItemLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:padding="16dp">
 
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="12dp">
-
-    <CheckBox
+    <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/isCheckedTodo"
         android:layout_width="24dp"
         android:layout_height="24dp"
@@ -16,31 +15,58 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/importanceIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/todoTextView"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/todoTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="30dp"
         android:layout_marginEnd="16dp"
-
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageView"
-        app:layout_constraintStart_toEndOf="@+id/isCheckedTodo"
-
+        android:ellipsize="end"
         android:maxLines="3"
+        app:layout_constraintEnd_toStartOf="@+id/imageView"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@+id/isCheckedTodo"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="@tools:sample/lorem/random" />
 
-
-        tools:text="@tools:sample/lorem/random"/>
+    <TextView
+        android:id="@+id/todoListDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="2dp"
+        android:textSize="14sp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="@+id/todoTextView"
+        app:layout_constraintTop_toBottomOf="@+id/todoTextView"
+        app:drawableStartCompat="@drawable/ic_calendar" />
+    <TextView
+        android:id="@+id/todoListModifyDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="2dp"
+        android:textSize="14sp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="@+id/todoTextView"
+        app:layout_constraintTop_toBottomOf="@+id/todoListDate"
+        app:drawableStartCompat="@drawable/edit_note_fill0_wght400_grad0_opsz20" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="24dp"
         android:layout_height="24dp"
-
         android:src="@drawable/ic_arrow_right"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/support" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

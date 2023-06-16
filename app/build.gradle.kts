@@ -4,6 +4,9 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.com.google.dagger.hilt.android)
+    alias(libs.plugins.parcelize)
+    id ("androidx.navigation.safeargs.kotlin")
+
 }
 
 android {
@@ -16,9 +19,11 @@ android {
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
+        compileSdkPreview = "UpsideDownCake"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
 
     buildTypes {
         release {
@@ -30,14 +35,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         viewBinding = true
+    }
+    sourceSets {
+        getByName("main").java.srcDirs("build/generated/source/navigation-args")
     }
 }
 

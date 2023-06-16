@@ -1,15 +1,24 @@
 package com.romka_po.to_doapp.model
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.romka_po.to_doapp.R
 import com.romka_po.to_doapp.databinding.TodoItemBinding
+import com.romka_po.to_doapp.utils.Convert
+import com.romka_po.to_doapp.utils.Importance
 
 
-class TodoListAdapter:
+class TodoListAdapter(
+    private val shortClickListener: (TodoItem) -> Unit,
+    private val longClickListener: (TodoItem, Int) -> Unit,
+    private val checkboxClickListener: (TodoItem) -> Unit,
+) :
     RecyclerView.Adapter<TodoListAdapter.TodoListViewHolder>() {
+
 
     private val diffCallback = object : DiffUtil.ItemCallback<TodoItem>() {
 
@@ -22,7 +31,6 @@ class TodoListAdapter:
 
     inner class TodoListViewHolder(val binding: TodoItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
     }
 
     val diffList = AsyncListDiffer(this, diffCallback)
@@ -44,9 +52,58 @@ class TodoListAdapter:
 
     override fun onBindViewHolder(holder: TodoListViewHolder, position: Int) {
         val currentTodoItem = diffList.currentList[position]
-        with(holder.binding){
-            isCheckedTodo.isChecked = currentTodoItem.isComplete
+        with(holder.binding) {
+            with(isCheckedTodo) {
+                isChecked = currentTodoItem.isComplete
+                isErrorShown = false
+                setOnCheckedChangeListener { _, state ->
+                    currentTodoItem.isComplete = state
+                    currentTodoItem.dateComplete = System.currentTimeMillis()
+                    checkboxClickListener(currentTodoItem)
+                }
+            }
             todoTextView.text = currentTodoItem.text
+            importanceIcon.visibility = View.VISIBLE
+
+            with(todoListDate) {
+                if (currentTodoItem.dateComplete != null) {
+                    text = Convert.getDateTime(currentTodoItem.dateComplete!!)
+                    visibility = View.VISIBLE
+                } else {
+                    visibility = View.GONE
+                }
+            }
+            with(todoListModifyDate) {
+                if (currentTodoItem.dateEdit != null) {
+                    text = Convert.getDateTime(currentTodoItem.dateEdit!!)
+                    visibility = View.VISIBLE
+                } else {
+                    visibility = View.GONE
+                }
+            }
+
+
+            when (currentTodoItem.importance) {
+                Importance.LOW -> {
+                    importanceIcon.setImageDrawable(root.context.getDrawable(R.drawable.ic_arrow_down))
+                }
+
+                Importance.HIGH -> {
+                    importanceIcon.setImageDrawable(root.context.getDrawable(R.drawable.ic_warning))
+                    isCheckedTodo.isErrorShown = true
+                }
+
+                else -> {
+                    importanceIcon.visibility = View.GONE
+                }
+            }
+            todoItemLayout.setOnClickListener { shortClickListener(currentTodoItem) }
+            todoItemLayout.setOnLongClickListener {
+                longClickListener(currentTodoItem, position)
+                return@setOnLongClickListener true
+            }
         }
     }
+
+
 }

@@ -1,13 +1,16 @@
 package com.romka_po.to_doapp.model
 
+import android.os.Parcelable
 import com.romka_po.to_doapp.utils.Importance
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class TodoItem(
-    val id:String,
-    var text:String,
+    var id: String,
+    var text: String,
     var importance: Importance,
-    var isComplete:Boolean,
-    val dateCreate: Long,
+    var dateCreate: Long,
     var dateComplete: Long? = null,
-    var dateEdit:Long? = null,
-)
+    var dateEdit: Long? = null,
+    var isComplete: Boolean = false,
+) : Parcelable
