@@ -3,6 +3,7 @@ package com.romka_po.to_doapp.model
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -30,11 +31,9 @@ class TodoListAdapter(
     }
 
     inner class TodoListViewHolder(val binding: TodoItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-    }
+        RecyclerView.ViewHolder(binding.root)
 
     val diffList = AsyncListDiffer(this, diffCallback)
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoListViewHolder {
         return TodoListViewHolder(
@@ -56,11 +55,19 @@ class TodoListAdapter(
             with(isCheckedTodo) {
                 isChecked = currentTodoItem.isComplete
                 isErrorShown = false
-                setOnCheckedChangeListener { _, state ->
-                    currentTodoItem.isComplete = state
-                    currentTodoItem.dateComplete = System.currentTimeMillis()
-                    checkboxClickListener(currentTodoItem)
+                setOnClickListener {
+                    if (isChecked) {
+                        currentTodoItem.isComplete = true
+                        currentTodoItem.dateComplete = System.currentTimeMillis()
+                        checkboxClickListener(currentTodoItem)
+                    }
+                    else{
+                        currentTodoItem.isComplete = false
+                        currentTodoItem.dateComplete = null
+                        checkboxClickListener(currentTodoItem)
+                    }
                 }
+
             }
             todoTextView.text = currentTodoItem.text
             importanceIcon.visibility = View.VISIBLE
@@ -85,11 +92,11 @@ class TodoListAdapter(
 
             when (currentTodoItem.importance) {
                 Importance.LOW -> {
-                    importanceIcon.setImageDrawable(root.context.getDrawable(R.drawable.ic_arrow_down))
+                    importanceIcon.setImageDrawable(ContextCompat.getDrawable(root.context,R.drawable.ic_arrow_down))
                 }
 
                 Importance.HIGH -> {
-                    importanceIcon.setImageDrawable(root.context.getDrawable(R.drawable.ic_warning))
+                    importanceIcon.setImageDrawable(ContextCompat.getDrawable(root.context, R.drawable.ic_warning))
                     isCheckedTodo.isErrorShown = true
                 }
 

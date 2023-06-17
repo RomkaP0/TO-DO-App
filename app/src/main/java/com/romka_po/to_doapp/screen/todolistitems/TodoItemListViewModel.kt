@@ -7,25 +7,23 @@ import androidx.lifecycle.viewModelScope
 import com.romka_po.to_doapp.model.TodoItem
 import com.romka_po.to_doapp.repository.TodoItemsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.cache
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TodoItemListViewModel @Inject constructor(val repository: TodoItemsRepository) : ViewModel() {
-    val _liveData: MutableLiveData<List<TodoItem>> = MutableLiveData(emptyList())
-    val liveData:LiveData<List<TodoItem>> get() = _liveData
+class TodoItemListViewModel @Inject constructor(private val repository: TodoItemsRepository) : ViewModel() {
+    private val _liveData: MutableLiveData<List<TodoItem>> = MutableLiveData(emptyList())
+    val liveData: LiveData<List<TodoItem>> get() = _liveData
     val countOfComplete: MutableLiveData<Int> = MutableLiveData(0)
 
     init {
         viewModelScope.launch {
-            repository.getFlowOfData().collect { list ->
+            repository.todoItems.collect { list ->
                 _liveData.value = list
-                countOfComplete.value = list.filter { item -> item.isComplete }.size
+                countOfComplete.value = list.filter { it.isComplete }.size
             }
         }
+
     }
 
     fun addTodoItemAt(item: TodoItem, position: Int) {

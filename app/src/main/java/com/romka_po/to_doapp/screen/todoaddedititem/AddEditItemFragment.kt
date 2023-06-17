@@ -73,7 +73,7 @@ class AddEditItemFragment : Fragment() {
 
     }
 
-    fun buildDatePickerDialog() {
+    private fun buildDatePickerDialog() {
         val datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText("Укажите дату")
             .setTheme(R.style.ThemeOverlay_App_DatePicker)
@@ -89,7 +89,7 @@ class AddEditItemFragment : Fragment() {
         datePicker.show(requireActivity().supportFragmentManager, "tag")
     }
 
-    fun tryAddTodoItem(isNew: Boolean) {
+    private fun tryAddTodoItem(isNew: Boolean) {
         val importance = when (binding.importanceToggleGroup.checkedButtonId) {
             R.id.ImportanceLow -> Importance.LOW
             R.id.ImportanceMiddle -> Importance.MEDIUM

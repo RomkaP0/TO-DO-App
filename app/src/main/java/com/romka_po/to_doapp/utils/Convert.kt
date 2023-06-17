@@ -1,9 +1,11 @@
 package com.romka_po.to_doapp.utils
 
+import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
 import java.util.Date
 
 object Convert {
+    @SuppressLint("SimpleDateFormat")
     fun getDateTime(time: Long): String? {
         return try {
             val sdf = SimpleDateFormat("dd/MM/yyyy")

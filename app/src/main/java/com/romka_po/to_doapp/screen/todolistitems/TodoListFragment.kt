@@ -6,7 +6,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import androidx.annotation.MenuRes
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -26,7 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class TodoListFragment : Fragment() {
 
-    val viewModel: TodoItemListViewModel by viewModels()
+    private val viewModel: TodoItemListViewModel by viewModels()
     lateinit var rvAdapter: TodoListAdapter
     private var _binding: FragmentTodoListBinding? = null
     private val binding get() = _binding!!
@@ -56,11 +55,19 @@ class TodoListFragment : Fragment() {
     private fun setupRecyclerView(recyclerView: RecyclerView) {
 
         rvAdapter = TodoListAdapter(
-            { todoItem ->
+            shortClickListener = { todoItem ->
                 navigateToAddEditFragment(todoItem)
             },
-            { todoItem, i -> showMenu(todoItem, i) },
-            { todoItem -> viewModel.editTodoItem(todoItem) })
+            longClickListener = { todoItem, i -> showMenu(todoItem, i) },
+            checkboxClickListener = { todoItem ->
+                viewModel.editTodoItem(todoItem)
+                val temp = if (todoItem.isComplete) {
+                    1
+                } else {
+                    -1
+                }
+                viewModel.countOfComplete.value = viewModel.countOfComplete.value!! + temp
+            })
         with(recyclerView) {
             adapter = rvAdapter
             layoutManager = LinearLayoutManager(context)
@@ -72,12 +79,12 @@ class TodoListFragment : Fragment() {
         viewModel.liveData.observe(viewLifecycleOwner) {
             rvAdapter.diffList.submitList(it)
         }
-        viewModel.countOfComplete.observe(viewLifecycleOwner){
-            binding.countCompleteTextView.text = "Выполнено: ${it}"
+        viewModel.countOfComplete.observe(viewLifecycleOwner) {
+            binding.countCompleteTextView.text = getString(R.string.complete,it)
         }
     }
 
-    fun swipeListener(recyclerView: RecyclerView) {
+    private fun swipeListener(recyclerView: RecyclerView) {
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
             override fun onMove(
                 recyclerView: RecyclerView,

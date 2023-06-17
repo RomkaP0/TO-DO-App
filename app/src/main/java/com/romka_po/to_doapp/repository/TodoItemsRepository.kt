@@ -2,52 +2,46 @@ package com.romka_po.to_doapp.repository
 
 import com.romka_po.to_doapp.model.TodoItem
 import com.romka_po.to_doapp.utils.Importance
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 class TodoItemsRepository @Inject constructor() {
-    private var todoItems = listOf<TodoItem>()
+    private var _todoItems = mutableListOf<TodoItem>()
+    private val _todoItemsHolder = MutableStateFlow(listOf<TodoItem>())
 
-    fun addData(item: TodoItem, position: Int = todoItems.size) {
-        val list = todoItems.toMutableList()
-        list.add(position, item)
-        todoItems = list
-    }
+    //this object sends out the immutable list
+    val todoItems = _todoItemsHolder.asStateFlow()
 
-    fun getFlowOfData(): Flow<List<TodoItem>> = flow {
-        emit(todoItems)
+    fun addData(item: TodoItem, position: Int = _todoItems.size) {
+        _todoItems.add(position, item)
+        val nl = _todoItems
+        _todoItemsHolder.value = nl
     }
 
     fun removeTodoItemWithID(id: String) {
-        val list = todoItems.toMutableList()
-        for (i in 0 until todoItems.size) {
-            if (list[i].id == id) {
-                list.removeAt(i)
+        for (i in 0 until _todoItems.size) {
+            if (_todoItems[i].id == id) {
+                _todoItems.removeAt(i)
                 break
             }
         }
-        todoItems = list
+        val nl = _todoItems
+        _todoItemsHolder.value = nl
     }
 
     fun editTodoItem(todoItem: TodoItem) {
-        val list = todoItems.toMutableList()
-        for (i in 0 until todoItems.size) {
-            if (list[i].id == todoItem.id) {
-                list[i] = todoItem
+        for (i in 0 until _todoItems.size) {
+            if (_todoItems[i].id == todoItem.id) {
+                _todoItems[i] = todoItem
                 break
             }
         }
-        todoItems = list
+        val nl = _todoItems
+        _todoItemsHolder.value = nl
     }
 
     init {
-        val list = todoItems.toMutableList()
         for (i in 1..20) {
             val todoItem = TodoItem(
                 id = "ID$i",
@@ -57,15 +51,14 @@ class TodoItemsRepository @Inject constructor() {
                     i <= 15 -> Importance.MEDIUM
                     else -> Importance.HIGH
                 },
-                isComplete = false,
+                isComplete = i == 4,
                 dateCreate = System.currentTimeMillis(),
-                dateComplete = null,
-                dateEdit = null
+                dateComplete = if (i==4) System.currentTimeMillis() else null,
+                dateEdit = if (i in 2..7) System.currentTimeMillis() else null
             )
-            list.add(todoItem)
+            _todoItems.add(todoItem)
         }
-        todoItems = list
+        val nl = _todoItems
+        _todoItemsHolder.value = nl
     }
-
-
 }
