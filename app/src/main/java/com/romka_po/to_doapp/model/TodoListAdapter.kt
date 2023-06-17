@@ -52,27 +52,20 @@ class TodoListAdapter(
         with(holder.binding) {
             with(isCheckedTodo) {
                 todoTextView.text = currentTodoItem.text
-
+                todoTextView.paint.isStrikeThruText = currentTodoItem.isComplete
                 isChecked = currentTodoItem.isComplete
                 isErrorShown = false
 
                 setOnClickListener {
                     if (isChecked) {
                         currentTodoItem.isComplete = true
-                        currentTodoItem.dateComplete = System.currentTimeMillis()
-                        checkboxClickListener(currentTodoItem)
-                        todoListDate.visibility = View.VISIBLE
+                        todoTextView.paint.isStrikeThruText = true
                     } else {
                         currentTodoItem.isComplete = false
-                        currentTodoItem.dateComplete = null
-                        checkboxClickListener(currentTodoItem)
-                        todoListDate.visibility = View.GONE
+                        todoTextView.paint.isStrikeThruText = false
                     }
-                    todoListDate.text = currentTodoItem.dateComplete?.let { it1 ->
-                        Convert.getDateTime(
-                            it1
-                        )
-                    }
+                    todoTextView.invalidate()
+                    checkboxClickListener(currentTodoItem)
                 }
             }
 

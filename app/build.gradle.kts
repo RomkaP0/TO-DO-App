@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.com.google.dagger.hilt.android)
     alias(libs.plugins.parcelize)
     id ("androidx.navigation.safeargs.kotlin")
-
 }
 
 android {
