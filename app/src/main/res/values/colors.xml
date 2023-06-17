@@ -6,5 +6,6 @@
     <color name="support">#8E8E93</color>
     <color name="tertiary">#6C989F</color>
     <color name="primaryContainer">#839681</color>
+    <color name="invert">#000000</color>
 
 </resources>

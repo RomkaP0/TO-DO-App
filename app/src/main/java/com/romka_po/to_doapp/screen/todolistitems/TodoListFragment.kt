@@ -27,6 +27,7 @@ class TodoListFragment : Fragment() {
 
     private val viewModel: TodoItemListViewModel by viewModels()
     lateinit var rvAdapter: TodoListAdapter
+
     private var _binding: FragmentTodoListBinding? = null
     private val binding get() = _binding!!
 
@@ -45,10 +46,19 @@ class TodoListFragment : Fragment() {
 
         setupRecyclerView(binding.todoRecyclerView)
         swipeListener(binding.todoRecyclerView)
+
         provideObservers()
+        viewModel.forceUpdate()
 
         binding.navigateToAddFAB.setOnClickListener {
             findNavController().navigate(R.id.action_todoListFragment_to_addEditItem)
+        }
+
+        with(binding.showUncheckedCheckbox) {
+            isChecked = viewModel.showUnchecked
+            setOnClickListener {
+                viewModel.changeShow()
+            }
         }
     }
 
@@ -61,13 +71,8 @@ class TodoListFragment : Fragment() {
             longClickListener = { todoItem, i -> showMenu(todoItem, i) },
             checkboxClickListener = { todoItem ->
                 viewModel.editTodoItem(todoItem)
-                val temp = if (todoItem.isComplete) {
-                    1
-                } else {
-                    -1
-                }
-                viewModel.countOfComplete.value = viewModel.countOfComplete.value!! + temp
             })
+
         with(recyclerView) {
             adapter = rvAdapter
             layoutManager = LinearLayoutManager(context)
@@ -76,11 +81,13 @@ class TodoListFragment : Fragment() {
     }
 
     private fun provideObservers() {
-        viewModel.liveData.observe(viewLifecycleOwner) {
-            rvAdapter.diffList.submitList(it)
+        viewModel.listTodoItem.observe(viewLifecycleOwner) {
+            val list = it.toList()
+            rvAdapter.diffList.submitList(list)
         }
+
         viewModel.countOfComplete.observe(viewLifecycleOwner) {
-            binding.countCompleteTextView.text = getString(R.string.complete,it)
+            binding.countCompleteTextView.text = getString(R.string.complete, it)
         }
     }
 
@@ -99,7 +106,6 @@ class TodoListFragment : Fragment() {
                     rvAdapter.diffList.currentList[viewHolder.adapterPosition]
                 val position = viewHolder.adapterPosition
                 deleteItem(deletedCourse, position)
-
             }
         }).attachToRecyclerView(recyclerView)
     }
@@ -120,10 +126,7 @@ class TodoListFragment : Fragment() {
             }
             return@setOnMenuItemClickListener false
         }
-        popup.setOnDismissListener {
-            // Respond to popup being dismissed.
-        }
-        // Show the popup menu.
+
         popup.show()
     }
 
@@ -135,17 +138,15 @@ class TodoListFragment : Fragment() {
 
     private fun deleteItem(deletedCourse: TodoItem, position: Int) {
         viewModel.removeItemWithID(deletedCourse.id)
-        rvAdapter.notifyDataSetChanged()
         Snackbar.make(
             binding.todoListConstraintLayout,
-            "Deleted " + deletedCourse.text,
+            getString(R.string.deleted) + deletedCourse.text,
             Snackbar.LENGTH_LONG
         )
             .setAction(
-                "Undo"
+                getString(R.string.undo)
             ) {
                 viewModel.addTodoItemAt(deletedCourse, position)
-                rvAdapter.notifyDataSetChanged()
             }.show()
     }
 

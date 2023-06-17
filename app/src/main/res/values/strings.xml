@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">TO-DO App</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="complete">Выполнено: %1$d</string>
     <string name="edit">Изменить</string>
     <string name="delete">Удалить</string>
@@ -14,4 +13,6 @@
     <string name="navigatotoadd">navigatoToAdd</string>
     <string name="importanceicon">importanceIcon</string>
     <string name="arrow_right">Arrow Right</string>
+    <string name="deleted">"Удален "</string>
+    <string name="undo">Вернуть</string>
 </resources>

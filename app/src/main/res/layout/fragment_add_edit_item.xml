@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".screen.todoaddedititem.AddEditItemFragment">
@@ -22,7 +21,8 @@
             android:padding="12dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_close"
-            android:contentDescription="@string/close" />
+            android:contentDescription="@string/close"
+            app:tint="@color/invert" />
 
         <TextView
             android:id="@+id/addeditButtonSave"
@@ -62,9 +62,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:layout_marginVertical="16dp"
-
                 android:background="@drawable/list_background"
                 android:clipToPadding="false"
                 android:padding="16dp">
@@ -122,9 +120,11 @@
 
                 <com.google.android.material.divider.MaterialDivider
                     android:id="@+id/firstAddEditDivider"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="2dp"
                     android:layout_marginTop="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/importancetextView" />
 
                 <TextView

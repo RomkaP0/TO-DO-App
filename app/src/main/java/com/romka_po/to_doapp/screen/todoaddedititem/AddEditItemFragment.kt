@@ -21,7 +21,6 @@ import java.lang.reflect.InvocationTargetException
 @AndroidEntryPoint
 class AddEditItemFragment : Fragment() {
     private var _binding: FragmentAddEditItemBinding? = null
-    private var id = ""
     private val binding get() = _binding!!
     private val args by navArgs<AddEditItemFragmentArgs>()
     private val viewModel: AddEditItemViewModel by viewModels()
@@ -30,7 +29,6 @@ class AddEditItemFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflate the layout for this fragment
         _binding = FragmentAddEditItemBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -38,6 +36,7 @@ class AddEditItemFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         var isNew = true
 
         try {
@@ -47,30 +46,31 @@ class AddEditItemFragment : Fragment() {
             Log.d("NavArgsException", "There aren`t args")
         }
 
-        binding.addEditDateTextView.text = Convert.getDateTime(viewModel.completeTimeStamp)
+        with(binding) {
+            addEditDateTextView.text = Convert.getDateTime(viewModel.completeTimeStamp)
 
-        binding.addeditButtonClose.setOnClickListener {
-            findNavController().popBackStack()
-        }
-        binding.addeditButtonSave.setOnClickListener {
-            tryAddTodoItem(isNew)
-            findNavController().navigate(R.id.action_addEditItem_to_todoListFragment)
-        }
+            addeditButtonClose.setOnClickListener {
+                findNavController().popBackStack()
+            }
+            addeditButtonSave.setOnClickListener {
+                tryAddTodoItem(isNew)
+                findNavController().navigate(R.id.action_addEditItem_to_todoListFragment)
+            }
 
-        binding.completeBeforeSwith.setOnCheckedChangeListener { _, isChecked ->
-            with(binding.addEditDateTextView) {
-                if (isChecked) {
-                    visibility = View.VISIBLE
-                    setOnClickListener {
-                        buildDatePickerDialog()
+            completeBeforeSwith.setOnCheckedChangeListener { _, isChecked ->
+                with(addEditDateTextView) {
+                    if (isChecked) {
+                        visibility = View.VISIBLE
+
+                        setOnClickListener {
+                            buildDatePickerDialog()
+                        }
+                    } else {
+                        visibility = View.INVISIBLE
                     }
-                } else {
-                    visibility = View.INVISIBLE
                 }
             }
         }
-
-
     }
 
     private fun buildDatePickerDialog() {
@@ -106,7 +106,7 @@ class AddEditItemFragment : Fragment() {
         }
 
         val item = TodoItem(
-            id,
+            viewModel.id,
             binding.TodoDescribe.text.toString(),
             importance,
             System.currentTimeMillis(),
@@ -123,10 +123,12 @@ class AddEditItemFragment : Fragment() {
     }
 
     private fun insertDataFromArgs(todoItem: TodoItem) {
-        id = todoItem.id
+        viewModel.id = todoItem.id
+
         with(binding) {
             TodoDescribe.setText(todoItem.text)
             importanceToggleGroup.clearChecked()
+
             when (todoItem.importance) {
                 Importance.LOW -> {
                     importanceToggleGroup.check(R.id.ImportanceLow)
@@ -140,19 +142,19 @@ class AddEditItemFragment : Fragment() {
                     importanceToggleGroup.check(R.id.ImportanceMiddle)
                 }
             }
+
             todoItem.dateComplete?.let {
                 completeBeforeSwith.isChecked = true
                 viewModel.completeTimeStamp = it
             }
+
             addEditDeleteButton.isEnabled = true
             addEditDeleteButton.setOnClickListener {
-                viewModel.removeItemWithID(id)
+                viewModel.removeItemWithID(viewModel.id)
                 findNavController().navigate(R.id.action_addEditItem_to_todoListFragment)
             }
         }
     }
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()

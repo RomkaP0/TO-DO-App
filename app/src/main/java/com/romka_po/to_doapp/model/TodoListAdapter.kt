@@ -17,12 +17,9 @@ class TodoListAdapter(
     private val shortClickListener: (TodoItem) -> Unit,
     private val longClickListener: (TodoItem, Int) -> Unit,
     private val checkboxClickListener: (TodoItem) -> Unit,
-) :
-    RecyclerView.Adapter<TodoListAdapter.TodoListViewHolder>() {
-
+) : RecyclerView.Adapter<TodoListAdapter.TodoListViewHolder>() {
 
     private val diffCallback = object : DiffUtil.ItemCallback<TodoItem>() {
-
         override fun areItemsTheSame(oldItem: TodoItem, newItem: TodoItem) =
             oldItem.id == newItem.id
 
@@ -30,10 +27,10 @@ class TodoListAdapter(
             oldItem == newItem
     }
 
+    val diffList = AsyncListDiffer(this, diffCallback)
+
     inner class TodoListViewHolder(val binding: TodoItemBinding) :
         RecyclerView.ViewHolder(binding.root)
-
-    val diffList = AsyncListDiffer(this, diffCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoListViewHolder {
         return TodoListViewHolder(
@@ -51,25 +48,34 @@ class TodoListAdapter(
 
     override fun onBindViewHolder(holder: TodoListViewHolder, position: Int) {
         val currentTodoItem = diffList.currentList[position]
+
         with(holder.binding) {
             with(isCheckedTodo) {
+                todoTextView.text = currentTodoItem.text
+
                 isChecked = currentTodoItem.isComplete
                 isErrorShown = false
+
                 setOnClickListener {
                     if (isChecked) {
                         currentTodoItem.isComplete = true
                         currentTodoItem.dateComplete = System.currentTimeMillis()
                         checkboxClickListener(currentTodoItem)
-                    }
-                    else{
+                        todoListDate.visibility = View.VISIBLE
+                    } else {
                         currentTodoItem.isComplete = false
                         currentTodoItem.dateComplete = null
                         checkboxClickListener(currentTodoItem)
+                        todoListDate.visibility = View.GONE
+                    }
+                    todoListDate.text = currentTodoItem.dateComplete?.let { it1 ->
+                        Convert.getDateTime(
+                            it1
+                        )
                     }
                 }
-
             }
-            todoTextView.text = currentTodoItem.text
+
             importanceIcon.visibility = View.VISIBLE
 
             with(todoListDate) {
@@ -80,6 +86,7 @@ class TodoListAdapter(
                     visibility = View.GONE
                 }
             }
+
             with(todoListModifyDate) {
                 if (currentTodoItem.dateEdit != null) {
                     text = Convert.getDateTime(currentTodoItem.dateEdit!!)
@@ -89,14 +96,23 @@ class TodoListAdapter(
                 }
             }
 
-
             when (currentTodoItem.importance) {
                 Importance.LOW -> {
-                    importanceIcon.setImageDrawable(ContextCompat.getDrawable(root.context,R.drawable.ic_arrow_down))
+                    importanceIcon.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            root.context,
+                            R.drawable.ic_arrow_down
+                        )
+                    )
                 }
 
                 Importance.HIGH -> {
-                    importanceIcon.setImageDrawable(ContextCompat.getDrawable(root.context, R.drawable.ic_warning))
+                    importanceIcon.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            root.context,
+                            R.drawable.ic_warning
+                        )
+                    )
                     isCheckedTodo.isErrorShown = true
                 }
 
@@ -104,6 +120,7 @@ class TodoListAdapter(
                     importanceIcon.visibility = View.GONE
                 }
             }
+
             todoItemLayout.setOnClickListener { shortClickListener(currentTodoItem) }
             todoItemLayout.setOnLongClickListener {
                 longClickListener(currentTodoItem, position)
@@ -111,6 +128,4 @@ class TodoListAdapter(
             }
         }
     }
-
-
 }
