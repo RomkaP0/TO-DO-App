@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/todoListFragment">
+
+    <fragment
+        android:id="@+id/todoListFragment"
+        android:name="com.romka_po.to_doapp.screen.todolistitems.TodoListFragment"
+        android:label="fragment_todo_list"
+        tools:layout="@layout/fragment_todo_list">
+        <action
+            android:id="@+id/action_todoListFragment_to_addEditItem"
+            app:destination="@id/addEditItem">
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/addEditItem"
+        android:name="com.romka_po.to_doapp.screen.todoaddedititem.AddEditItemFragment"
+        android:label="fragment_add_edit_item"
+        tools:layout="@layout/fragment_add_edit_item">
+        <action
+            android:id="@+id/action_addEditItem_to_todoListFragment"
+            app:destination="@id/todoListFragment" />
+        <argument
+            android:name="todoItem"
+            app:argType="com.romka_po.to_doapp.model.TodoItem" />
+    </fragment>
+
+</navigation>
