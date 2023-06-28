@@ -1,11 +1,11 @@
-@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.com.google.dagger.hilt.android)
     alias(libs.plugins.parcelize)
-    id ("androidx.navigation.safeargs.kotlin")
+    alias(libs.plugins.navigation.safe.args)
 }
 
 android {

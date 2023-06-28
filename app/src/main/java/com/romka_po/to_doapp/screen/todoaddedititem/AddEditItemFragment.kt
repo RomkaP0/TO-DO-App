@@ -50,11 +50,11 @@ class AddEditItemFragment : Fragment() {
             addEditDateTextView.text = Convert.getDateTime(viewModel.completeTimeStamp)
 
             addeditButtonClose.setOnClickListener {
-                findNavController().popBackStack()
+                findNavController().navigateUp()
             }
             addeditButtonSave.setOnClickListener {
                 tryAddTodoItem(isNew)
-                findNavController().navigate(R.id.action_addEditItem_to_todoListFragment)
+                findNavController().navigateUp()
             }
 
             completeBeforeSwith.setOnCheckedChangeListener { _, isChecked ->
@@ -152,6 +152,10 @@ class AddEditItemFragment : Fragment() {
             addEditDeleteButton.setOnClickListener {
                 viewModel.removeItemWithID(viewModel.id)
                 findNavController().navigate(R.id.action_addEditItem_to_todoListFragment)
+            }
+            
+            if (todoItem.dateComplete!=null){
+                completeBeforeSwith.isChecked = true
             }
         }
     }

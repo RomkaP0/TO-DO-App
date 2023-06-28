@@ -32,6 +32,6 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 com-google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-
+navigation-safe-args = {id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation-safe-args-gradle-plugin"}
 [bundles]
 

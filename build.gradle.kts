@@ -3,7 +3,7 @@
 buildscript {
     dependencies {
 
-        classpath (libs.navigation.safe.args.gradle.plugin)
+        classpath(libs.navigation.safe.args.gradle.plugin)
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -15,5 +15,6 @@ plugins {
     alias(libs.plugins.kotlin.kapt) apply false
     alias(libs.plugins.com.google.dagger.hilt.android) apply false
     alias(libs.plugins.parcelize) apply false
+    alias(libs.plugins.navigation.safe.args) apply false
 }
 true
