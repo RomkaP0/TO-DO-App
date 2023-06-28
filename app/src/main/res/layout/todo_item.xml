@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="16dp">
+    android:padding="@dimen/spacing_m">
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/isCheckedTodo"
