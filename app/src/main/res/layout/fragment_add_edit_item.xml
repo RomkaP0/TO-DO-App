@@ -2,11 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/add_edit_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="@dimen/spacing_m"
-    tools:context=".screen.todoaddedititem.AddEditItemFragment">
+    tools:context=".presentation.screen.todoaddedititem.AddEditItemFragment">
 
     <LinearLayout
         android:id="@+id/topLinearLayout"

@@ -1,5 +1,6 @@
 [versions]
 agp = "8.2.0-alpha08"
+authsdk = "2.5.1"
 kotlin = "1.8.0"
 core-ktx = "1.10.1"
 junit = "4.13.2"
@@ -11,8 +12,17 @@ constraintlayout = "2.1.4"
 hilt = "2.46.1"
 navigation = "2.6.0"
 navigation-safe-args-gradle-plugin = "2.6.0"
+room = "2.5.2"
+retrofit = "2.9.0"
+gson = "2.10.1"
+gson-converter = "2.9.0"
+kotlin-serialaize-json = "1.5.0"
+work-runtime-ktx = "2.8.1"
+okhttp = "4.11.0"
+hilt-common = "1.0.0"
 
 [libraries]
+authsdk = { module = "com.yandex.android:authsdk", version.ref = "authsdk" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
@@ -23,8 +33,25 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigation" }
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-work = {group = "androidx.hilt", name = "hilt-work", version = "1.0.0"}
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+hilt-androidcompiler = {group = "androidx.hilt", name = "hilt-compiler", version = "1.0.0"}
 navigation-safe-args-gradle-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation-safe-args-gradle-plugin" }
+room = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+retrofit2 = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+gson-converter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gson-converter" }
+
+
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+
+kotlin-serialaize-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlin-serialaize-json" }
+androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "work-runtime-ktx" }
+androidx-hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hilt-common" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -32,6 +59,10 @@ kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 com-google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-navigation-safe-args = {id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation-safe-args-gradle-plugin"}
+navigation-safe-args = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation-safe-args-gradle-plugin" }
+kotlin-serialize = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
 [bundles]
+retrofit = ["retrofit2", "gson", "gson-converter"]
+okhttp = ["okhttp", "okhttp-logging"]
 

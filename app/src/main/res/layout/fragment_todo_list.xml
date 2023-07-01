@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:paddingHorizontal="16dp"
-    tools:context=".screen.todolistitems.TodoListFragment">
+    tools:context=".presentation.screen.todolistitems.TodoListFragment">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

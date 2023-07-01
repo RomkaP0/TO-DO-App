@@ -6,19 +6,22 @@ plugins {
     alias(libs.plugins.com.google.dagger.hilt.android)
     alias(libs.plugins.parcelize)
     alias(libs.plugins.navigation.safe.args)
+    alias(libs.plugins.kotlin.serialize)
 }
 
 android {
-    namespace = "com.romka_po.to_doapp"
+    namespace = "com.romkapo.todoapp"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.romka_po.to_doapp"
+        applicationId = "com.romkapo.todoapp"
         minSdk = 26
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
         compileSdkPreview = "UpsideDownCake"
+
+        manifestPlaceholders["YANDEX_CLIENT_ID"] = "3a2ee2f9992946e193f7160fd9870bc5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,15 +53,31 @@ android {
 
 dependencies {
 
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.common)
     kapt(libs.hilt.compiler)
+    kapt(libs.hilt.androidcompiler)
+    kapt(libs.room.compiler)
+    implementation(libs.hilt.work)
+    implementation(libs.bundles.retrofit)
+    implementation(libs.bundles.okhttp)
+
+
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
+    implementation(libs.room)
+    implementation(libs.kotlin.serialaize.json)
+    implementation(libs.room.runtime)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.hilt)
+    implementation (libs.authsdk)
+
+
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
