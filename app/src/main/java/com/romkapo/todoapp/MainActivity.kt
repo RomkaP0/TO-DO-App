@@ -3,14 +3,14 @@ package com.romkapo.todoapp
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
 import com.romkapo.todoapp.data.repository.MainRepository
 import com.romkapo.todoapp.databinding.ActivityMainBinding
-import com.romkapo.todoapp.presentation.screen.MainViewModel
-import com.romkapo.todoapp.presentation.screen.MyState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -47,16 +47,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initInternetMonitoring() {
-        viewModel.state.observe(this) {
+        lifecycleScope.launch {
+            viewModel.state.collect {
             val text = when (it) {
                 MyState.Fetched -> {
                     viewModel.updateRepository()
                     getString(R.string.available_network_state)
                 }
-
                 MyState.Error -> getString(R.string.no_internet_connection)
             }
             Snackbar.make(binding.navHostFragment, text, Snackbar.LENGTH_SHORT).show()
         }
     }
-}
+}}

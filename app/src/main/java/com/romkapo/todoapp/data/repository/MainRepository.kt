@@ -2,6 +2,7 @@ package com.romkapo.todoapp.data.repository
 
 import android.util.Log
 import com.romkapo.todoapp.core.DeviceId
+import com.romkapo.todoapp.data.model.Resource
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.data.model.network.ApiTodoItem
 import com.romkapo.todoapp.data.model.network.AppSharedPreferences
@@ -9,7 +10,6 @@ import com.romkapo.todoapp.data.model.network.TodoItemListRequest
 import com.romkapo.todoapp.data.model.network.TodoItemRequest
 import com.romkapo.todoapp.data.model.network.toNetworkItem
 import com.romkapo.todoapp.data.model.network.toTodoItem
-import com.romkapo.todoapp.data.network.Resource
 import com.romkapo.todoapp.data.network.TodoAPI
 import com.romkapo.todoapp.data.room.TodoDAO
 import kotlinx.coroutines.flow.Flow
@@ -156,6 +156,7 @@ class MainRepository @Inject constructor(
                     val merged = mergedList.values.toList()
                     toDoItemDao.insertTodoList(merged.map { it.toTodoItem() })
                     updateRemoteTasks(merged)
+                    return true
                 }
             } else {
                 networkListResponse.errorBody()?.close()

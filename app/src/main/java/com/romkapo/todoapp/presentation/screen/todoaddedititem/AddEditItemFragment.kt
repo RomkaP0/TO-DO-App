@@ -158,6 +158,10 @@ class AddEditItemFragment : Fragment() {
             todoItem.dateComplete?.let {
                 completeBeforeSwith.isChecked = true
                 viewModel.completeTimeStamp = it
+                binding.addEditDateTextView .apply {
+                    text = viewModel.completeTimeStamp.toString()
+                    visibility = View.VISIBLE
+                }
             }
 
             addEditDeleteButton.isEnabled = true
@@ -165,10 +169,6 @@ class AddEditItemFragment : Fragment() {
                 viewModel.removeTodoItem(todoItem
                 )
                 findNavController().navigateUp()
-            }
-
-            if (todoItem.dateComplete != null) {
-                completeBeforeSwith.isChecked = true
             }
         }
     }

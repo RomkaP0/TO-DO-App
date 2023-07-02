@@ -1,4 +1,4 @@
-package com.romkapo.todoapp
+package com.romkapo.todoapp.presentation.screen.todolistitems
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.romkapo.todoapp.R
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.TodoItemBinding
 import com.romkapo.todoapp.utils.Convert
@@ -64,20 +65,26 @@ class TodoListAdapter(
                 }
             }
 
+            todoListDate
+
             importanceIcon.visibility = View.VISIBLE
 
             with(todoListDate) {
-                if (currentTodoItem.dateComplete != null) {
-                    text = Convert.getDateTime(currentTodoItem.dateComplete!!)
+                    text = Convert.getDateTime(currentTodoItem.dateCreate)
+                    visibility = View.VISIBLE
+                }
+
+            with(todoListModifyDate) {
+                if (currentTodoItem.dateEdit != null) {
+                    text = Convert.getDateTime(currentTodoItem.dateEdit!!)
                     visibility = View.VISIBLE
                 } else {
                     visibility = View.GONE
                 }
             }
-
-            with(todoListModifyDate) {
-                if (currentTodoItem.dateEdit != null) {
-                    text = Convert.getDateTime(currentTodoItem.dateEdit!!)
+            with(todoListCompleteDate) {
+                if (currentTodoItem.dateComplete != null) {
+                    text = Convert.getDateTime(currentTodoItem.dateComplete!!)
                     visibility = View.VISIBLE
                 } else {
                     visibility = View.GONE

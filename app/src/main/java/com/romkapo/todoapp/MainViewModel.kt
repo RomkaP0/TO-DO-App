@@ -1,7 +1,6 @@
-package com.romkapo.todoapp.presentation.screen
+package com.romkapo.todoapp
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.romkapo.todoapp.data.network.ConnectionManagerObserver
 import com.romkapo.todoapp.data.network.map
@@ -23,7 +22,6 @@ class MainViewModel @Inject constructor(
                 onUnavailable = { MyState.Error },
                 onAvailable = { MyState.Fetched },
             )
-            .asLiveData(Dispatchers.IO)
 
     fun updateRepository()  = viewModelScope.launch(Dispatchers.IO) {
         repository.updateTask()

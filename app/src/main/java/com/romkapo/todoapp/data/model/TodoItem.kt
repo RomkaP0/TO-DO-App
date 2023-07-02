@@ -15,6 +15,6 @@ data class TodoItem(
     var dateEdit: Long? = null,
     var isComplete: Boolean = false,
 ){
-    constructor() : this("-1", "", Importance.MEDIUM, 0L, 0L, 0L, false)
+    constructor() : this("-1", "", Importance.MEDIUM, 0L, null, null, false)
 
 }

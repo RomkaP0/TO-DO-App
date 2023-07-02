@@ -65,6 +65,8 @@ dependencies {
     implementation (libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.activity.ktx)
 
+    implementation(libs.androidx.swiperefreshlayout)
+
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)

@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.google.android.material.snackbar.Snackbar
 import com.romkapo.todoapp.R
-import com.romkapo.todoapp.TodoListAdapter
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.FragmentTodoListBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,6 +62,14 @@ class TodoListFragment : Fragment() {
                 viewModel.changeShow()
             }
         }
+        binding.swipeLayoutLit.setOnRefreshListener {
+            viewModel.refresh()
+        }
+
+        binding.logout.setOnClickListener {
+            viewModel.logOut()
+            findNavController().navigate(R.id.action_todoListFragment_to_authFragment)
+        }
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
@@ -86,11 +93,10 @@ class TodoListFragment : Fragment() {
     private fun provideObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.listTodoItem.collectLatest {
-                if (binding.showUncheckedCheckbox.isChecked){
+                if (binding.showUncheckedCheckbox.isChecked) {
                     rvAdapter.diffList.submitList(it)
-                }
-                else{
-                    rvAdapter.diffList.submitList(it.filter { item->!item.isComplete })
+                } else {
+                    rvAdapter.diffList.submitList(it.filter { item -> !item.isComplete })
                 }
             }
         }
@@ -100,6 +106,19 @@ class TodoListFragment : Fragment() {
                 binding.countCompleteTextView.text = getString(R.string.complete, it)
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.result.collectLatest { result ->
+                val text: String = if (result)
+                    "Update successful"
+                else
+                    "Update failure"
+                Snackbar.make(binding.swipeLayoutLit, text, Snackbar.LENGTH_SHORT).show()
+                viewModel.getAllList()
+                binding.swipeLayoutLit.isRefreshing = false
+            }
+        }
+
     }
 
     private fun swipeListener(recyclerView: RecyclerView) {
@@ -160,6 +179,7 @@ class TodoListFragment : Fragment() {
                 viewModel.addTodoItem(deletedCourse)
             }.show()
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
