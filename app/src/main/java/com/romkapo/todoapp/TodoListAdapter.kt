@@ -57,15 +57,10 @@ class TodoListAdapter(
                 isErrorShown = false
 
                 setOnClickListener {
-                    if (isChecked) {
-                        currentTodoItem.isComplete = true
-                        todoTextView.paint.isStrikeThruText = true
-                    } else {
-                        currentTodoItem.isComplete = false
-                        todoTextView.paint.isStrikeThruText = false
-                    }
-                    todoTextView.invalidate()
+                    currentTodoItem.isComplete = isChecked
                     checkboxClickListener(currentTodoItem)
+                    todoTextView.paint.isStrikeThruText = isChecked
+                    todoTextView.invalidate()
                 }
             }
 

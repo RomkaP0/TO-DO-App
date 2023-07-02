@@ -1,6 +1,7 @@
 package com.romkapo.todoapp.data.room
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -13,10 +14,7 @@ interface TodoDAO {
     fun getTodoListFlow(): Flow<List<TodoItem>>
 
     @Query("SELECT * FROM todoItems")
-    fun getTodoList():List<TodoItem>
-
-    @Query("SELECT * FROM todoItems WHERE isComplete=:state")
-    fun getUncheckedTodoListFlow(state: Boolean=false): Flow<List<TodoItem>>
+    fun getTodoList(): List<TodoItem>
 
     @Query("SELECT * FROM todoItems WHERE id = :id")
     fun getTodoItemById(id: String): TodoItem?
@@ -25,11 +23,11 @@ interface TodoDAO {
     fun insertTodoList(itemList: List<TodoItem>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTodoItem(todo: TodoItem)
+    fun upsertTodoItem(todo: TodoItem)
 
-    @Query("DELETE FROM todoItems WHERE id = :id")
-    fun deleteTodoItemById(id: String)
+    @Delete
+    fun deleteTodoItem(todo: TodoItem)
 
-    @Query("UPDATE todoItems SET isComplete = :isComplete, dateEdit = :dateEdit WHERE id = :id")
-    fun setTodoItemState(id: String, isComplete: Boolean, dateEdit:Long)
+    @Query("DELETE FROM todoItems")
+    fun dropTodoItems()
 }

@@ -55,6 +55,12 @@ class AuthFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.token?.let {
+            if (it != "") {
+                findNavController().navigate(R.id.action_authFragment_to_todoListFragment)
+            }
+        }
+
         binding.authYandexButton.setOnClickListener {
             launcher.launch(sdk)
         }

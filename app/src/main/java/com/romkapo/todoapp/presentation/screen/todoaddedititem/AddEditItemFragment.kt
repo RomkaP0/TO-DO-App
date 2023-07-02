@@ -11,10 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.snackbar.Snackbar
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.data.model.TodoItem
-import com.romkapo.todoapp.data.network.ConnectionObserver
 import com.romkapo.todoapp.databinding.FragmentAddEditItemBinding
 import com.romkapo.todoapp.utils.Convert
 import com.romkapo.todoapp.utils.Importance
@@ -29,7 +27,6 @@ class AddEditItemFragment : Fragment() {
     private val binding get() = _binding!!
     private val args by navArgs<AddEditItemFragmentArgs>()
     private val viewModel: AddEditItemViewModel by viewModels()
-    private var internetState = ConnectionObserver.Status.Unavailable
 
 
     override fun onCreateView(
@@ -129,12 +126,10 @@ class AddEditItemFragment : Fragment() {
 
             if (isNew) {
                 id = UUID.randomUUID().toString()
-                tryRemote({viewModel.createRemoteTask(this)}, R.string.no_internet_connection)
-                viewModel.addTodoItemAt(this)
+                viewModel.addTodoItem(this)
             } else {
                 dateEdit = System.currentTimeMillis()
-                tryRemote({viewModel.updateRemoteTask(this)}, R.string.no_internet_connection)
-                viewModel.updateTask(this)
+                viewModel.editTodoItem(this)
             }
         }
     }
@@ -167,8 +162,8 @@ class AddEditItemFragment : Fragment() {
 
             addEditDeleteButton.isEnabled = true
             addEditDeleteButton.setOnClickListener {
-                tryRemote({viewModel.deleteRemoteTask(viewModel.id)}, R.string.no_internet_connection)
-                viewModel.removeItemWithID(viewModel.id)
+                viewModel.removeTodoItem(todoItem
+                )
                 findNavController().navigateUp()
             }
 
@@ -178,23 +173,6 @@ class AddEditItemFragment : Fragment() {
         }
     }
 
-    private fun tryRemote(action: () -> Unit, stringID: Int) {
-        if (internetState == ConnectionObserver.Status.Available) {
-            action()
-        } else {
-            provideSnackBar(
-                stringID,
-            )
-        }
-    }
-
-    private fun provideSnackBar(stringID: Int) {
-        Snackbar.make(
-            binding.addEditLayout,
-            getString(stringID),
-            Snackbar.LENGTH_SHORT
-        ).show()
-    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

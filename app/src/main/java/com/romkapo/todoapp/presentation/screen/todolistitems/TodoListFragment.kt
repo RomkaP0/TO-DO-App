@@ -20,9 +20,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.TodoListAdapter
 import com.romkapo.todoapp.data.model.TodoItem
-import com.romkapo.todoapp.data.network.ConnectionObserver.Status
-import com.romkapo.todoapp.data.network.ConnectionObserver.Status.Available
-import com.romkapo.todoapp.data.network.Resource
 import com.romkapo.todoapp.databinding.FragmentTodoListBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -36,7 +33,6 @@ class TodoListFragment : Fragment() {
 
     private var _binding: FragmentTodoListBinding? = null
     private val binding get() = _binding!!
-    private var internetState = Status.Unavailable
 
 
     override fun onCreateView(
@@ -55,7 +51,7 @@ class TodoListFragment : Fragment() {
         swipeListener(binding.todoRecyclerView)
 
         provideObservers()
-        viewModel.loadData()
+        viewModel.getAllList()
 
         binding.navigateToAddFAB.setOnClickListener {
             findNavController().navigate(R.id.action_todoListFragment_to_addEditItem)
@@ -77,8 +73,7 @@ class TodoListFragment : Fragment() {
             },
             longClickListener = { todoItem, i -> showMenu(todoItem, i) },
             checkboxClickListener = { todoItem ->
-                viewModel.changeTaskDone(todoItem);
-                tryRemote({viewModel.updateRemoteTask(todoItem)}, R.string.no_internet_connection)
+                viewModel.editStateTodoItem(todoItem)
             })
 
         with(recyclerView) {
@@ -89,24 +84,18 @@ class TodoListFragment : Fragment() {
     }
 
     private fun provideObservers() {
-        lifecycleScope.launch {
-            viewModel.loadingState.collectLatest {
-                updateLoadingStatus(it)
-            }
-        }
-
-        lifecycleScope.launch {
-            viewModel.status.collectLatest {
-                updateNetworkState(it)
-            }
-        }
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.listTodoItem.collectLatest {
-                rvAdapter.diffList.submitList(it)
+                if (binding.showUncheckedCheckbox.isChecked){
+                    rvAdapter.diffList.submitList(it)
+                }
+                else{
+                    rvAdapter.diffList.submitList(it.filter { item->!item.isComplete })
+                }
             }
         }
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.countOfComplete.collectLatest {
                 binding.countCompleteTextView.text = getString(R.string.complete, it)
             }
@@ -158,11 +147,8 @@ class TodoListFragment : Fragment() {
     }
 
     private fun deleteItem(deletedCourse: TodoItem) {
-        viewModel.removeItemWithID(deletedCourse.id)
-        tryRemote(
-            { viewModel.deleteRemoteTask(deletedCourse.id) },
-            R.string.no_internet_connection
-        )
+        viewModel.removeTodoItem(deletedCourse)
+
         Snackbar.make(
             binding.todoListConstraintLayout,
             getString(R.string.deleted) + deletedCourse.text,
@@ -171,57 +157,8 @@ class TodoListFragment : Fragment() {
             .setAction(
                 getString(R.string.undo)
             ) {
-                viewModel.addTodoItemAt(deletedCourse)
-                tryRemote(
-                    { viewModel.createRemoteTask(deletedCourse) },
-                    R.string.no_internet_connection
-                )
+                viewModel.addTodoItem(deletedCourse)
             }.show()
-    }
-
-    private fun updateLoadingStatus(loadingState: Resource<Any>) {
-        if (loadingState is Resource.Error) {
-            provideSnackBar(
-                R.string.loading_failed_showing_local_data
-            )
-        }
-    }
-
-    private fun updateNetworkState(status: Status) {
-        when (status) {
-            Available -> {
-                if (internetState != status) {
-                    provideSnackBar(R.string.available_network_state)
-                    viewModel.loadRemoteList()
-                }
-            }
-
-            Status.Unavailable -> {
-                if (internetState != status) {
-                    provideSnackBar(R.string.unavailable_network_state)
-                    viewModel.loadRemoteList()
-                }
-            }
-        }
-        internetState = status
-    }
-
-    private fun provideSnackBar(stringID: Int) {
-        Snackbar.make(
-            binding.todoListConstraintLayout,
-            getString(stringID),
-            Snackbar.LENGTH_SHORT
-        ).show()
-    }
-
-    private fun tryRemote(action: () -> Unit, stringID: Int) {
-        if (internetState == Available) {
-            action()
-        } else {
-            provideSnackBar(
-                stringID,
-            )
-        }
     }
 
     override fun onDestroyView() {

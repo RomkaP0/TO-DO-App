@@ -9,7 +9,7 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val appSharedPreferences: AppSharedPreferences,
 ) : ViewModel() {
-
+    val token = appSharedPreferences.getCurrentToken()
     fun putToken(token: String) {
         appSharedPreferences.setCurrentToken(token)
     }

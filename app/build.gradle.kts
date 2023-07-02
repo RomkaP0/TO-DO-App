@@ -62,6 +62,8 @@ dependencies {
     implementation(libs.bundles.retrofit)
     implementation(libs.bundles.okhttp)
 
+    implementation (libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.activity.ktx)
 
     implementation(libs.core.ktx)
     implementation(libs.appcompat)

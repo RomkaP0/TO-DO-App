@@ -14,25 +14,11 @@ class UpdateLocalDataWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val repository: MainRepository
 ) : CoroutineWorker(context, workerParams) {
-    //    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-//        return@withContext when (mergeData()) {
-//            is Resource.Success<*> -> Result.success()
-//            else -> {
-//                Result.failure()
-//            }
-//        }
     override suspend fun doWork(): Result {
-        return try {
-            repository.getRemoteTasks()
+        return if (repository.updateTask()) {
             Result.success()
-        }
-        catch (e:Exception){
+        } else {
             Result.retry()
+        }
     }
-}
-
-
-//    private fun mergeData() = runBlocking {
-//        return@runBlocking repository.getRemoteTasks()
-//    }
 }
