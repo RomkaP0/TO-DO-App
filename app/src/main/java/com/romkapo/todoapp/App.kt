@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.core
+package com.romkapo.todoapp
 
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
