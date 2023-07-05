@@ -16,5 +16,6 @@ plugins {
     alias(libs.plugins.com.google.dagger.hilt.android) apply false
     alias(libs.plugins.parcelize) apply false
     alias(libs.plugins.navigation.safe.args) apply false
+    alias(libs.plugins.kotlin.serialize) apply false
 }
 true

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/spacing_m">
+
+    <TextView
+        android:id="@+id/AuthText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/auth"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/auth_button_laoyut"
+        android:layout_width="346dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <Button
+            android:id="@+id/auth_offline_button"
+            android:layout_width="298dp"
+            android:layout_height="44dp"
+            android:text="@string/auth_guest" />
+
+        <include
+            layout="@layout/choose_divider"
+            android:layout_width="270dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_xxl_2"
+            android:layout_marginVertical="@dimen/spacing_m" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/auth_yandex_button"
+            android:layout_width="298dp"
+            android:layout_height="44dp"
+            android:backgroundTint="@color/invert"
+            android:text="@string/auth_yandex"
+            app:icon="@drawable/yandex_logo"
+            app:iconTintMode="multiply" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

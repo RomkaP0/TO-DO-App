@@ -61,6 +61,19 @@
         app:layout_constraintTop_toBottomOf="@+id/todoListDate"
         app:drawableStartCompat="@drawable/edit_note_fill0_wght400_grad0_opsz20" />
 
+
+
+    <TextView
+        android:id="@+id/todoListCompleteDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="2dp"
+        android:textSize="14sp"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="@+id/todoTextView"
+        app:layout_constraintTop_toBottomOf="@+id/todoListModifyDate"
+        app:drawableStartCompat="@drawable/outline_done_all_24" />
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="@dimen/icon_size"
@@ -71,5 +84,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/support"
         android:contentDescription="@string/arrow_right" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
