@@ -4,13 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.romkapo.todoapp.data.network.ConnectionManagerObserver
 import com.romkapo.todoapp.data.network.map
-import com.romkapo.todoapp.data.repository.MainRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.romkapo.todoapp.domain.MainRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
 class MainViewModel @Inject constructor(
     networkStatusTracker: ConnectionManagerObserver,
     private val repository: MainRepository

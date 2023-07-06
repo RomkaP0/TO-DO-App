@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.data.model.network.AppSharedPreferences
-import com.romkapo.todoapp.data.repository.MainRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.romkapo.todoapp.domain.MainRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
@@ -18,7 +17,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
 class TodoItemListViewModel @Inject constructor(
     private val repository: MainRepository,
     private val appSharedPreferences: AppSharedPreferences

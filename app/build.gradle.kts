@@ -3,8 +3,6 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.com.google.dagger.hilt.android)
-    alias(libs.plugins.parcelize)
     alias(libs.plugins.navigation.safe.args)
     alias(libs.plugins.kotlin.serialize)
 }
@@ -52,13 +50,10 @@ android {
 }
 
 dependencies {
-
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.hilt.common)
-    kapt(libs.hilt.compiler)
-    kapt(libs.hilt.androidcompiler)
     kapt(libs.room.compiler)
-    implementation(libs.hilt.work)
+    kapt(libs.bundles.dagger.compiler)
+
+    implementation(libs.bundles.dagger)
     implementation(libs.bundles.retrofit)
     implementation(libs.bundles.okhttp)
 
@@ -66,6 +61,8 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
 
     implementation(libs.androidx.swiperefreshlayout)
+
+    implementation(libs.androidx.work.runtime.ktx)
 
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
@@ -76,7 +73,6 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.hilt)
     implementation (libs.authsdk)
 
 

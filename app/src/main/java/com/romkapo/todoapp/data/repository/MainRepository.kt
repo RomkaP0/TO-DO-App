@@ -12,23 +12,24 @@ import com.romkapo.todoapp.data.model.network.toNetworkItem
 import com.romkapo.todoapp.data.model.network.toTodoItem
 import com.romkapo.todoapp.data.network.TodoAPI
 import com.romkapo.todoapp.data.room.TodoDAO
+import com.romkapo.todoapp.domain.MainRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-class MainRepository @Inject constructor(
+class MainRepositoryImpl @Inject constructor(
     private val toDoItemDao: TodoDAO,
     private val todoAPI: TodoAPI,
     private val appSharedPreferences: AppSharedPreferences
-) {
+):MainRepository {
 
     private val deviceId = DeviceId().id
 
-    fun getTodoList(): Flow<List<TodoItem>> {
+    override fun getTodoList(): Flow<List<TodoItem>> {
         return toDoItemDao.getTodoListFlow()
     }
 
-    suspend fun mergeTodoItemList() {
+    override suspend fun mergeTodoItemList() {
         try {
             val convertedLocalTodoList = toDoItemDao.getTodoListFlow().first().map {
                 it.toNetworkItem(deviceId)
@@ -47,7 +48,7 @@ class MainRepository @Inject constructor(
         }
     }
 
-    suspend fun addTodoItem(todoItem: TodoItem) {
+    override suspend fun addTodoItem(todoItem: TodoItem) {
         try {
             toDoItemDao.upsertTodoItem(todoItem)
             val resultApi = todoAPI.addItem(
@@ -62,7 +63,7 @@ class MainRepository @Inject constructor(
         }
     }
 
-    suspend fun updateTodoItem(todoItem: TodoItem) {
+    override suspend fun updateTodoItem(todoItem: TodoItem) {
         try {
             toDoItemDao.upsertTodoItem(todoItem)
             val resultApi = todoAPI.updateItem(
@@ -82,7 +83,7 @@ class MainRepository @Inject constructor(
         }
     }
 
-    suspend fun deleteTodoItem(todoItem: TodoItem) {
+    override suspend fun deleteTodoItem(todoItem: TodoItem) {
         try {
             toDoItemDao.deleteTodoItem(todoItem)
             val resultApi = todoAPI.deleteItem(appSharedPreferences.getRevisionId(), todoItem.id)
@@ -94,12 +95,12 @@ class MainRepository @Inject constructor(
         }
     }
 
-    fun getTodoItem(id: String): TodoItem? {
+    override fun getTodoItem(id: String): TodoItem? {
         return toDoItemDao.getTodoItemById(id)
     }
 
 
-    private suspend fun updateRemoteTasks(mergedList: List<ApiTodoItem>): Resource<Any> {
+    override suspend fun updateRemoteTasks(mergedList: List<ApiTodoItem>): Resource<Any> {
         try {
             val response = todoAPI.updateList(
                 revision = appSharedPreferences.getRevisionId(),
@@ -123,7 +124,7 @@ class MainRepository @Inject constructor(
         return Resource.Error("Merge failed, continue offline.")
     }
 
-    suspend fun updateTask(): Boolean {
+    override suspend fun updateTask(): Boolean {
         try {
             val networkListResponse = todoAPI.getList()
 

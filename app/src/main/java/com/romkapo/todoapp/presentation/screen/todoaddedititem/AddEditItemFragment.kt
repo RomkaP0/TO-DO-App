@@ -16,12 +16,10 @@ import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.FragmentAddEditItemBinding
 import com.romkapo.todoapp.utils.Convert
 import com.romkapo.todoapp.utils.Importance
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.lang.reflect.InvocationTargetException
 import java.util.UUID
 
-@AndroidEntryPoint
 class AddEditItemFragment : Fragment() {
     private var _binding: FragmentAddEditItemBinding? = null
     private val binding get() = _binding!!

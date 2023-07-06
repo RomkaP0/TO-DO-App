@@ -7,13 +7,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
-import com.romkapo.todoapp.data.repository.MainRepository
 import com.romkapo.todoapp.databinding.ActivityMainBinding
-import dagger.hilt.android.AndroidEntryPoint
+import com.romkapo.todoapp.domain.MainRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private val viewModel: MainViewModel by viewModels()

@@ -14,9 +14,7 @@ import com.romkapo.todoapp.databinding.FragmentAuthBinding
 import com.yandex.authsdk.YandexAuthException
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class AuthFragment : Fragment() {
 
     private lateinit var launcher: ActivityResultLauncher<YandexAuthSdk>

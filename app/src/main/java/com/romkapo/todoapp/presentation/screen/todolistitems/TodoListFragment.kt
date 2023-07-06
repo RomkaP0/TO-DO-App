@@ -20,11 +20,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.FragmentTodoListBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class TodoListFragment : Fragment() {
 
     private val viewModel: TodoItemListViewModel by viewModels()
