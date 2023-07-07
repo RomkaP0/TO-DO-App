@@ -11,8 +11,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.core.components.main.MainActivityComponent
+import com.romkapo.todoapp.data.model.Resource
 import com.romkapo.todoapp.databinding.ActivityMainBinding
 import com.romkapo.todoapp.utils.ViewModelFactory
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,7 +29,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        mainComponent = (applicationContext as Application).appComponent.mainActivityComponentFactory().create()
+        mainComponent =
+            (applicationContext as Application).appComponent.mainActivityComponentFactory().create()
         mainComponent.inject(this)
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
         super.onCreate(savedInstanceState)
@@ -36,33 +39,36 @@ class MainActivity : AppCompatActivity() {
 
         initInternetMonitoring()
 
+        viewModel.listenStateRequest()
+
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (!isFirstOpen) {
-            viewModel.updateRepository()
-            Snackbar.make(binding.navHostFragment, "Update data from remote", Snackbar.LENGTH_SHORT)
-                .show()
-        }else{
-            isFirstOpen=false
-        }
-    }
-
     private fun initInternetMonitoring() {
         lifecycleScope.launch {
             viewModel.state.collect {
-            val text = when (it) {
-                MyState.Fetched -> {
+                if (it is MyState.Fetched) {
+                    showSnackBar(getString(R.string.available_network_state))
                     viewModel.updateRepository()
-                    getString(R.string.available_network_state)
+                } else {
+                    showSnackBar(getString(R.string.loading_failed_showing_local_data))
                 }
-                MyState.Error -> getString(R.string.no_internet_connection)
             }
-            Snackbar.make(binding.navHostFragment, text, Snackbar.LENGTH_SHORT).show()
+        }
+        lifecycleScope.launch {
+            viewModel.stateRequest.collectLatest {
+                if (it is Resource.Success){
+                    showSnackBar(getString(R.string.success_update))}
+                if (it is Resource.Error){
+                    showSnackBar(it.message)
+                }
+            }
         }
     }
-}}
+
+    private fun showSnackBar(text: String) {
+        Snackbar.make(binding.navHostFragment, text, Snackbar.LENGTH_SHORT).show()
+    }
+}

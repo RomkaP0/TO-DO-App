@@ -21,6 +21,8 @@ import com.romkapo.todoapp.data.room.TodoDAO
 import com.romkapo.todoapp.data.room.TodoOperationDAO
 import com.romkapo.todoapp.domain.MainRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -30,6 +32,9 @@ class MainRepositoryImpl @Inject constructor(
     private val todoAPI: TodoAPI,
     private val appSharedPreferences: AppSharedPreferences
 ) : MainRepository {
+
+    private val _stateRequest = MutableStateFlow<Resource>(Resource.Success(""))
+    override val stateRequest get() = _stateRequest.asStateFlow()
 
     private val deviceId = DeviceId().id
 
@@ -68,7 +73,6 @@ class MainRepositoryImpl @Inject constructor(
 
                 400 -> {
                     failurePush(syncItem, type)
-
                 }
 
                 404 -> {
@@ -117,7 +121,8 @@ class MainRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun updateRemoteTasks(mergedList: List<ApiTodoItem>): Resource<Any> {
+    override suspend fun updateRemoteTasks(mergedList: List<ApiTodoItem>): Resource {
+        _stateRequest.value = Resource.Loading("Loading")
         try {
             val response = todoAPI.updateList(
                 revision = appSharedPreferences.getRevisionId(),
@@ -129,7 +134,11 @@ class MainRepositoryImpl @Inject constructor(
                 if (responseBody != null) {
                     appSharedPreferences.putRevisionId(responseBody.revision)
                     todoOperationDAO.dropTodoItems()
-                    return Resource.Success(responseBody.list, "")
+
+                    _stateRequest.value = Resource.Success("")
+
+
+                    return Resource.Success("")
                 }
             } else {
                 response.errorBody()?.close()

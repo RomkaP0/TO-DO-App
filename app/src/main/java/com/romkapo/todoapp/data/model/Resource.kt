@@ -1,7 +1,7 @@
 package com.romkapo.todoapp.data.model
 
-sealed class Resource<out T> {
-    data class Success<out T>(val data: T, val message:String): Resource<T>()
-    data class Loading<out T>(val message:String): Resource<T>()
-    data class Error<T>(val message:String): Resource<T>()
+sealed class Resource {
+    data class Success(val message:String): Resource()
+    data class Loading(val message:String): Resource()
+    data class Error(val message:String): Resource()
 }

@@ -59,6 +59,8 @@ class TodoListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.swipeLayoutLit.isRefreshing = false
+
         setupRecyclerView(binding.todoRecyclerView)
         swipeListener(binding.todoRecyclerView)
 
@@ -112,6 +114,7 @@ class TodoListFragment : Fragment() {
                 } else {
                     rvAdapter.diffList.submitList(it.filter { item -> !item.isComplete })
                 }
+                binding.swipeLayoutLit.isRefreshing = false
             }
         }
 
@@ -120,19 +123,6 @@ class TodoListFragment : Fragment() {
                 binding.countCompleteTextView.text = getString(R.string.complete, it)
             }
         }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.result.collectLatest { result ->
-                val text: String = if (result)
-                    "Update successful"
-                else
-                    "Update failure"
-                Snackbar.make(binding.swipeLayoutLit, text, Snackbar.LENGTH_SHORT).show()
-//                viewModel.getAllList()
-                binding.swipeLayoutLit.isRefreshing = false
-            }
-        }
-
     }
 
     private fun swipeListener(recyclerView: RecyclerView) {
