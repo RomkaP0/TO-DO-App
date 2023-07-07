@@ -8,13 +8,16 @@ import com.romkapo.todoapp.data.model.network.ApiTodoItem
 import com.romkapo.todoapp.data.model.network.AppSharedPreferences
 import com.romkapo.todoapp.data.model.network.TodoItemListRequest
 import com.romkapo.todoapp.data.model.network.TodoItemRequest
+import com.romkapo.todoapp.data.model.network.TodoItemResponse
 import com.romkapo.todoapp.data.model.network.toNetworkItem
+import com.romkapo.todoapp.data.model.network.toOperationItem
 import com.romkapo.todoapp.data.model.network.toTodoItem
 import com.romkapo.todoapp.data.network.TodoAPI
 import com.romkapo.todoapp.data.room.TodoDAO
 import com.romkapo.todoapp.data.room.TodoOperationDAO
 import com.romkapo.todoapp.domain.MainRepository
 import kotlinx.coroutines.flow.Flow
+import retrofit2.Response
 import javax.inject.Inject
 
 class MainRepositoryImpl @Inject constructor(
@@ -30,55 +33,77 @@ class MainRepositoryImpl @Inject constructor(
         return toDoItemDao.getTodoListFlow()
     }
 
+    override fun getTodoItem(id: String): TodoItem? {
+        return toDoItemDao.getTodoItemById(id)
+    }
+
     override suspend fun addTodoItem(todoItem: TodoItem) {
+        safeCall(todoItem,"add")
+    }
+
+    override suspend fun updateTodoItem(todoItem: TodoItem) {
+        safeCall(todoItem,"edit")
+    }
+
+    override suspend fun deleteTodoItem(todoItem: TodoItem) {
+        safeCall(todoItem,"drop")
+    }
+
+    private suspend fun safeCall(
+        syncItem: TodoItem,
+        type:String,
+        ) {
         try {
-            toDoItemDao.upsertTodoItem(todoItem)
-            val resultApi = todoAPI.addItem(
-                appSharedPreferences.getRevisionId(),
-                TodoItemRequest("ok", todoItem.toNetworkItem(deviceId))
-            )
-            if (resultApi.isSuccessful) {
-                appSharedPreferences.putRevisionId(resultApi.body()?.revision!!)
+            val resultApi = when(type){
+                "add"-> addTodoItemSafe(syncItem)
+                "edit" -> updateTodoItemSafe(syncItem)
+                "drop" -> deleteTodoItemSafe(syncItem)
+                else->{deleteTodoItemSafe(syncItem)}
             }
+            when (resultApi.code()) {
+                in 200..300 ->  appSharedPreferences.putRevisionId(resultApi.body()!!.revision)
+
+                400->{ failurePush(syncItem, type)
+
+                }
+                404-> {failurePush(syncItem, type)}
+                in 500..600 ->{failurePush(syncItem, type)}
+            }
+
         } catch (exception: Exception) {
+            failurePush(syncItem, type)
             Log.i("addTodoItem", exception.message.toString())
         }
     }
 
-    override suspend fun updateTodoItem(todoItem: TodoItem) {
-        try {
-            toDoItemDao.upsertTodoItem(todoItem)
-            val resultApi = todoAPI.updateItem(
-                appSharedPreferences.getRevisionId(),
-                todoItem.id,
-                TodoItemRequest(
-                    "ok",
-                    todoItem.toNetworkItem(deviceId)
-                )
+    private suspend fun failurePush(syncItem: TodoItem, type: String){
+        todoOperationDAO.insertUnSyncOperation(syncItem.toOperationItem(type))
+        updateTask()
+    }
+
+    private suspend inline fun addTodoItemSafe(todoItem: TodoItem): Response<TodoItemResponse> {
+        toDoItemDao.upsertTodoItem(todoItem)
+        return todoAPI.addItem(
+            appSharedPreferences.getRevisionId(),
+            TodoItemRequest("ok", todoItem.toNetworkItem(deviceId))
+        )
+    }
+
+    private suspend fun updateTodoItemSafe(todoItem: TodoItem): Response<TodoItemResponse> {
+        toDoItemDao.upsertTodoItem(todoItem)
+        return todoAPI.updateItem(
+            appSharedPreferences.getRevisionId(),
+            todoItem.id,
+            TodoItemRequest(
+                "ok",
+                todoItem.toNetworkItem(deviceId)
             )
-
-            if (resultApi.isSuccessful) {
-                appSharedPreferences.putRevisionId(resultApi.body()?.revision!!)
-            }
-        } catch (exception: Exception) {
-            Log.i("updateTodoItem", exception.message.toString())
-        }
+        )
     }
 
-    override suspend fun deleteTodoItem(todoItem: TodoItem) {
-        try {
-            toDoItemDao.deleteTodoItem(todoItem)
-            val resultApi = todoAPI.deleteItem(appSharedPreferences.getRevisionId(), todoItem.id)
-            if (resultApi.isSuccessful) {
-                appSharedPreferences.putRevisionId(resultApi.body()?.revision!!)
-            }
-        } catch (exception: Exception) {
-            Log.i("deleteTodoItem", exception.message.toString())
-        }
-    }
-
-    override fun getTodoItem(id: String): TodoItem? {
-        return toDoItemDao.getTodoItemById(id)
+    private suspend fun deleteTodoItemSafe(todoItem: TodoItem): Response<TodoItemResponse> {
+        toDoItemDao.deleteTodoItem(todoItem)
+        return todoAPI.deleteItem(appSharedPreferences.getRevisionId(), todoItem.id)
     }
 
 
@@ -93,8 +118,8 @@ class MainRepositoryImpl @Inject constructor(
                 val responseBody = response.body()
                 if (responseBody != null) {
                     appSharedPreferences.putRevisionId(responseBody.revision)
-
-                    return Resource.Success(responseBody.list)
+                    todoOperationDAO.dropTodoItems()
+                    return Resource.Success(responseBody.list,"")
                 }
             } else {
                 response.errorBody()?.close()
@@ -140,6 +165,7 @@ class MainRepositoryImpl @Inject constructor(
 
                     appSharedPreferences.putRevisionId(revision)
                     val merged = mergedList.values.toList()
+                    toDoItemDao.dropTodoItems()
                     toDoItemDao.insertTodoList(merged)
                     updateRemoteTasks(merged.map { it.toNetworkItem(deviceId) })
                     return true

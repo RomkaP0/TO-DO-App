@@ -6,6 +6,7 @@ import androidx.room.Room
 import com.romkapo.todoapp.data.model.network.AppSharedPreferences
 import com.romkapo.todoapp.data.room.AppDatabase
 import com.romkapo.todoapp.data.room.TodoDAO
+import com.romkapo.todoapp.data.room.TodoOperationDAO
 import com.romkapo.todoapp.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -32,7 +33,7 @@ interface LocalModule {
         @Provides
         fun provideOperationDao(
             database: AppDatabase
-        ): TodoDAO = database.getTodoDAO()
+        ): TodoOperationDAO = database.getOperationsDAO()
 
 
         @Provides
