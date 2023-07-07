@@ -1,36 +1,51 @@
 package com.romkapo.todoapp.presentation.screen.addedititem
 
+import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.romkapo.todoapp.R
+import com.romkapo.todoapp.appComponent
+import com.romkapo.todoapp.core.components.edit.AddEditFragmentComponent
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.FragmentAddEditItemBinding
 import com.romkapo.todoapp.utils.Convert
 import com.romkapo.todoapp.utils.Importance
+import com.romkapo.todoapp.utils.ViewModelFactory
 import kotlinx.coroutines.launch
 import java.lang.reflect.InvocationTargetException
 import java.util.UUID
+import javax.inject.Inject
 
 class AddEditItemFragment : Fragment() {
     private var _binding: FragmentAddEditItemBinding? = null
     private val binding get() = _binding!!
     private val args by navArgs<AddEditItemFragmentArgs>()
-    private val viewModel: AddEditItemViewModel by viewModels()
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private lateinit var addEditFragmentComponent: AddEditFragmentComponent
+    private lateinit var viewModel: AddEditItemViewModel
 
-
+    override fun onAttach(context: Context) {
+        addEditFragmentComponent = (requireContext().applicationContext as Application).appComponent.addEditFragmentComponentFactory().create()
+        addEditFragmentComponent.inject(this)
+        super.onAttach(context)
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        viewModel = ViewModelProvider(this, viewModelFactory)[AddEditItemViewModel::class.java]
         _binding = FragmentAddEditItemBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -64,7 +79,7 @@ class AddEditItemFragment : Fragment() {
             }
             addeditButtonSave.setOnClickListener {
                 tryAddTodoItem(isNew)
-                findNavController().navigateUp()
+//                findNavController().navigateUp()
             }
 
             completeBeforeSwith.setOnCheckedChangeListener { _, isChecked ->

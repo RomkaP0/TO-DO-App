@@ -9,12 +9,12 @@ import com.romkapo.todoapp.utils.parseToNetwork
 data class ApiTodoItem(
     @SerializedName("id") val id: String,
     @SerializedName("text") val text: String,
-    @SerializedName("deadline") val deadline: Long?,
+    @SerializedName("deadline") val deadline: Long,
     @SerializedName("done") val done: Boolean,
-    @SerializedName("color") val color: String?,
+    @SerializedName("color") val color: String,
     @SerializedName("importance") val importance: String,
     @SerializedName("created_at") val createdAt: Long,
-    @SerializedName("changed_at") val changedAt: Long?,
+    @SerializedName("changed_at") val changedAt: Long,
     @SerializedName("last_updated_by") val lastUpdatedBy: String,
 )
 
@@ -23,11 +23,11 @@ fun TodoItem.toNetworkItem(deviceID:String): ApiTodoItem {
         id = id,
         text = text,
         importance = importance.parseToNetwork(),
-        deadline = dateComplete,
+        deadline = if (dateComplete==null) 0L else dateComplete!!,
         done = isComplete,
         color = "",
         createdAt = dateCreate,
-        changedAt = dateEdit,
+        changedAt = if (dateEdit==null) 0L else dateEdit!!,
         lastUpdatedBy = deviceID,
     )
 }
@@ -37,9 +37,9 @@ fun ApiTodoItem.toTodoItem(): TodoItem {
         id = id,
         text = text,
         importance = parseImportanceToLocal(importance),
-        dateComplete = deadline,
+        dateComplete = if (deadline ==0L) null else deadline,
         isComplete = done,
         dateCreate = createdAt,
-        dateEdit = changedAt
+        dateEdit = if (changedAt ==0L) null else changedAt,
     )
 }

@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.Flow
 interface MainRepository {
     fun getTodoList(): Flow<List<TodoItem>>
 
-    suspend fun mergeTodoItemList()
-
     suspend fun addTodoItem(todoItem: TodoItem)
 
     suspend fun updateTodoItem(todoItem: TodoItem)

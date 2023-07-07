@@ -12,6 +12,7 @@ import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.core.components.main.MainActivityComponent
 import com.romkapo.todoapp.databinding.ActivityMainBinding
+import com.romkapo.todoapp.utils.ViewModelFactory
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     private var isFirstOpen = true
 
     @Inject
-    lateinit var viewModelFactory: MainViewModelFactory
+    lateinit var viewModelFactory: ViewModelFactory
     private lateinit var mainComponent: MainActivityComponent
     private lateinit var viewModel: MainViewModel
 

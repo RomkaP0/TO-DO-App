@@ -12,40 +12,22 @@ import com.romkapo.todoapp.data.model.network.toNetworkItem
 import com.romkapo.todoapp.data.model.network.toTodoItem
 import com.romkapo.todoapp.data.network.TodoAPI
 import com.romkapo.todoapp.data.room.TodoDAO
+import com.romkapo.todoapp.data.room.TodoOperationDAO
 import com.romkapo.todoapp.domain.MainRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class MainRepositoryImpl @Inject constructor(
     private val toDoItemDao: TodoDAO,
+    private val todoOperationDAO: TodoOperationDAO,
     private val todoAPI: TodoAPI,
     private val appSharedPreferences: AppSharedPreferences
-):MainRepository {
+) : MainRepository {
 
     private val deviceId = DeviceId().id
 
     override fun getTodoList(): Flow<List<TodoItem>> {
         return toDoItemDao.getTodoListFlow()
-    }
-
-    override suspend fun mergeTodoItemList() {
-        try {
-            val convertedLocalTodoList = toDoItemDao.getTodoListFlow().first().map {
-                it.toNetworkItem(deviceId)
-            }
-
-            val resultApi =
-                todoAPI.updateList(
-                    appSharedPreferences.getRevisionId(),
-                    TodoItemListRequest("ok", convertedLocalTodoList)
-                )
-            if (resultApi.isSuccessful) {
-                appSharedPreferences.putRevisionId(resultApi.body()?.revision!!)
-            }
-        } catch (exception: Exception) {
-            Log.i("mergeTodoItemList", exception.message.toString())
-        }
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {
@@ -132,38 +114,41 @@ class MainRepositoryImpl @Inject constructor(
                 val body = networkListResponse.body()
                 if (body != null) {
                     val revision = body.revision
-                    val networkList = body.list
-                    val currentList = toDoItemDao.getTodoList().map {
-                        it.toNetworkItem(deviceId)
-                    }
-                    val mergedList = HashMap<String, ApiTodoItem>()
+                    val networkList = body.list.map { it.toTodoItem() }
+                    val unSyncOperationsList = todoOperationDAO.getUnSyncTodoList()
+                    val mergedList = HashMap<String, TodoItem>()
 
-                    for (item in currentList) {
+                    for (item in networkList) {
                         mergedList[item.id] = item
                     }
-                    for (item in networkList) {
-                        if (mergedList.containsKey(item.id)) {
-                            val item1 = mergedList[item.id]
-                            item1!!.changedAt?.let {
-                                if (item1.changedAt!! < item.changedAt!!) {
-                                    mergedList[item.id] = item
+                    for (operation in unSyncOperationsList) {
+                        val localItemId = operation.id
+                        when (operation.type) {
+                            "add" -> mergedList[localItemId] =
+                                toDoItemDao.getTodoItemById(localItemId)!!
+
+                            "edit" -> mergedList[localItemId]?.let { netItem ->
+                                if (!(netItem.dateEdit != null && netItem.dateEdit!! >= operation.timestamp)) {
+                                    mergedList[localItemId] =
+                                        toDoItemDao.getTodoItemById(localItemId)!!
                                 }
                             }
-                        } else if (revision != appSharedPreferences.getRevisionId()) {
-                            mergedList[item.id] = item
+
+                            "drop" -> mergedList.remove(localItemId)
                         }
                     }
+
                     appSharedPreferences.putRevisionId(revision)
                     val merged = mergedList.values.toList()
-                    toDoItemDao.insertTodoList(merged.map { it.toTodoItem() })
-                    updateRemoteTasks(merged)
+                    toDoItemDao.insertTodoList(merged)
+                    updateRemoteTasks(merged.map { it.toNetworkItem(deviceId) })
                     return true
                 }
             } else {
                 networkListResponse.errorBody()?.close()
                 return false
-            }
 
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             return false

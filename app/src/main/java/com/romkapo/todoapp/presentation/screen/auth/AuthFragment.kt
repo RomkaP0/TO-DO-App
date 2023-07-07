@@ -15,6 +15,7 @@ import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.core.components.auth.AuthFragmentComponent
 import com.romkapo.todoapp.databinding.FragmentAuthBinding
+import com.romkapo.todoapp.utils.ViewModelFactory
 import com.yandex.authsdk.YandexAuthException
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
@@ -29,7 +30,7 @@ class AuthFragment : Fragment() {
     private val binding get() = _binding!!
 
     @Inject
-    lateinit var viewModelFactory: AuthViewModelFactory
+    lateinit var viewModelFactory: ViewModelFactory
     private lateinit var authFragmentComponent: AuthFragmentComponent
     private lateinit var viewModel: AuthViewModel
 

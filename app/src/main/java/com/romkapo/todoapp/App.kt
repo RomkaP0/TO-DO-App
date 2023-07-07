@@ -2,6 +2,7 @@ package com.romkapo.todoapp
 
 import android.app.Application
 import android.content.Context
+import androidx.work.Configuration
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
@@ -49,6 +50,11 @@ class App : Application() {
             TimeUnit.HOURS
         ).setConstraints(constraints).build()
 
+        val configuration = Configuration.Builder()
+            .setWorkerFactory(serviceFactory)
+            .build()
+
+        WorkManager.initialize(this,configuration)
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             UPDATE_LOCAL_WORKER_NAME,
             ExistingPeriodicWorkPolicy.KEEP,

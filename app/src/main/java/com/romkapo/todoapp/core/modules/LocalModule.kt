@@ -25,9 +25,15 @@ interface LocalModule {
         }
 
         @Provides
-        fun provideDBDao(
+        fun provideItemDao(
             database: AppDatabase
         ): TodoDAO = database.getTodoDAO()
+
+        @Provides
+        fun provideOperationDao(
+            database: AppDatabase
+        ): TodoDAO = database.getTodoDAO()
+
 
         @Provides
         fun provideSharedPreferences(context: Context): SharedPreferences =

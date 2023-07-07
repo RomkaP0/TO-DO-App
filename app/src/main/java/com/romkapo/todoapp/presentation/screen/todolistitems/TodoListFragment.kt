@@ -24,6 +24,7 @@ import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.core.components.list.TodoListItemFragmentComponent
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.FragmentTodoListBinding
+import com.romkapo.todoapp.utils.ViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,13 +36,13 @@ class TodoListFragment : Fragment() {
     private var _binding: FragmentTodoListBinding? = null
     private val binding get() = _binding!!
     @Inject
-    lateinit var viewModelFactory: TodoListViewModelFactory
-    private lateinit var authFragmentComponent: TodoListItemFragmentComponent
+    lateinit var viewModelFactory: ViewModelFactory
+    private lateinit var todoFragmentComponent: TodoListItemFragmentComponent
     private lateinit var viewModel: TodoItemListViewModel
 
     override fun onAttach(context: Context) {
-        authFragmentComponent = (requireContext().applicationContext as Application).appComponent.todoItemListFragmentComponentFactory().create()
-        authFragmentComponent.inject(this)
+        todoFragmentComponent = (requireContext().applicationContext as Application).appComponent.todoItemListFragmentComponentFactory().create()
+        todoFragmentComponent.inject(this)
         super.onAttach(context)
     }
     override fun onCreateView(
