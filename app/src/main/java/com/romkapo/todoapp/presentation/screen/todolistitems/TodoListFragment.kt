@@ -1,5 +1,7 @@
 package com.romkapo.todoapp.presentation.screen.todolistitems
 
+import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -8,7 +10,7 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -18,24 +20,37 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.google.android.material.snackbar.Snackbar
 import com.romkapo.todoapp.R
+import com.romkapo.todoapp.appComponent
+import com.romkapo.todoapp.core.components.list.TodoListItemFragmentComponent
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.FragmentTodoListBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class TodoListFragment : Fragment() {
 
-    private val viewModel: TodoItemListViewModel by viewModels()
     lateinit var rvAdapter: TodoListAdapter
 
     private var _binding: FragmentTodoListBinding? = null
     private val binding get() = _binding!!
+    @Inject
+    lateinit var viewModelFactory: TodoListViewModelFactory
+    private lateinit var authFragmentComponent: TodoListItemFragmentComponent
+    private lateinit var viewModel: TodoItemListViewModel
 
-
+    override fun onAttach(context: Context) {
+        authFragmentComponent = (requireContext().applicationContext as Application).appComponent.todoItemListFragmentComponentFactory().create()
+        authFragmentComponent.inject(this)
+        super.onAttach(context)
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        viewModel = ViewModelProvider(this, viewModelFactory)[TodoItemListViewModel::class.java]
+
         _binding = FragmentTodoListBinding.inflate(inflater, container, false)
 
         return binding.root
@@ -43,12 +58,12 @@ class TodoListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView(binding.todoRecyclerView)
         swipeListener(binding.todoRecyclerView)
 
         provideObservers()
-        viewModel.getAllList()
+
+        viewModel.refresh()
 
         binding.navigateToAddFAB.setOnClickListener {
             findNavController().navigate(R.id.action_todoListFragment_to_addEditItem)
@@ -112,7 +127,7 @@ class TodoListFragment : Fragment() {
                 else
                     "Update failure"
                 Snackbar.make(binding.swipeLayoutLit, text, Snackbar.LENGTH_SHORT).show()
-                viewModel.getAllList()
+//                viewModel.getAllList()
                 binding.swipeLayoutLit.isRefreshing = false
             }
         }

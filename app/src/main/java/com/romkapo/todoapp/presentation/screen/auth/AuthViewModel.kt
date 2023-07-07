@@ -2,9 +2,8 @@ package com.romkapo.todoapp.presentation.screen.auth
 
 import androidx.lifecycle.ViewModel
 import com.romkapo.todoapp.data.model.network.AppSharedPreferences
-import javax.inject.Inject
 
-class AuthViewModel @Inject constructor(
+class AuthViewModel (
     private val appSharedPreferences: AppSharedPreferences,
 ) : ViewModel() {
     val token = appSharedPreferences.getCurrentToken()

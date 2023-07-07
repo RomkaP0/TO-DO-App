@@ -1,27 +1,34 @@
-package com.romkapo.todoapp
+package com.romkapo.todoapp.presentation.screen.main
 
+import android.app.Application
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
+import com.romkapo.todoapp.R
+import com.romkapo.todoapp.appComponent
+import com.romkapo.todoapp.core.components.main.MainActivityComponent
 import com.romkapo.todoapp.databinding.ActivityMainBinding
-import com.romkapo.todoapp.domain.MainRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
-    private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
     private var isFirstOpen = true
 
     @Inject
-    lateinit var repository: MainRepository
+    lateinit var viewModelFactory: MainViewModelFactory
+    private lateinit var mainComponent: MainActivityComponent
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        mainComponent = (applicationContext as Application).appComponent.mainActivityComponentFactory().create()
+        mainComponent.inject(this)
+        viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

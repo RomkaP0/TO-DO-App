@@ -22,7 +22,9 @@ class TodoItemListViewModel @Inject constructor(
     private val appSharedPreferences: AppSharedPreferences
 ) :
     ViewModel() {
-    private var job: Job? = null
+    private var getDataJob: Job? = null
+    private var updateDataJob: Job? = null
+
 
     private val _listTodoItem = MutableSharedFlow<List<TodoItem>>()
     val listTodoItem: SharedFlow<List<TodoItem>> get() = _listTodoItem.asSharedFlow()
@@ -37,8 +39,8 @@ class TodoItemListViewModel @Inject constructor(
     }
 
     fun getAllList() {
-        job?.cancel()
-        job = viewModelScope.launch(Dispatchers.IO) {
+        getDataJob?.cancel()
+        getDataJob = viewModelScope.launch(Dispatchers.IO) {
             _listTodoItem.emitAll(repository.getTodoList())
         }
     }
@@ -64,9 +66,10 @@ class TodoItemListViewModel @Inject constructor(
     }
 
     fun refresh() {
-        job?.cancel()
-        job =  viewModelScope.async(Dispatchers.IO) {
+        updateDataJob?.cancel()
+        updateDataJob =  viewModelScope.async(Dispatchers.IO) {
             async {_result.emit(repository.updateTask())}.await()
+            getAllList()
         }
     }
 
@@ -75,7 +78,7 @@ class TodoItemListViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        job?.cancel()
+        getDataJob?.cancel()
         super.onCleared()
     }
 }

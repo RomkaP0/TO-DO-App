@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="@dimen/spacing_m"
-    tools:context=".presentation.screen.todoaddedititem.AddEditItemFragment">
+    tools:context=".presentation.screen.addedititem.AddEditItemFragment">
 
     <LinearLayout
         android:id="@+id/topLinearLayout"

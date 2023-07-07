@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.presentation.screen.todoaddedititem
+package com.romkapo.todoapp.presentation.screen.addedititem
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,9 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class AddEditItemViewModel @Inject constructor(private val repository: MainRepository) :
+class AddEditItemViewModel (private val repository: MainRepository) :
     ViewModel() {
     var completeTimeStamp = System.currentTimeMillis()
     var id = ""

@@ -1,5 +1,7 @@
 package com.romkapo.todoapp.presentation.screen.auth
 
+import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,28 +9,42 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.romkapo.todoapp.R
+import com.romkapo.todoapp.appComponent
+import com.romkapo.todoapp.core.components.auth.AuthFragmentComponent
 import com.romkapo.todoapp.databinding.FragmentAuthBinding
 import com.yandex.authsdk.YandexAuthException
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
+import javax.inject.Inject
 
 class AuthFragment : Fragment() {
 
     private lateinit var launcher: ActivityResultLauncher<YandexAuthSdk>
     private lateinit var sdk: YandexAuthSdk
 
-    private val viewModel: AuthViewModel by viewModels()
-
     private var _binding: FragmentAuthBinding? = null
     private val binding get() = _binding!!
 
+    @Inject
+    lateinit var viewModelFactory: AuthViewModelFactory
+    private lateinit var authFragmentComponent: AuthFragmentComponent
+    private lateinit var viewModel: AuthViewModel
+
+    override fun onAttach(context: Context) {
+        authFragmentComponent = (requireContext().applicationContext as Application).appComponent.authFragmentComponentFactory().create()
+        authFragmentComponent.inject(this)
+        super.onAttach(context)
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+        viewModel = ViewModelProvider(this, viewModelFactory)[AuthViewModel::class.java]
+
 
         sdk = YandexAuthSdk(requireContext(), YandexAuthOptions(requireContext()))
 

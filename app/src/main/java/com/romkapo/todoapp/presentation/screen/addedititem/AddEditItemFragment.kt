@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.presentation.screen.todoaddedititem
+package com.romkapo.todoapp.presentation.screen.addedititem
 
 import android.os.Bundle
 import android.util.Log

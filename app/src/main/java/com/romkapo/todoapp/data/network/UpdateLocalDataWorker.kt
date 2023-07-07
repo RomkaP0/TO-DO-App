@@ -5,6 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.romkapo.todoapp.domain.MainRepository
 import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
 //@HiltWorker
@@ -19,5 +20,9 @@ class UpdateLocalDataWorker @AssistedInject constructor(
         } else {
             Result.retry()
         }
+    }
+    @AssistedFactory
+    interface Factory {
+        fun create(appContext: Context, params: WorkerParameters): UpdateLocalDataWorker
     }
 }
