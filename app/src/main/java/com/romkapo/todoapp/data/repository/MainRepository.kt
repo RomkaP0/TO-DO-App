@@ -4,6 +4,10 @@ import android.util.Log
 import com.romkapo.todoapp.core.DeviceId
 import com.romkapo.todoapp.data.model.Resource
 import com.romkapo.todoapp.data.model.TodoItem
+import com.romkapo.todoapp.data.model.UnSyncAction
+import com.romkapo.todoapp.data.model.UnSyncAction.ADD
+import com.romkapo.todoapp.data.model.UnSyncAction.DELETE
+import com.romkapo.todoapp.data.model.UnSyncAction.EDIT
 import com.romkapo.todoapp.data.model.network.ApiTodoItem
 import com.romkapo.todoapp.data.model.network.AppSharedPreferences
 import com.romkapo.todoapp.data.model.network.TodoItemListRequest
@@ -38,36 +42,42 @@ class MainRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {
-        safeCall(todoItem,"add")
+        safeCall(todoItem, ADD)
     }
 
     override suspend fun updateTodoItem(todoItem: TodoItem) {
-        safeCall(todoItem,"edit")
+        safeCall(todoItem, EDIT)
     }
 
     override suspend fun deleteTodoItem(todoItem: TodoItem) {
-        safeCall(todoItem,"drop")
+        safeCall(todoItem, DELETE)
     }
 
     private suspend fun safeCall(
         syncItem: TodoItem,
-        type:String,
-        ) {
+        type: UnSyncAction
+    ) {
         try {
-            val resultApi = when(type){
-                "add"-> addTodoItemSafe(syncItem)
-                "edit" -> updateTodoItemSafe(syncItem)
-                "drop" -> deleteTodoItemSafe(syncItem)
-                else->{deleteTodoItemSafe(syncItem)}
+            val resultApi = when (type) {
+                ADD-> addTodoItemSafe(syncItem)
+                EDIT -> updateTodoItemSafe(syncItem)
+                DELETE -> deleteTodoItemSafe(syncItem)
             }
             when (resultApi.code()) {
-                in 200..300 ->  appSharedPreferences.putRevisionId(resultApi.body()!!.revision)
+                in 200..300 -> appSharedPreferences.putRevisionId(resultApi.body()!!.revision)
 
-                400->{ failurePush(syncItem, type)
+                400 -> {
+                    failurePush(syncItem, type)
 
                 }
-                404-> {failurePush(syncItem, type)}
-                in 500..600 ->{failurePush(syncItem, type)}
+
+                404 -> {
+                    failurePush(syncItem, type)
+                }
+
+                in 500..600 -> {
+                    failurePush(syncItem, type)
+                }
             }
 
         } catch (exception: Exception) {
@@ -76,8 +86,8 @@ class MainRepositoryImpl @Inject constructor(
         }
     }
 
-    private suspend fun failurePush(syncItem: TodoItem, type: String){
-        todoOperationDAO.insertUnSyncOperation(syncItem.toOperationItem(type))
+    private suspend fun failurePush(syncItem: TodoItem, type: UnSyncAction) {
+        todoOperationDAO.insertUnSyncOperation(syncItem.toOperationItem(type.label))
         updateTask()
     }
 
@@ -119,7 +129,7 @@ class MainRepositoryImpl @Inject constructor(
                 if (responseBody != null) {
                     appSharedPreferences.putRevisionId(responseBody.revision)
                     todoOperationDAO.dropTodoItems()
-                    return Resource.Success(responseBody.list,"")
+                    return Resource.Success(responseBody.list, "")
                 }
             } else {
                 response.errorBody()?.close()
