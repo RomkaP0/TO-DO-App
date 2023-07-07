@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.navigation.safe.args)
     alias(libs.plugins.kotlin.serialize)
+    alias(libs.plugins.ktlint)
 }
 
 android {
@@ -24,13 +25,12 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-
     buildTypes {
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    //noinspection KaptUsageInsteadOfKsp
     kapt(libs.room.compiler)
     kapt(libs.bundles.dagger.compiler)
 
@@ -57,7 +58,7 @@ dependencies {
     implementation(libs.bundles.retrofit)
     implementation(libs.bundles.okhttp)
 
-    implementation (libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.activity.ktx)
 
     implementation(libs.androidx.swiperefreshlayout)
@@ -73,14 +74,13 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation (libs.authsdk)
-
+    implementation(libs.authsdk)
 
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
-kapt{
+kapt {
     correctErrorTypes = true
 }

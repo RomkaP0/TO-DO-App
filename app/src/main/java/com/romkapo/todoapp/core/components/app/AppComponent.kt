@@ -20,7 +20,7 @@ interface AppComponent {
     fun addEditFragmentComponentFactory(): AddEditFragmentComponent.Factory
     fun authFragmentComponentFactory(): AuthFragmentComponent.Factory
     fun todoItemListFragmentComponentFactory(): TodoListItemFragmentComponent.Factory
-    fun mainActivityComponentFactory():MainActivityComponent.Factory
+    fun mainActivityComponentFactory(): MainActivityComponent.Factory
     fun inject(application: App)
 
     @Component.Builder

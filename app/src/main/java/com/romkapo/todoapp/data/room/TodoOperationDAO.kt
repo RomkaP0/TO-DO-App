@@ -16,7 +16,7 @@ interface TodoOperationDAO {
     fun insertUnSyncOperation(unSyncTodoItem: UnSyncTodoItem)
 
     @Query("DELETE FROM unsyncoperations WHERE id = :id")
-    fun deleteOperationWithId(id:String)
+    fun deleteOperationWithId(id: String)
 
     @Query("DELETE FROM unsyncoperations")
     fun dropTodoItems()

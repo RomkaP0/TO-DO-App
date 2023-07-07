@@ -10,7 +10,7 @@ data class UnSyncTodoItem(
     var timestamp: Long,
     var type: String,
     @PrimaryKey(autoGenerate = true)
-    var primaryKey: Int = 0
+    var primaryKey: Int = 0,
 )
 fun TodoItem.toOperationItem(type: String): UnSyncTodoItem {
     return UnSyncTodoItem(id, System.currentTimeMillis(), type)

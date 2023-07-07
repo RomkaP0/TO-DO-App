@@ -3,7 +3,6 @@ package com.romkapo.todoapp.core.components.auth
 import com.romkapo.todoapp.presentation.screen.auth.AuthFragment
 import dagger.Subcomponent
 
-
 @Subcomponent(modules = [AuthFragmentModule::class])
 interface AuthFragmentComponent {
 
@@ -12,5 +11,4 @@ interface AuthFragmentComponent {
         fun create(): AuthFragmentComponent
     }
     fun inject(authFragment: AuthFragment)
-
 }

@@ -18,23 +18,19 @@ import javax.inject.Inject
 
 class TodoItemListViewModel @Inject constructor(
     private val repository: MainRepository,
-    private val appSharedPreferences: AppSharedPreferences
+    private val appSharedPreferences: AppSharedPreferences,
 ) :
     ViewModel() {
     private var getDataJob: Job? = null
     private var updateDataJob: Job? = null
-
 
     private val _listTodoItem = MutableSharedFlow<List<TodoItem>>()
     val listTodoItem: SharedFlow<List<TodoItem>> get() = _listTodoItem.asSharedFlow()
 
     val countOfComplete: Flow<Int> = _listTodoItem.map { it -> it.count { it.isComplete } }
     var showUnchecked = true
-    init {
-        getAllList()
-    }
 
-    private fun getAllList() {
+    fun getAllList() {
         getDataJob?.cancel()
         getDataJob = viewModelScope.launch(Dispatchers.IO) {
             _listTodoItem.emitAll(repository.getTodoList())
@@ -43,6 +39,7 @@ class TodoItemListViewModel @Inject constructor(
 
     fun changeShow() {
         showUnchecked = !showUnchecked
+        getAllList()
     }
 
     fun addTodoItem(todoItem: TodoItem) = viewModelScope.launch(Dispatchers.IO) {
@@ -60,7 +57,7 @@ class TodoItemListViewModel @Inject constructor(
     fun refresh() {
         updateDataJob?.cancel()
         updateDataJob = viewModelScope.launch(Dispatchers.IO) {
-            repository.updateTask()
+            repository.fetchTasks()
         }
     }
 

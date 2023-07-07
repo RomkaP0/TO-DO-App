@@ -11,5 +11,4 @@ interface MainActivityComponent {
         fun create(): MainActivityComponent
     }
     fun inject(mainActivity: MainActivity)
-
 }

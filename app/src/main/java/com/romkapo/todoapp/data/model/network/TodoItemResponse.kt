@@ -6,5 +6,4 @@ data class TodoItemResponse(
     @SerializedName("status") val status: String,
     @SerializedName("element") val element: ApiTodoItem,
     @SerializedName("revision") val revision: Int,
-
 )

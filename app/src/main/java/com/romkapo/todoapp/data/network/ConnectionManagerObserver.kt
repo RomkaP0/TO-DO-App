@@ -12,12 +12,12 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ConnectionManagerObserver @Inject constructor(
-    context: Context
+    context: Context,
 ) {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    val networkStatus = callbackFlow<NetworkStatus> {
+    val networkStatus = callbackFlow {
         val networkStatusCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onUnavailable() {
                 trySend(NetworkStatus.Unavailable)
@@ -52,7 +52,6 @@ inline fun <Result> Flow<NetworkStatus>.map(
         NetworkStatus.Available -> onAvailable()
     }
 }
-
 
 sealed class NetworkStatus {
     object Available : NetworkStatus()

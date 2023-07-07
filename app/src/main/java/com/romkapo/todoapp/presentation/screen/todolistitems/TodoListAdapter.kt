@@ -13,7 +13,6 @@ import com.romkapo.todoapp.databinding.TodoItemBinding
 import com.romkapo.todoapp.utils.Convert
 import com.romkapo.todoapp.utils.Importance
 
-
 class TodoListAdapter(
     private val shortClickListener: (TodoItem) -> Unit,
     private val longClickListener: (TodoItem, Int) -> Unit,
@@ -38,8 +37,8 @@ class TodoListAdapter(
             TodoItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
-                false
-            )
+                false,
+            ),
         )
     }
 
@@ -70,9 +69,9 @@ class TodoListAdapter(
             importanceIcon.visibility = View.VISIBLE
 
             with(todoListDate) {
-                    text = Convert.getDateTime(currentTodoItem.dateCreate)
-                    visibility = View.VISIBLE
-                }
+                text = Convert.getDateTime(currentTodoItem.dateCreate)
+                visibility = View.VISIBLE
+            }
 
             with(todoListModifyDate) {
                 if (currentTodoItem.dateEdit != null) {
@@ -96,8 +95,8 @@ class TodoListAdapter(
                     importanceIcon.setImageDrawable(
                         ContextCompat.getDrawable(
                             root.context,
-                            R.drawable.ic_arrow_down
-                        )
+                            R.drawable.ic_arrow_down,
+                        ),
                     )
                 }
 
@@ -105,8 +104,8 @@ class TodoListAdapter(
                     importanceIcon.setImageDrawable(
                         ContextCompat.getDrawable(
                             root.context,
-                            R.drawable.ic_warning
-                        )
+                            R.drawable.ic_warning,
+                        ),
                     )
                     isCheckedTodo.isErrorShown = true
                 }

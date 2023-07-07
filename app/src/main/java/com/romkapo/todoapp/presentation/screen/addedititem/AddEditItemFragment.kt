@@ -10,8 +10,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -47,10 +47,10 @@ class AddEditItemFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
-
         viewModel = ViewModelProvider(this, viewModelFactory)[AddEditItemViewModel::class.java]
         _binding = FragmentAddEditItemBinding.inflate(inflater, container, false)
 
@@ -69,7 +69,6 @@ class AddEditItemFragment : Fragment() {
 
             viewModel.loadTask(itemID)
 
-
             isNew = false
         } catch (e: InvocationTargetException) {
             Log.d("NavArgsException", "There aren`t args")
@@ -78,10 +77,10 @@ class AddEditItemFragment : Fragment() {
         with(binding) {
             addEditDateTextView.text = Convert.getDateTime(viewModel.completeTimeStamp)
 
-            addeditButtonClose.setOnClickListener {
+            addEditButtonClose.setOnClickListener {
                 findNavController().navigateUp()
             }
-            addeditButtonSave.setOnClickListener {
+            addEditButtonSave.setOnClickListener {
                 tryAddTodoItem(isNew)
                 findNavController().navigateUp()
             }
@@ -104,11 +103,10 @@ class AddEditItemFragment : Fragment() {
 
     private fun provideObservers() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.currentItemFlow.collect {
+            viewModel.currentItemFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect {
                     insertDataFromArgs(it)
                 }
-            }
         }
     }
 
@@ -186,15 +184,15 @@ class AddEditItemFragment : Fragment() {
                 completeBeforeSwith.isChecked = true
                 viewModel.completeTimeStamp = it
                 binding.addEditDateTextView.apply {
-                    text = viewModel.completeTimeStamp.toString()
+                    text = Convert.getDateTime(viewModel.completeTimeStamp).toString()
                     visibility = View.VISIBLE
                 }
             }
 
-            addEditDeleteButton.isEnabled = true
-            addEditDeleteButton.setOnClickListener {
+            addEditButtonDelete.isEnabled = true
+            addEditButtonDelete.setOnClickListener {
                 viewModel.removeTodoItem(
-                    todoItem
+                    todoItem,
                 )
                 findNavController().navigateUp()
             }

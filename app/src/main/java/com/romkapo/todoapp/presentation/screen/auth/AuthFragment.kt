@@ -40,12 +40,11 @@ class AuthFragment : Fragment() {
         super.onAttach(context)
     }
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
-
         viewModel = ViewModelProvider(this, viewModelFactory)[AuthViewModel::class.java]
-
 
         sdk = YandexAuthSdk(requireContext(), YandexAuthOptions(requireContext()))
 
@@ -89,7 +88,7 @@ class AuthFragment : Fragment() {
         Toast.makeText(
             requireContext(),
             getText(R.string.failed_to_login),
-            Toast.LENGTH_LONG
+            Toast.LENGTH_LONG,
         ).show()
     }
 

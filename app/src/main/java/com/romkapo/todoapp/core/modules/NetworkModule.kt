@@ -23,7 +23,6 @@ interface NetworkModule {
             }
         }
 
-
         @Provides
         fun provideOkHttpClient(
             httpLoggingInterceptor: HttpLoggingInterceptor,
@@ -39,7 +38,6 @@ interface NetworkModule {
                 .build()
         }
 
-
         @Provides
         fun toDoApiService(
             okHttpClient: OkHttpClient,
@@ -51,7 +49,6 @@ interface NetworkModule {
                 .build()
                 .create(TodoAPI::class.java)
         }
-
 
         @Provides
         fun provideConnectionManager(context: Context): ConnectionManagerObserver {

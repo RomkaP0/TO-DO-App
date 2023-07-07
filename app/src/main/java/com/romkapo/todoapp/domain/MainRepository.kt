@@ -17,9 +17,7 @@ interface MainRepository {
     suspend fun deleteTodoItem(todoItem: TodoItem)
     fun getTodoItem(id: String): TodoItem?
 
-
     suspend fun updateRemoteTasks(mergedList: List<ApiTodoItem>): Resource
 
-    suspend fun updateTask(): Resource
-
+    suspend fun fetchTasks(): Resource
 }

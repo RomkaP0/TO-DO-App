@@ -24,7 +24,5 @@ class AppSharedPreferences @Inject constructor(
         editor.apply()
     }
 
-    fun getRevisionId(): Int {
-        return sharedPreferences.getInt(REVISION_KEY, 0)
-    }
+    fun getRevisionId(): Int = sharedPreferences.getInt(REVISION_KEY, 0)
 }

@@ -17,10 +17,12 @@ import kotlinx.coroutines.SupervisorJob
 
 @Module(
     includes = [LocalModule::class, NetworkModule::class],
-    subcomponents = [AuthFragmentComponent::class,
+    subcomponents = [
+        AuthFragmentComponent::class,
         TodoListItemFragmentComponent::class,
         AddEditFragmentComponent::class,
-        MainActivityComponent::class]
+        MainActivityComponent::class,
+    ],
 )
 interface AppModule {
 
@@ -28,7 +30,7 @@ interface AppModule {
     @AppScope
     fun provideRepository(impl: MainRepositoryImpl): MainRepository
 
-    companion object{
+    companion object {
         @Provides
         @AppScope
         fun provideScope(context: Context) = CoroutineScope(SupervisorJob())

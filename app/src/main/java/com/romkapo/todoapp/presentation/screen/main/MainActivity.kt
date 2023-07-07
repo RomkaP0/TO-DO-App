@@ -2,14 +2,14 @@ package com.romkapo.todoapp.presentation.screen.main
 
 import android.app.Application
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import com.google.android.material.snackbar.Snackbar
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.core.components.main.MainActivityComponent
@@ -50,17 +50,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun initInternetMonitoring() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-
-                viewModel.state.collect {
-                    if (it is Success) {
-                        showSnackBar(getString(R.string.available_network_state))
-                        viewModel.updateRepository()
-                    } else {
-                        showSnackBar(getString(R.string.loading_failed_showing_local_data))
-                    }
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
+                if (it is Success) {
+                    showSnackBar(getString(R.string.available_network_state))
+                    viewModel.updateRepository()
+                } else {
+                    showSnackBar(getString(R.string.loading_failed_showing_local_data))
                 }
-                viewModel.stateRequest.collectLatest {
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.stateRequest.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collectLatest {
                     if (it is Success) {
                         showSnackBar(getString(R.string.success_update))
                     }
@@ -68,11 +69,10 @@ class MainActivity : AppCompatActivity() {
                         showSnackBar(it.message)
                     }
                 }
-            }
         }
     }
 
     private fun showSnackBar(text: String) {
-        Snackbar.make(binding.navHostFragment, text, Snackbar.LENGTH_SHORT).show()
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
     }
 }

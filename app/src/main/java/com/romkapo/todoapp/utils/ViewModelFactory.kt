@@ -18,14 +18,14 @@ class ViewModelFactory @Inject constructor(
     private val networkStatusTracker: ConnectionManagerObserver,
     private val repository: MainRepository,
     private val appSharedPreferences: AppSharedPreferences,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return when (modelClass) {
             TodoItemListViewModel::class.java -> TodoItemListViewModel(
                 repository,
-                appSharedPreferences
+                appSharedPreferences,
             ) as T
 
             AddEditItemViewModel::class.java -> AddEditItemViewModel(repository, coroutineScope) as T

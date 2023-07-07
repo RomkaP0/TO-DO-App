@@ -6,7 +6,7 @@ import okhttp3.Response
 import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
-    private val appSharedPreferences: AppSharedPreferences
+    private val appSharedPreferences: AppSharedPreferences,
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -14,8 +14,8 @@ class AuthInterceptor @Inject constructor(
         return chain.proceed(
             chain.request().newBuilder().addHeader(
                 "Authorization",
-                "OAuth $token"
-            ).build()
+                "OAuth $token",
+            ).build(),
         )
     }
 }

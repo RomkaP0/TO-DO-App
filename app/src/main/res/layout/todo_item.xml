@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/todoItemLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:padding="@dimen/spacing_m">
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/isCheckedTodo"
         android:layout_width="@dimen/icon_size"
         android:layout_height="@dimen/icon_size"
+        android:saveEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:saveEnabled="true"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/importanceIcon"
+        android:id="@+id/importance_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/spacing_xs"
+        android:contentDescription="@string/importanceicon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/todoTextView"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="@string/importanceicon" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/todoTextView"
@@ -34,8 +34,8 @@
         android:layout_marginEnd="@dimen/spacing_m"
         android:ellipsize="end"
         android:maxLines="3"
-        app:layout_constraintEnd_toStartOf="@+id/imageView"
         android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/imageView"
         app:layout_constraintStart_toEndOf="@+id/isCheckedTodo"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/lorem/random" />
@@ -45,22 +45,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawablePadding="2dp"
-        android:textSize="14sp"
         android:gravity="center"
+        android:textSize="14sp"
+        app:drawableStartCompat="@drawable/ic_calendar"
         app:layout_constraintStart_toStartOf="@+id/todoTextView"
-        app:layout_constraintTop_toBottomOf="@+id/todoTextView"
-        app:drawableStartCompat="@drawable/ic_calendar" />
+        app:layout_constraintTop_toBottomOf="@+id/todoTextView" />
+
     <TextView
         android:id="@+id/todoListModifyDate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawablePadding="2dp"
-        android:textSize="14sp"
         android:gravity="center"
+        android:textSize="14sp"
+        app:drawableStartCompat="@drawable/edit_note_fill0_wght400_grad0_opsz20"
         app:layout_constraintStart_toStartOf="@+id/todoTextView"
-        app:layout_constraintTop_toBottomOf="@+id/todoListDate"
-        app:drawableStartCompat="@drawable/edit_note_fill0_wght400_grad0_opsz20" />
-
+        app:layout_constraintTop_toBottomOf="@+id/todoListDate" />
 
 
     <TextView
@@ -68,20 +68,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawablePadding="2dp"
-        android:textSize="14sp"
         android:gravity="center"
+        android:textSize="14sp"
+        app:drawableStartCompat="@drawable/outline_done_all_24"
         app:layout_constraintStart_toStartOf="@+id/todoTextView"
-        app:layout_constraintTop_toBottomOf="@+id/todoListModifyDate"
-        app:drawableStartCompat="@drawable/outline_done_all_24" />
+        app:layout_constraintTop_toBottomOf="@+id/todoListModifyDate" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="@dimen/icon_size"
         android:layout_height="@dimen/icon_size"
+        android:contentDescription="@string/arrow_right"
         android:src="@drawable/ic_arrow_right"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/support"
-        android:contentDescription="@string/arrow_right" />
+        app:tint="@color/support" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AddEditItemViewModel (private val repository: MainRepository, private val coroutineScope: CoroutineScope) :
+class AddEditItemViewModel(private val repository: MainRepository, private val coroutineScope: CoroutineScope) :
     ViewModel() {
     var completeTimeStamp = System.currentTimeMillis()
     var id = ""
@@ -18,7 +18,6 @@ class AddEditItemViewModel (private val repository: MainRepository, private val 
     private var _currentItemFlow = MutableStateFlow(TodoItem())
     var currentItemFlow = _currentItemFlow.asStateFlow()
     var currentItem = TodoItem()
-
 
     fun loadTask(id: String) {
         viewModelScope.launch(Dispatchers.IO) {

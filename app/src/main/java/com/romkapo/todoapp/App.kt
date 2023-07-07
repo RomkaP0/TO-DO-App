@@ -19,17 +19,14 @@ import javax.inject.Inject
 
 class App : Application() {
     private var _appComponent: AppComponent? = null
-    val appComponent get() = requireNotNull(_appComponent){
+    val appComponent get() = requireNotNull(_appComponent) {
         "AppComponent must not be null"
     }
 
     @Inject
-    lateinit var serviceFactory: UpdateWorkerFactory;
-
-
+    lateinit var serviceFactory: UpdateWorkerFactory
 
     override fun onCreate() {
-
         _appComponent = DaggerAppComponent.builder()
             .context(applicationContext)
             .build()
@@ -37,7 +34,6 @@ class App : Application() {
         appComponent.inject(this)
 
         super.onCreate()
-
 
         val updateInterval = UPDATE_PERIOD // hours
 
@@ -47,18 +43,18 @@ class App : Application() {
 
         val workRequest = PeriodicWorkRequestBuilder<UpdateLocalDataWorker>(
             updateInterval,
-            TimeUnit.HOURS
+            TimeUnit.HOURS,
         ).setConstraints(constraints).build()
 
         val configuration = Configuration.Builder()
             .setWorkerFactory(serviceFactory)
             .build()
 
-        WorkManager.initialize(this,configuration)
+        WorkManager.initialize(this, configuration)
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             UPDATE_LOCAL_WORKER_NAME,
             ExistingPeriodicWorkPolicy.KEEP,
-            workRequest
+            workRequest,
         )
     }
 }

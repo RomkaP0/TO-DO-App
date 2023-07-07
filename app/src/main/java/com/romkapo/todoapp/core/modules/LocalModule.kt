@@ -21,25 +21,25 @@ interface LocalModule {
             return Room.databaseBuilder(
                 context,
                 AppDatabase::class.java,
-                "TodoDatabase.db"
+                "TodoDatabase.db",
             ).build()
         }
 
         @Provides
         fun provideItemDao(
-            database: AppDatabase
+            database: AppDatabase,
         ): TodoDAO = database.getTodoDAO()
 
         @Provides
         fun provideOperationDao(
-            database: AppDatabase
+            database: AppDatabase,
         ): TodoOperationDAO = database.getOperationsDAO()
-
 
         @Provides
         fun provideSharedPreferences(context: Context): SharedPreferences =
             context.getSharedPreferences(
-                Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE
+                Constants.SHARED_PREF_NAME,
+                Context.MODE_PRIVATE,
             )
 
         @Provides

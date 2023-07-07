@@ -12,9 +12,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class MainViewModel (
+class MainViewModel(
     networkStatusTracker: ConnectionManagerObserver,
-    private val repository: MainRepository
+    private val repository: MainRepository,
 ) : ViewModel() {
 
     init {
@@ -31,13 +31,13 @@ class MainViewModel (
                 onAvailable = { Resource.Success("") },
             )
 
-    fun listenStateRequest() = viewModelScope.launch(Dispatchers.IO){
-         repository.stateRequest.collectLatest {
-        _stateRequest.value = it
+    fun listenStateRequest() = viewModelScope.launch(Dispatchers.IO) {
+        repository.stateRequest.collectLatest {
+            _stateRequest.value = it
         }
     }
 
-    fun updateRepository()  = viewModelScope.launch(Dispatchers.IO) {
-        repository.updateTask()
+    fun updateRepository() = viewModelScope.launch(Dispatchers.IO) {
+        repository.fetchTasks()
     }
 }

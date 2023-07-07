@@ -12,8 +12,8 @@ import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -52,10 +52,10 @@ class TodoListFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
     ): View {
-
         viewModel = ViewModelProvider(this, viewModelFactory)[TodoItemListViewModel::class.java]
 
         _binding = FragmentTodoListBinding.inflate(inflater, container, false)
@@ -65,14 +65,14 @@ class TodoListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.swipeLayoutLit.isRefreshing = false
+        binding.swipeLayout.isRefreshing = false
 
         setupRecyclerView(binding.todoRecyclerView)
         swipeListener(binding.todoRecyclerView)
 
         provideObservers()
 
-        viewModel.refresh()
+        viewModel.getAllList()
 
         binding.navigateToAddFAB.setOnClickListener {
             findNavController().navigate(R.id.action_todoListFragment_to_addEditItem)
@@ -84,8 +84,9 @@ class TodoListFragment : Fragment() {
                 viewModel.changeShow()
             }
         }
-        binding.swipeLayoutLit.setOnRefreshListener {
+        binding.swipeLayout.setOnRefreshListener {
             viewModel.refresh()
+            binding.swipeLayout.isRefreshing = false
         }
 
         binding.logout.setOnClickListener {
@@ -95,7 +96,6 @@ class TodoListFragment : Fragment() {
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
-
         rvAdapter = TodoListAdapter(
             shortClickListener = { todoItem ->
                 navigateToAddEditFragment(todoItem.id)
@@ -103,7 +103,8 @@ class TodoListFragment : Fragment() {
             longClickListener = { todoItem, i -> showMenu(todoItem, i) },
             checkboxClickListener = { todoItem ->
                 viewModel.editStateTodoItem(todoItem)
-            })
+            },
+        )
 
         with(recyclerView) {
             adapter = rvAdapter
@@ -114,19 +115,25 @@ class TodoListFragment : Fragment() {
 
     private fun provideObservers() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.listTodoItem.collectLatest {
-                    if (binding.showUncheckedCheckbox.isChecked) {
-                        rvAdapter.diffList.submitList(it)
-                    } else {
-                        rvAdapter.diffList.submitList(it.filter { item -> !item.isComplete })
-                    }
-                    binding.swipeLayoutLit.isRefreshing = false
+            viewModel.listTodoItem.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collectLatest {
+                    updateRecyclerItems(it)
+                    binding.swipeLayout.isRefreshing = false
                 }
-                viewModel.countOfComplete.collectLatest {
+        }
+        lifecycleScope.launch {
+            viewModel.countOfComplete.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collectLatest {
                     binding.countCompleteTextView.text = getString(R.string.complete, it)
                 }
-            }
+        }
+    }
+
+    private fun updateRecyclerItems(listTodo: List<TodoItem>) {
+        if (binding.showUncheckedCheckbox.isChecked) {
+            rvAdapter.diffList.submitList(listTodo)
+        } else {
+            rvAdapter.diffList.submitList(listTodo.filter { item -> !item.isComplete })
         }
     }
 
@@ -135,7 +142,7 @@ class TodoListFragment : Fragment() {
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
+                target: RecyclerView.ViewHolder,
             ): Boolean {
                 return false
             }
@@ -170,7 +177,7 @@ class TodoListFragment : Fragment() {
 
     private fun navigateToAddEditFragment(todoItemID: String) {
         findNavController().navigate(
-            TodoListFragmentDirections.actionTodoListFragmentToAddEditItem(todoItemID)
+            TodoListFragmentDirections.actionTodoListFragmentToAddEditItem(todoItemID),
         )
     }
 
@@ -180,10 +187,10 @@ class TodoListFragment : Fragment() {
         Snackbar.make(
             binding.todoListConstraintLayout,
             getString(R.string.deleted) + deletedCourse.text,
-            Snackbar.LENGTH_LONG
+            Snackbar.LENGTH_LONG,
         )
             .setAction(
-                getString(R.string.undo)
+                getString(R.string.undo),
             ) {
                 viewModel.addTodoItem(deletedCourse)
             }.show()
