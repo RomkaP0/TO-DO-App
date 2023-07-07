@@ -10,8 +10,10 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -35,16 +37,20 @@ class TodoListFragment : Fragment() {
 
     private var _binding: FragmentTodoListBinding? = null
     private val binding get() = _binding!!
+
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private lateinit var todoFragmentComponent: TodoListItemFragmentComponent
     private lateinit var viewModel: TodoItemListViewModel
 
     override fun onAttach(context: Context) {
-        todoFragmentComponent = (requireContext().applicationContext as Application).appComponent.todoItemListFragmentComponentFactory().create()
+        todoFragmentComponent =
+            (requireContext().applicationContext as Application).appComponent.todoItemListFragmentComponentFactory()
+                .create()
         todoFragmentComponent.inject(this)
         super.onAttach(context)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -107,20 +113,19 @@ class TodoListFragment : Fragment() {
     }
 
     private fun provideObservers() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.listTodoItem.collectLatest {
-                if (binding.showUncheckedCheckbox.isChecked) {
-                    rvAdapter.diffList.submitList(it)
-                } else {
-                    rvAdapter.diffList.submitList(it.filter { item -> !item.isComplete })
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.listTodoItem.collectLatest {
+                    if (binding.showUncheckedCheckbox.isChecked) {
+                        rvAdapter.diffList.submitList(it)
+                    } else {
+                        rvAdapter.diffList.submitList(it.filter { item -> !item.isComplete })
+                    }
+                    binding.swipeLayoutLit.isRefreshing = false
                 }
-                binding.swipeLayoutLit.isRefreshing = false
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.countOfComplete.collectLatest {
-                binding.countCompleteTextView.text = getString(R.string.complete, it)
+                viewModel.countOfComplete.collectLatest {
+                    binding.countCompleteTextView.text = getString(R.string.complete, it)
+                }
             }
         }
     }
@@ -183,7 +188,6 @@ class TodoListFragment : Fragment() {
                 viewModel.addTodoItem(deletedCourse)
             }.show()
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

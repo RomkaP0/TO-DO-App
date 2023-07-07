@@ -3,15 +3,18 @@ package com.romkapo.todoapp.presentation.screen.main
 import android.app.Application
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.snackbar.Snackbar
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.core.components.main.MainActivityComponent
-import com.romkapo.todoapp.data.model.Resource
+import com.romkapo.todoapp.data.model.Resource.Error
+import com.romkapo.todoapp.data.model.Resource.Success
 import com.romkapo.todoapp.databinding.ActivityMainBinding
 import com.romkapo.todoapp.utils.ViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
@@ -21,7 +24,6 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private lateinit var binding: ActivityMainBinding
-    private var isFirstOpen = true
 
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
@@ -48,21 +50,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun initInternetMonitoring() {
         lifecycleScope.launch {
-            viewModel.state.collect {
-                if (it is MyState.Fetched) {
-                    showSnackBar(getString(R.string.available_network_state))
-                    viewModel.updateRepository()
-                } else {
-                    showSnackBar(getString(R.string.loading_failed_showing_local_data))
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+
+                viewModel.state.collect {
+                    if (it is Success) {
+                        showSnackBar(getString(R.string.available_network_state))
+                        viewModel.updateRepository()
+                    } else {
+                        showSnackBar(getString(R.string.loading_failed_showing_local_data))
+                    }
                 }
-            }
-        }
-        lifecycleScope.launch {
-            viewModel.stateRequest.collectLatest {
-                if (it is Resource.Success){
-                    showSnackBar(getString(R.string.success_update))}
-                if (it is Resource.Error){
-                    showSnackBar(it.message)
+                viewModel.stateRequest.collectLatest {
+                    if (it is Success) {
+                        showSnackBar(getString(R.string.success_update))
+                    }
+                    if (it is Error) {
+                        showSnackBar(it.message)
+                    }
                 }
             }
         }

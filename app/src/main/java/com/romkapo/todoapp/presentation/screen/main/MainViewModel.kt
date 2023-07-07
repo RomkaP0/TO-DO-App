@@ -21,15 +21,14 @@ class MainViewModel (
         updateRepository()
     }
 
-
     private val _stateRequest = MutableStateFlow<Resource>(Resource.Success(""))
     val stateRequest get() = _stateRequest.asStateFlow()
 
     val state =
         networkStatusTracker.networkStatus
             .map(
-                onUnavailable = { MyState.Error },
-                onAvailable = { MyState.Fetched },
+                onUnavailable = { Resource.Error("") },
+                onAvailable = { Resource.Success("") },
             )
 
     fun listenStateRequest() = viewModelScope.launch(Dispatchers.IO){
@@ -41,10 +40,4 @@ class MainViewModel (
     fun updateRepository()  = viewModelScope.launch(Dispatchers.IO) {
         repository.updateTask()
     }
-}
-
-
-sealed class MyState {
-    object Fetched : MyState()
-    object Error : MyState()
 }

@@ -1,6 +1,5 @@
 package com.romkapo.todoapp.data.repository
 
-import android.util.Log
 import com.romkapo.todoapp.core.DeviceId
 import com.romkapo.todoapp.data.model.Resource
 import com.romkapo.todoapp.data.model.TodoItem
@@ -11,6 +10,7 @@ import com.romkapo.todoapp.data.model.UnSyncAction.EDIT
 import com.romkapo.todoapp.data.model.network.ApiTodoItem
 import com.romkapo.todoapp.data.model.network.AppSharedPreferences
 import com.romkapo.todoapp.data.model.network.TodoItemListRequest
+import com.romkapo.todoapp.data.model.network.TodoItemListResponse
 import com.romkapo.todoapp.data.model.network.TodoItemRequest
 import com.romkapo.todoapp.data.model.network.TodoItemResponse
 import com.romkapo.todoapp.data.model.network.toNetworkItem
@@ -59,39 +59,49 @@ class MainRepositoryImpl @Inject constructor(
     }
 
     private suspend fun safeCall(
-        syncItem: TodoItem,
-        type: UnSyncAction
+        syncItem: TodoItem, type: UnSyncAction
     ) {
         try {
             val resultApi = when (type) {
-                ADD-> addTodoItemSafe(syncItem)
+                ADD -> addTodoItemSafe(syncItem)
                 EDIT -> updateTodoItemSafe(syncItem)
                 DELETE -> deleteTodoItemSafe(syncItem)
             }
-            when (resultApi.code()) {
-                in 200..300 -> appSharedPreferences.putRevisionId(resultApi.body()!!.revision)
-
-                400 -> {
-                    failurePush(syncItem, type)
-                }
-
-                404 -> {
-                    failurePush(syncItem, type)
-                }
-
-                in 500..600 -> {
-                    failurePush(syncItem, type)
-                }
+            if (resultApi.isSuccessful) {
+                appSharedPreferences.putRevisionId(resultApi.body()!!.revision)
+            } else {
+                retryCall(resultApi.code())
+                failurePush(syncItem, type)
             }
 
         } catch (exception: Exception) {
+            _stateRequest.value = Resource.Error("Неизвестная ошибка, пробуем снова")
             failurePush(syncItem, type)
-            Log.i("addTodoItem", exception.message.toString())
         }
     }
 
+    private fun retryCall(resultCode: Int) {
+        when (resultCode) {
+
+            400 -> _stateRequest.value = Resource.Error("Проблема с клиентом, пробуем снова")
+
+
+            401 -> _stateRequest.value = Resource.Error("Проблема с авторизацией, пробуем снова")
+
+
+            404 -> _stateRequest.value = Resource.Error("Элемента нет на сервере, пробуем снова")
+
+            in 500..600 -> _stateRequest.value = Resource.Error("Проблема с сетью, пробуем снова")
+        }
+    }
+
+
     private suspend fun failurePush(syncItem: TodoItem, type: UnSyncAction) {
-        todoOperationDAO.insertUnSyncOperation(syncItem.toOperationItem(type.label))
+        val operation = syncItem.toOperationItem(type.label)
+        if (type == DELETE) {
+            todoOperationDAO.deleteOperationWithId(operation.id)
+        }
+        todoOperationDAO.insertUnSyncOperation(operation)
         updateTask()
     }
 
@@ -106,11 +116,8 @@ class MainRepositoryImpl @Inject constructor(
     private suspend fun updateTodoItemSafe(todoItem: TodoItem): Response<TodoItemResponse> {
         toDoItemDao.upsertTodoItem(todoItem)
         return todoAPI.updateItem(
-            appSharedPreferences.getRevisionId(),
-            todoItem.id,
-            TodoItemRequest(
-                "ok",
-                todoItem.toNetworkItem(deviceId)
+            appSharedPreferences.getRevisionId(), todoItem.id, TodoItemRequest(
+                "ok", todoItem.toNetworkItem(deviceId)
             )
         )
     }
@@ -120,85 +127,67 @@ class MainRepositoryImpl @Inject constructor(
         return todoAPI.deleteItem(appSharedPreferences.getRevisionId(), todoItem.id)
     }
 
-
-    override suspend fun updateRemoteTasks(mergedList: List<ApiTodoItem>): Resource {
+    private suspend fun safeCallList(): Resource {
         _stateRequest.value = Resource.Loading("Loading")
         try {
-            val response = todoAPI.updateList(
-                revision = appSharedPreferences.getRevisionId(),
-                body = TodoItemListRequest(status = "ok", mergedList)
-            )
-
-            if (response.isSuccessful) {
-                val responseBody = response.body()
-                if (responseBody != null) {
-                    appSharedPreferences.putRevisionId(responseBody.revision)
-                    todoOperationDAO.dropTodoItems()
-
-                    _stateRequest.value = Resource.Success("")
-
-
-                    return Resource.Success("")
-                }
-            } else {
-                response.errorBody()?.close()
+            val resultApi = todoAPI.getList()
+            if (resultApi.isSuccessful) {
+                return mergeData(resultApi.body()!!)
             }
-        } catch (e: Exception) {
-            return Resource.Error("Merge failed, continue offline.")
+        } catch (exception: Exception) {
+            _stateRequest.value = Resource.Error("Ошибка при обновлении")
         }
-
-        return Resource.Error("Merge failed, continue offline.")
+        return Resource.Error("Ошибка при обновлении")
     }
 
-    override suspend fun updateTask(): Boolean {
-        try {
-            val networkListResponse = todoAPI.getList()
+    override suspend fun updateRemoteTasks(mergedList: List<ApiTodoItem>): Resource {
+        val response = todoAPI.updateList(
+            revision = appSharedPreferences.getRevisionId(),
+            body = TodoItemListRequest(status = "ok", mergedList)
+        )
 
-            if (networkListResponse.isSuccessful) {
-                val body = networkListResponse.body()
-                if (body != null) {
-                    val revision = body.revision
-                    val networkList = body.list.map { it.toTodoItem() }
-                    val unSyncOperationsList = todoOperationDAO.getUnSyncTodoList()
-                    val mergedList = HashMap<String, TodoItem>()
-
-                    for (item in networkList) {
-                        mergedList[item.id] = item
-                    }
-                    for (operation in unSyncOperationsList) {
-                        val localItemId = operation.id
-                        when (operation.type) {
-                            "add" -> mergedList[localItemId] =
-                                toDoItemDao.getTodoItemById(localItemId)!!
-
-                            "edit" -> mergedList[localItemId]?.let { netItem ->
-                                if (!(netItem.dateEdit != null && netItem.dateEdit!! >= operation.timestamp)) {
-                                    mergedList[localItemId] =
-                                        toDoItemDao.getTodoItemById(localItemId)!!
-                                }
-                            }
-
-                            "drop" -> mergedList.remove(localItemId)
-                        }
-                    }
-
-                    appSharedPreferences.putRevisionId(revision)
-                    val merged = mergedList.values.toList()
-                    toDoItemDao.dropTodoItems()
-                    toDoItemDao.insertTodoList(merged)
-                    updateRemoteTasks(merged.map { it.toNetworkItem(deviceId) })
-                    return true
-                }
-            } else {
-                networkListResponse.errorBody()?.close()
-                return false
-
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
+        if (response.isSuccessful) {
+            appSharedPreferences.putRevisionId(response.body()!!.revision)
+            todoOperationDAO.dropTodoItems()
+            return Resource.Success("Успешно обновлено")
         }
-        return true
+        return Resource.Error("Ошибка при отправлении")
     }
 
+    private suspend fun mergeData(body: TodoItemListResponse): Resource {
+        val revision = body.revision
+        val networkList = body.list.map { it.toTodoItem() }
+        val unSyncOperationsList = todoOperationDAO.getUnSyncTodoList()
+        val mergedList = HashMap<String, TodoItem>()
+
+        for (item in networkList) {
+            mergedList[item.id] = item
+        }
+        for (operation in unSyncOperationsList) {
+            val localItemId = operation.id
+            when (operation.type) {
+                "add" -> mergedList[localItemId] =
+                    toDoItemDao.getTodoItemById(localItemId)!!
+
+                "edit" -> mergedList[localItemId]?.let { netItem ->
+                    if (!(netItem.dateEdit != null && netItem.dateEdit!! >= operation.timestamp)) {
+                        mergedList[localItemId] =
+                            toDoItemDao.getTodoItemById(localItemId)!!
+                    }
+                }
+
+                "drop" -> mergedList.remove(localItemId)
+            }
+        }
+
+        appSharedPreferences.putRevisionId(revision)
+        val merged = mergedList.values.toList()
+        toDoItemDao.dropTodoItems()
+        toDoItemDao.insertTodoList(merged)
+        return updateRemoteTasks(merged.map { it.toNetworkItem(deviceId) })
+    }
+
+    override suspend fun updateTask(): Resource {
+        return safeCallList()
+    }
 }

@@ -8,8 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -30,16 +32,20 @@ class AddEditItemFragment : Fragment() {
     private var _binding: FragmentAddEditItemBinding? = null
     private val binding get() = _binding!!
     private val args by navArgs<AddEditItemFragmentArgs>()
+
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private lateinit var addEditFragmentComponent: AddEditFragmentComponent
     private lateinit var viewModel: AddEditItemViewModel
 
     override fun onAttach(context: Context) {
-        addEditFragmentComponent = (requireContext().applicationContext as Application).appComponent.addEditFragmentComponentFactory().create()
+        addEditFragmentComponent =
+            (requireContext().applicationContext as Application).appComponent.addEditFragmentComponentFactory()
+                .create()
         addEditFragmentComponent.inject(this)
         super.onAttach(context)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -56,16 +62,14 @@ class AddEditItemFragment : Fragment() {
 
         var isNew = true
 
+        provideObservers()
+
         try {
             val itemID = args.todoItemID
 
             viewModel.loadTask(itemID)
 
-            lifecycleScope.launch {
-                viewModel.currentItemFlow.collect {
-                    insertDataFromArgs(it)
-                }
-            }
+
             isNew = false
         } catch (e: InvocationTargetException) {
             Log.d("NavArgsException", "There aren`t args")
@@ -79,7 +83,7 @@ class AddEditItemFragment : Fragment() {
             }
             addeditButtonSave.setOnClickListener {
                 tryAddTodoItem(isNew)
-//                findNavController().navigateUp()
+                findNavController().navigateUp()
             }
 
             completeBeforeSwith.setOnCheckedChangeListener { _, isChecked ->
@@ -93,6 +97,16 @@ class AddEditItemFragment : Fragment() {
                     } else {
                         visibility = View.INVISIBLE
                     }
+                }
+            }
+        }
+    }
+
+    private fun provideObservers() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.currentItemFlow.collect {
+                    insertDataFromArgs(it)
                 }
             }
         }
@@ -171,7 +185,7 @@ class AddEditItemFragment : Fragment() {
             todoItem.dateComplete?.let {
                 completeBeforeSwith.isChecked = true
                 viewModel.completeTimeStamp = it
-                binding.addEditDateTextView .apply {
+                binding.addEditDateTextView.apply {
                     text = viewModel.completeTimeStamp.toString()
                     visibility = View.VISIBLE
                 }
@@ -179,7 +193,8 @@ class AddEditItemFragment : Fragment() {
 
             addEditDeleteButton.isEnabled = true
             addEditDeleteButton.setOnClickListener {
-                viewModel.removeTodoItem(todoItem
+                viewModel.removeTodoItem(
+                    todoItem
                 )
                 findNavController().navigateUp()
             }
