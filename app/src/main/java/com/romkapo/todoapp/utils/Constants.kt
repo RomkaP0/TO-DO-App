@@ -5,8 +5,6 @@ object Constants {
 
     // Retry
     const val UPDATE_LOCAL_WORKER_NAME = "UpdateLocalDataWorker"
-    const val MAX_RETRY_COUNT = 3
-    const val RETRY_OFFSET = 3000L
     const val UPDATE_PERIOD = 8L
 
     // AppSharedPreferences
