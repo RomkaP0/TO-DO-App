@@ -1,12 +1,18 @@
 package com.romkapo.todoapp.data.repository
 
 import com.romkapo.todoapp.core.DeviceId
+import com.romkapo.todoapp.data.model.BadRequestException
+import com.romkapo.todoapp.data.model.ClientSideException
+import com.romkapo.todoapp.data.model.ItemNotFoundException
+import com.romkapo.todoapp.data.model.NetworkException
 import com.romkapo.todoapp.data.model.Resource
+import com.romkapo.todoapp.data.model.SyncFailedException
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.data.model.UnSyncAction
 import com.romkapo.todoapp.data.model.UnSyncAction.ADD
 import com.romkapo.todoapp.data.model.UnSyncAction.DELETE
 import com.romkapo.todoapp.data.model.UnSyncAction.EDIT
+import com.romkapo.todoapp.data.model.UpdateFailedException
 import com.romkapo.todoapp.data.model.network.ApiTodoItem
 import com.romkapo.todoapp.data.model.network.AppSharedPreferences
 import com.romkapo.todoapp.data.model.network.TodoItemListRequest
@@ -21,6 +27,11 @@ import com.romkapo.todoapp.data.network.TodoAPI
 import com.romkapo.todoapp.data.room.TodoDAO
 import com.romkapo.todoapp.data.room.TodoOperationDAO
 import com.romkapo.todoapp.domain.MainRepository
+import com.romkapo.todoapp.utils.Constants.CLIENT_EXCEPTION
+import com.romkapo.todoapp.utils.Constants.NET_EXCEPTION_DOWN
+import com.romkapo.todoapp.utils.Constants.NET_EXCEPTION_UP
+import com.romkapo.todoapp.utils.Constants.NOT_FOUND_EXCEPTION
+import com.romkapo.todoapp.utils.Constants.SYNC_EXCEPTION
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,8 +44,7 @@ class MainRepositoryImpl @Inject constructor(
     private val todoAPI: TodoAPI,
     private val appSharedPreferences: AppSharedPreferences,
 ) : MainRepository {
-
-    private val _stateRequest = MutableStateFlow<Resource>(Resource.Success(""))
+    private val _stateRequest = MutableStateFlow<Resource>(Resource.Success)
     override val stateRequest get() = _stateRequest.asStateFlow()
 
     private val deviceId = DeviceId().id
@@ -63,10 +73,7 @@ class MainRepositoryImpl @Inject constructor(
         return safeCallList()
     }
 
-    private suspend fun safeCallTodo(
-        syncItem: TodoItem,
-        type: UnSyncAction,
-    ) {
+    private suspend fun safeCallTodo(syncItem: TodoItem, type: UnSyncAction) {
         try {
             val resultApi = when (type) {
                 ADD -> addTodoItemSafe(syncItem)
@@ -80,34 +87,30 @@ class MainRepositoryImpl @Inject constructor(
                 failurePush(syncItem, type)
             }
         } catch (exception: Exception) {
-            _stateRequest.value = Resource.Error("Неизвестная ошибка, пробуем снова")
+            _stateRequest.value = Resource.Error(NetworkException)
             failurePush(syncItem, type)
         }
     }
 
     private suspend fun safeCallList(): Resource {
-        _stateRequest.value = Resource.Loading("Loading")
         try {
             val resultApi = todoAPI.getList()
             if (resultApi.isSuccessful) {
                 return mergeData(resultApi.body()!!)
             }
         } catch (exception: Exception) {
-            _stateRequest.value = Resource.Error("Ошибка при обновлении")
+            _stateRequest.value = Resource.Error(UpdateFailedException)
         }
-        return Resource.Error("Ошибка при обновлении")
+        return Resource.Error(UpdateFailedException)
     }
-
 
     private fun resultCodeCallback(resultCode: Int) {
         when (resultCode) {
-            400 -> _stateRequest.value = Resource.Error("Проблема с клиентом, пробуем снова")
-
-            401 -> _stateRequest.value = Resource.Error("Проблема с авторизацией, пробуем снова")
-
-            404 -> _stateRequest.value = Resource.Error("Элемента нет на сервере, пробуем снова")
-
-            in 500..600 -> _stateRequest.value = Resource.Error("Проблема с сетью, пробуем снова")
+            CLIENT_EXCEPTION -> _stateRequest.value = Resource.Error(ClientSideException)
+            SYNC_EXCEPTION -> _stateRequest.value = Resource.Error(SyncFailedException)
+            NOT_FOUND_EXCEPTION -> _stateRequest.value = Resource.Error(ItemNotFoundException)
+            in NET_EXCEPTION_DOWN..NET_EXCEPTION_UP -> _stateRequest.value =
+                Resource.Error(BadRequestException)
         }
     }
 
@@ -133,10 +136,7 @@ class MainRepositoryImpl @Inject constructor(
         return todoAPI.updateItem(
             appSharedPreferences.getRevisionId(),
             todoItem.id,
-            TodoItemRequest(
-                "ok",
-                todoItem.toNetworkItem(deviceId),
-            ),
+            TodoItemRequest("ok", todoItem.toNetworkItem(deviceId))
         )
     }
 
@@ -144,7 +144,6 @@ class MainRepositoryImpl @Inject constructor(
         toDoItemDao.deleteTodoItem(todoItem)
         return todoAPI.deleteItem(appSharedPreferences.getRevisionId(), todoItem.id)
     }
-
 
     override suspend fun updateRemoteTasks(mergedList: List<ApiTodoItem>): Resource {
         val response = todoAPI.updateList(
@@ -155,21 +154,15 @@ class MainRepositoryImpl @Inject constructor(
         if (response.isSuccessful) {
             appSharedPreferences.putRevisionId(response.body()!!.revision)
             todoOperationDAO.dropTodoItems()
-            return Resource.Success("Успешно обновлено")
+            return Resource.Success
         }
-        return Resource.Error("Ошибка при отправлении")
+        return Resource.Error(UpdateFailedException)
     }
 
     private suspend fun mergeData(body: TodoItemListResponse): Resource {
         val revision = body.revision
-        val networkList = body.list.map { it.toTodoItem() }
-        val unSyncOperationsList = todoOperationDAO.getUnSyncTodoList()
-        val mergedList = mutableMapOf<String, TodoItem>()
-
-        for (item in networkList) {
-            mergedList[item.id] = item
-        }
-        for (operation in unSyncOperationsList) {
+        val mergedList = body.list.associate { it.id to it.toTodoItem() }.toMutableMap()
+        for (operation in todoOperationDAO.getUnSyncTodoList()) {
             val localItemId = operation.id
             when (operation.type) {
                 ADD.label -> mergedList[localItemId] =
@@ -184,7 +177,7 @@ class MainRepositoryImpl @Inject constructor(
         }
 
         appSharedPreferences.putRevisionId(revision)
-        val merged = mergedList.values.toList().filter { it.id != "-1" }
+        val merged = mergedList.values.toList()
         toDoItemDao.dropTodoItems()
         toDoItemDao.insertTodoList(merged)
         return updateRemoteTasks(merged.map { it.toNetworkItem(deviceId) })
@@ -193,7 +186,7 @@ class MainRepositoryImpl @Inject constructor(
     private fun editTodoUpdate(operation: UnSyncTodoItem, netItem: TodoItem): TodoItem {
         return if (!(netItem.dateEdit != null && netItem.dateEdit!! >= operation.timestamp)) {
             toDoItemDao.getTodoItemById(operation.id)!!
-        }else{
+        } else {
             netItem
         }
     }

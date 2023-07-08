@@ -35,10 +35,13 @@ class AuthFragment : Fragment() {
     private lateinit var viewModel: AuthViewModel
 
     override fun onAttach(context: Context) {
-        authFragmentComponent = (requireContext().applicationContext as Application).appComponent.authFragmentComponentFactory().create()
+        authFragmentComponent =
+            (requireContext().applicationContext as Application).appComponent.authFragmentComponentFactory()
+                .create()
         authFragmentComponent.inject(this)
         super.onAttach(context)
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

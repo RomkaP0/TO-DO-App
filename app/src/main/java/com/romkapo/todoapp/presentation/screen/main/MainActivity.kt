@@ -13,8 +13,15 @@ import androidx.navigation.fragment.NavHostFragment
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.core.components.main.MainActivityComponent
+import com.romkapo.todoapp.data.model.BadRequestException
+import com.romkapo.todoapp.data.model.ClientSideException
+import com.romkapo.todoapp.data.model.ItemNotFoundException
+import com.romkapo.todoapp.data.model.NetworkException
+import com.romkapo.todoapp.data.model.Resource
 import com.romkapo.todoapp.data.model.Resource.Error
 import com.romkapo.todoapp.data.model.Resource.Success
+import com.romkapo.todoapp.data.model.SyncFailedException
+import com.romkapo.todoapp.data.model.UpdateFailedException
 import com.romkapo.todoapp.databinding.ActivityMainBinding
 import com.romkapo.todoapp.utils.ViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
@@ -31,16 +38,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        mainComponent =
-            (applicationContext as Application).appComponent.mainActivityComponentFactory().create()
-        mainComponent.inject(this)
-        viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
+        injections()
+
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         initInternetMonitoring()
-
         viewModel.listenStateRequest()
 
         val navHostFragment =
@@ -52,27 +57,49 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect {
                 if (it is Success) {
-                    showSnackBar(getString(R.string.available_network_state))
+                    showToast(getString(R.string.available_network_state))
                     viewModel.updateRepository()
                 } else {
-                    showSnackBar(getString(R.string.loading_failed_showing_local_data))
+                    showToast(getString(R.string.loading_failed_showing_local_data))
                 }
             }
         }
         lifecycleScope.launch {
             viewModel.stateRequest.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collectLatest {
-                    if (it is Success) {
-                        showSnackBar(getString(R.string.success_update))
-                    }
-                    if (it is Error) {
-                        showSnackBar(it.message)
-                    }
+                    showToast(classifyResult(it))
                 }
         }
     }
 
-    private fun showSnackBar(text: String) {
+    private fun classifyResult(result: Resource): String {
+        return if (result is Error) {
+            when (result.exception) {
+                SyncFailedException -> getString(R.string.sync_exc)
+                ItemNotFoundException -> getString(R.string.not_found_exc)
+                BadRequestException -> getString(R.string.bad_exc)
+                ClientSideException -> getString(R.string.client_exc)
+                NetworkException -> getString(R.string.net_exc)
+                UpdateFailedException -> getString(R.string.update_exc)
+            }
+        } else {
+            getString(R.string.success_update)
+        }
+    }
+
+
+    private fun showToast(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun injections() {
+        mainComponent = (applicationContext as Application)
+            .appComponent
+            .mainActivityComponentFactory()
+            .create()
+
+        mainComponent.inject(this)
+
+        viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
     }
 }

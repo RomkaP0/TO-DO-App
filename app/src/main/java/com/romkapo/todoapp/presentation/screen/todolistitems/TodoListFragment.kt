@@ -74,25 +74,7 @@ class TodoListFragment : Fragment() {
 
         viewModel.getAllList()
 
-        binding.navigateToAddFAB.setOnClickListener {
-            findNavController().navigate(R.id.action_todoListFragment_to_addEditItem)
-        }
-
-        with(binding.showUncheckedCheckbox) {
-            isChecked = viewModel.showUnchecked
-            setOnClickListener {
-                viewModel.changeShow()
-            }
-        }
-        binding.swipeLayout.setOnRefreshListener {
-            viewModel.refresh()
-            binding.swipeLayout.isRefreshing = false
-        }
-
-        binding.logout.setOnClickListener {
-            viewModel.logOut()
-            findNavController().navigate(R.id.action_todoListFragment_to_authFragment)
-        }
+        setupListeners()
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
@@ -126,6 +108,28 @@ class TodoListFragment : Fragment() {
                 .collectLatest {
                     binding.countCompleteTextView.text = getString(R.string.complete, it)
                 }
+        }
+    }
+
+    private fun setupListeners(){
+        binding.navigateToAddFAB.setOnClickListener {
+            findNavController().navigate(R.id.action_todoListFragment_to_addEditItem)
+        }
+
+        with(binding.showUncheckedCheckbox) {
+            isChecked = viewModel.showUnchecked
+            setOnClickListener {
+                viewModel.changeShow()
+            }
+        }
+        binding.swipeLayout.setOnRefreshListener {
+            viewModel.refresh()
+            binding.swipeLayout.isRefreshing = false
+        }
+
+        binding.logout.setOnClickListener {
+            viewModel.logOut()
+            findNavController().navigate(R.id.action_todoListFragment_to_authFragment)
         }
     }
 

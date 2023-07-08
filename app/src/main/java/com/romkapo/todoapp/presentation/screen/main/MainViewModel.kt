@@ -2,6 +2,7 @@ package com.romkapo.todoapp.presentation.screen.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.romkapo.todoapp.data.model.NetworkException
 import com.romkapo.todoapp.data.model.Resource
 import com.romkapo.todoapp.data.network.ConnectionManagerObserver
 import com.romkapo.todoapp.data.network.map
@@ -17,18 +18,14 @@ class MainViewModel(
     private val repository: MainRepository,
 ) : ViewModel() {
 
-    init {
-        updateRepository()
-    }
-
-    private val _stateRequest = MutableStateFlow<Resource>(Resource.Success(""))
+    private val _stateRequest = MutableStateFlow<Resource>(Resource.Success)
     val stateRequest get() = _stateRequest.asStateFlow()
 
     val state =
         networkStatusTracker.networkStatus
             .map(
-                onUnavailable = { Resource.Error("") },
-                onAvailable = { Resource.Success("") },
+                onUnavailable = { Resource.Error(NetworkException) },
+                onAvailable = { Resource.Success },
             )
 
     fun listenStateRequest() = viewModelScope.launch(Dispatchers.IO) {

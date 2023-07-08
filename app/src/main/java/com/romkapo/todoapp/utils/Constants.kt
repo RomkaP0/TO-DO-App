@@ -13,4 +13,13 @@ object Constants {
     const val SHARED_PREF_NAME = "shared_preferences"
     const val TOKEN_KEY = "token_key"
     const val REVISION_KEY = "revision_key"
+
+    //Exceptions
+    const val CLIENT_EXCEPTION = 400
+    const val SYNC_EXCEPTION = 401
+    const val NOT_FOUND_EXCEPTION = 404
+    const val NET_EXCEPTION_DOWN = 500
+    const val NET_EXCEPTION_UP = 500
+
+
 }

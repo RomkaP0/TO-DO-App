@@ -74,28 +74,31 @@ class AddEditItemFragment : Fragment() {
             Log.d("NavArgsException", "There aren`t args")
         }
 
-        with(binding) {
-            addEditDateTextView.text = Convert.getDateTime(viewModel.completeTimeStamp)
+        binding.addEditDateTextView.text = Convert.getDateTime(viewModel.completeTimeStamp)
 
-            addEditButtonClose.setOnClickListener {
-                findNavController().navigateUp()
-            }
-            addEditButtonSave.setOnClickListener {
-                tryAddTodoItem(isNew)
-                findNavController().navigateUp()
-            }
+        setupListeners(isNew)
+    }
 
-            completeBeforeSwith.setOnCheckedChangeListener { _, isChecked ->
-                with(addEditDateTextView) {
-                    if (isChecked) {
-                        visibility = View.VISIBLE
+    private fun setupListeners(isNew: Boolean) {
+        binding.addEditButtonClose.setOnClickListener {
+            findNavController().navigateUp()
+        }
 
-                        setOnClickListener {
-                            buildDatePickerDialog()
-                        }
-                    } else {
-                        visibility = View.INVISIBLE
+        binding.addEditButtonSave.setOnClickListener {
+            tryAddTodoItem(isNew)
+            findNavController().navigateUp()
+        }
+
+        binding.completeBeforeSwith.setOnCheckedChangeListener { _, isChecked ->
+            with(binding.addEditDateTextView) {
+                if (isChecked) {
+                    visibility = View.VISIBLE
+
+                    setOnClickListener {
+                        buildDatePickerDialog()
                     }
+                } else {
+                    visibility = View.INVISIBLE
                 }
             }
         }
@@ -162,40 +165,38 @@ class AddEditItemFragment : Fragment() {
     private fun insertDataFromArgs(todoItem: TodoItem) {
         viewModel.id = todoItem.id
 
-        with(binding) {
-            TodoDescribe.setText(todoItem.text)
-            importanceToggleGroup.clearChecked()
+        binding.TodoDescribe.setText(todoItem.text)
+        binding.importanceToggleGroup.clearChecked()
 
-            when (todoItem.importance) {
-                Importance.LOW -> {
-                    importanceToggleGroup.check(R.id.ImportanceLow)
-                }
-
-                Importance.HIGH -> {
-                    importanceToggleGroup.check(R.id.ImportanceHigh)
-                }
-
-                Importance.MEDIUM -> {
-                    importanceToggleGroup.check(R.id.ImportanceMiddle)
-                }
+        when (todoItem.importance) {
+            Importance.LOW -> {
+                binding.importanceToggleGroup.check(R.id.ImportanceLow)
             }
 
-            todoItem.dateComplete?.let {
-                completeBeforeSwith.isChecked = true
-                viewModel.completeTimeStamp = it
-                binding.addEditDateTextView.apply {
-                    text = Convert.getDateTime(viewModel.completeTimeStamp).toString()
-                    visibility = View.VISIBLE
-                }
+            Importance.HIGH -> {
+                binding.importanceToggleGroup.check(R.id.ImportanceHigh)
             }
 
-            addEditButtonDelete.isEnabled = true
-            addEditButtonDelete.setOnClickListener {
-                viewModel.removeTodoItem(
-                    todoItem,
-                )
-                findNavController().navigateUp()
+            Importance.MEDIUM -> {
+                binding.importanceToggleGroup.check(R.id.ImportanceMiddle)
             }
+        }
+
+        todoItem.dateComplete?.let {
+            binding.completeBeforeSwith.isChecked = true
+            viewModel.completeTimeStamp = it
+            binding.addEditDateTextView.apply {
+                text = Convert.getDateTime(viewModel.completeTimeStamp).toString()
+                visibility = View.VISIBLE
+            }
+        }
+
+        binding.addEditButtonDelete.isEnabled = true
+        binding.addEditButtonDelete.setOnClickListener {
+            viewModel.removeTodoItem(
+                todoItem,
+            )
+            findNavController().navigateUp()
         }
     }
 
