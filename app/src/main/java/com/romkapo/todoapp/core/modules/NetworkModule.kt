@@ -6,6 +6,7 @@ import com.romkapo.todoapp.data.network.ConnectionManagerObserver
 import com.romkapo.todoapp.data.network.TodoAPI
 import dagger.Module
 import dagger.Provides
+import dagger.Reusable
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -39,6 +40,7 @@ interface NetworkModule {
         }
 
         @Provides
+        @Reusable
         fun toDoApiService(
             okHttpClient: OkHttpClient,
         ): TodoAPI {

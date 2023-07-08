@@ -9,9 +9,6 @@ import com.romkapo.todoapp.data.model.Resource
 import com.romkapo.todoapp.data.model.SyncFailedException
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.data.model.UnSyncAction
-import com.romkapo.todoapp.data.model.UnSyncAction.ADD
-import com.romkapo.todoapp.data.model.UnSyncAction.DELETE
-import com.romkapo.todoapp.data.model.UnSyncAction.EDIT
 import com.romkapo.todoapp.data.model.UpdateFailedException
 import com.romkapo.todoapp.data.model.network.ApiTodoItem
 import com.romkapo.todoapp.data.model.network.AppSharedPreferences
@@ -31,6 +28,7 @@ import com.romkapo.todoapp.utils.Constants.CLIENT_EXCEPTION
 import com.romkapo.todoapp.utils.Constants.NET_EXCEPTION_DOWN
 import com.romkapo.todoapp.utils.Constants.NET_EXCEPTION_UP
 import com.romkapo.todoapp.utils.Constants.NOT_FOUND_EXCEPTION
+import com.romkapo.todoapp.utils.Constants.OK
 import com.romkapo.todoapp.utils.Constants.SYNC_EXCEPTION
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,15 +56,15 @@ class MainRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {
-        safeCallTodo(todoItem, ADD)
+        safeCallTodo(todoItem, UnSyncAction.ADD)
     }
 
     override suspend fun updateTodoItem(todoItem: TodoItem) {
-        safeCallTodo(todoItem, EDIT)
+        safeCallTodo(todoItem, UnSyncAction.EDIT)
     }
 
     override suspend fun deleteTodoItem(todoItem: TodoItem) {
-        safeCallTodo(todoItem, DELETE)
+        safeCallTodo(todoItem, UnSyncAction.DELETE)
     }
 
     override suspend fun fetchTasks(): Resource {
@@ -76,11 +74,11 @@ class MainRepositoryImpl @Inject constructor(
     private suspend fun safeCallTodo(syncItem: TodoItem, type: UnSyncAction) {
         try {
             val resultApi = when (type) {
-                ADD -> addTodoItemSafe(syncItem)
-                EDIT -> updateTodoItemSafe(syncItem)
-                DELETE -> deleteTodoItemSafe(syncItem)
+                UnSyncAction.ADD -> addTodoItemSafe(syncItem)
+                UnSyncAction.EDIT -> updateTodoItemSafe(syncItem)
+                UnSyncAction.DELETE -> deleteTodoItemSafe(syncItem)
             }
-            
+
             if (resultApi.isSuccessful) {
                 appSharedPreferences.putRevisionId(resultApi.body()!!.revision)
             } else {
@@ -117,7 +115,7 @@ class MainRepositoryImpl @Inject constructor(
 
     private suspend fun failurePush(syncItem: TodoItem, type: UnSyncAction) {
         val operation = syncItem.toOperationItem(type.label)
-        if (type == DELETE) {
+        if (type == UnSyncAction.DELETE) {
             todoOperationDAO.deleteOperationWithId(operation.id)
         }
         todoOperationDAO.insertUnSyncOperation(operation)
@@ -128,7 +126,7 @@ class MainRepositoryImpl @Inject constructor(
         toDoItemDao.upsertTodoItem(todoItem)
         return todoAPI.addItem(
             appSharedPreferences.getRevisionId(),
-            TodoItemRequest("ok", todoItem.toNetworkItem(deviceId)),
+            TodoItemRequest(OK, todoItem.toNetworkItem(deviceId)),
         )
     }
 
@@ -137,7 +135,7 @@ class MainRepositoryImpl @Inject constructor(
         return todoAPI.updateItem(
             appSharedPreferences.getRevisionId(),
             todoItem.id,
-            TodoItemRequest("ok", todoItem.toNetworkItem(deviceId))
+            TodoItemRequest(OK, todoItem.toNetworkItem(deviceId))
         )
     }
 
@@ -149,7 +147,7 @@ class MainRepositoryImpl @Inject constructor(
     override suspend fun updateRemoteTasks(mergedList: List<ApiTodoItem>): Resource {
         val response = todoAPI.updateList(
             revision = appSharedPreferences.getRevisionId(),
-            body = TodoItemListRequest(status = "ok", mergedList),
+            body = TodoItemListRequest(status = OK, mergedList),
         )
 
         if (response.isSuccessful) {
@@ -168,14 +166,12 @@ class MainRepositoryImpl @Inject constructor(
             val localItemId = operation.id
 
             when (operation.type) {
-                ADD.label -> mergedList[localItemId] =
+                UnSyncAction.ADD.label -> mergedList[localItemId] =
                     toDoItemDao.getTodoItemById(localItemId)!!
-
-                EDIT.label -> mergedList[localItemId]?.let { netItem ->
+                UnSyncAction.EDIT.label -> mergedList[localItemId]?.let { netItem ->
                     mergedList[localItemId] = editTodoUpdate(operation, netItem)
                 }
-
-                DELETE.label -> mergedList.remove(localItemId)
+                UnSyncAction.DELETE.label -> mergedList.remove(localItemId)
             }
         }
 

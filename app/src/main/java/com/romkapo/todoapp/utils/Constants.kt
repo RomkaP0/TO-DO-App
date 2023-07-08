@@ -19,5 +19,7 @@ object Constants {
     const val NET_EXCEPTION_DOWN = 500
     const val NET_EXCEPTION_UP = 500
 
+    const val OK ="ok"
+
 
 }
