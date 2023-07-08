@@ -1,6 +1,5 @@
 package com.romkapo.todoapp.data.repository
 
-import com.romkapo.todoapp.core.DeviceId
 import com.romkapo.todoapp.data.model.BadRequestException
 import com.romkapo.todoapp.data.model.ClientSideException
 import com.romkapo.todoapp.data.model.ItemNotFoundException
@@ -23,6 +22,7 @@ import com.romkapo.todoapp.data.model.network.toTodoItem
 import com.romkapo.todoapp.data.network.TodoAPI
 import com.romkapo.todoapp.data.room.TodoDAO
 import com.romkapo.todoapp.data.room.TodoOperationDAO
+import com.romkapo.todoapp.di.DeviceId
 import com.romkapo.todoapp.domain.MainRepository
 import com.romkapo.todoapp.utils.Constants.CLIENT_EXCEPTION
 import com.romkapo.todoapp.utils.Constants.NET_EXCEPTION_DOWN
@@ -108,8 +108,9 @@ class MainRepositoryImpl @Inject constructor(
             CLIENT_EXCEPTION -> _stateRequest.value = Resource.Error(ClientSideException)
             SYNC_EXCEPTION -> _stateRequest.value = Resource.Error(SyncFailedException)
             NOT_FOUND_EXCEPTION -> _stateRequest.value = Resource.Error(ItemNotFoundException)
-            in NET_EXCEPTION_DOWN..NET_EXCEPTION_UP -> _stateRequest.value =
-                Resource.Error(BadRequestException)
+            in NET_EXCEPTION_DOWN..NET_EXCEPTION_UP ->
+                _stateRequest.value =
+                    Resource.Error(BadRequestException)
         }
     }
 
@@ -130,16 +131,16 @@ class MainRepositoryImpl @Inject constructor(
         )
     }
 
-    private suspend fun updateTodoItemSafe(todoItem: TodoItem): Response<TodoItemResponse> {
+    private suspend inline fun updateTodoItemSafe(todoItem: TodoItem): Response<TodoItemResponse> {
         toDoItemDao.upsertTodoItem(todoItem)
         return todoAPI.updateItem(
             appSharedPreferences.getRevisionId(),
             todoItem.id,
-            TodoItemRequest(OK, todoItem.toNetworkItem(deviceId))
+            TodoItemRequest(OK, todoItem.toNetworkItem(deviceId)),
         )
     }
 
-    private suspend fun deleteTodoItemSafe(todoItem: TodoItem): Response<TodoItemResponse> {
+    private suspend inline fun deleteTodoItemSafe(todoItem: TodoItem): Response<TodoItemResponse> {
         toDoItemDao.deleteTodoItem(todoItem)
         return todoAPI.deleteItem(appSharedPreferences.getRevisionId(), todoItem.id)
     }
@@ -161,7 +162,6 @@ class MainRepositoryImpl @Inject constructor(
     private suspend fun mergeData(body: TodoItemListResponse): Resource {
         val mergedList = body.list.associate { it.id to it.toTodoItem() }.toMutableMap()
         for (operation in todoOperationDAO.getUnSyncTodoList()) {
-
             when (operation.type) {
                 UnSyncAction.ADD.label -> mergedList[operation.id] =
                     toDoItemDao.getTodoItemById(operation.id)!!

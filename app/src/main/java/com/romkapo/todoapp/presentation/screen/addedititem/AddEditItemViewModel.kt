@@ -13,9 +13,8 @@ import javax.inject.Inject
 
 class AddEditItemViewModel @Inject constructor(
     private val repository: MainRepository,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
 ) : ViewModel() {
-    var completeTimeStamp = System.currentTimeMillis()
     var id = ""
 
     private var _currentItemFlow = MutableStateFlow(TodoItem())

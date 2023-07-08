@@ -1,11 +1,11 @@
-package com.romkapo.todoapp.core.components.app
+package com.romkapo.todoapp.di.components.app
 
 import android.content.Context
 import com.romkapo.todoapp.App
-import com.romkapo.todoapp.core.components.auth.AuthFragmentComponent
-import com.romkapo.todoapp.core.components.edit.AddEditFragmentComponent
-import com.romkapo.todoapp.core.components.list.TodoListItemFragmentComponent
-import com.romkapo.todoapp.core.components.main.MainActivityComponent
+import com.romkapo.todoapp.di.components.auth.AuthFragmentComponent
+import com.romkapo.todoapp.di.components.edit.AddEditFragmentComponent
+import com.romkapo.todoapp.di.components.list.TodoListItemFragmentComponent
+import com.romkapo.todoapp.di.components.main.MainActivityComponent
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Qualifier

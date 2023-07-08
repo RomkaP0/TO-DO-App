@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.core.components.app
+package com.romkapo.todoapp.di.components.app
 
 import javax.inject.Scope
 

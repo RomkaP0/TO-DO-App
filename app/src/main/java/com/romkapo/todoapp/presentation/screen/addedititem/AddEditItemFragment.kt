@@ -18,9 +18,9 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
-import com.romkapo.todoapp.core.components.edit.AddEditFragmentComponent
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.FragmentAddEditItemBinding
+import com.romkapo.todoapp.di.components.edit.AddEditFragmentComponent
 import com.romkapo.todoapp.utils.Importance
 import com.romkapo.todoapp.utils.LongToString
 import kotlinx.coroutines.launch
@@ -58,94 +58,83 @@ class AddEditItemFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        var isNew = true
-        provideObservers()
+        lifecycleScope.launch {
+            viewModel.currentItemFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect {
+                    viewModel.currentItem = it
+                    enableDeleteButton(it)
+                    insertDataFromArgs(it)
+                }
+        }
 
         try {
-            val itemID = args.todoItemID
-            viewModel.loadTask(itemID)
-            isNew = false
+            viewModel.loadTask(args.todoItemID)
         } catch (e: InvocationTargetException) {
             Log.d("NavArgsException", "There aren`t args")
         }
 
-        binding.addEditDateTextView.text = LongToString.getDateTime(viewModel.completeTimeStamp)
-        setupListeners(isNew)
+        binding.addEditDateTextView.text = LongToString.getDateTime(
+            viewModel.currentItem.dateComplete ?: System.currentTimeMillis(),
+        )
+        setupListeners()
     }
 
-    private fun setupListeners(isNew: Boolean) {
+    private fun setupListeners() {
         binding.addEditButtonClose.setOnClickListener {
             findNavController().navigateUp()
         }
 
         binding.addEditButtonSave.setOnClickListener {
-            tryAddTodoItem(isNew)
+            tryAddTodoItem()
             findNavController().navigateUp()
         }
 
         binding.completeBeforeSwith.setOnCheckedChangeListener { _, isChecked ->
-            with(binding.addEditDateTextView) {
-                if (isChecked) {
-                    visibility = View.VISIBLE
-                    setOnClickListener {
-                        buildDatePickerDialog()
-                    }
-                } else {
-                    visibility = View.INVISIBLE
-                }
+            provideCheckChangeLogic(isChecked)
+        }
+    }
+
+    private fun provideCheckChangeLogic(isChecked: Boolean) {
+        val time = viewModel.currentItem.dateComplete ?: System.currentTimeMillis()
+        viewModel.currentItem.dateComplete = time
+        with(binding.addEditDateTextView) {
+            text = LongToString.getDateTime(time)
+            if (isChecked) {
+                visibility = View.VISIBLE
+                setOnClickListener { buildDatePickerDialog(time) }
+            } else {
+                visibility = View.INVISIBLE
             }
         }
     }
 
-    private fun provideObservers() {
-        lifecycleScope.launch {
-            viewModel.currentItemFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect {
-                    insertDataFromArgs(it)
-                }
-        }
-    }
-
-    private fun buildDatePickerDialog() {
+    private fun buildDatePickerDialog(time: Long) {
         val datePicker = MaterialDatePicker.Builder.datePicker()
             .setTitleText(getString(R.string.choose_data))
             .setTheme(R.style.ThemeOverlay_App_DatePicker)
-            .setSelection(viewModel.completeTimeStamp)
+            .setSelection(time)
             .build()
 
         datePicker.addOnPositiveButtonClickListener {
             datePicker.selection?.let {
-                viewModel.completeTimeStamp = it
+                viewModel.currentItem.dateComplete = it
                 binding.addEditDateTextView.text = LongToString.getDateTime(it)
             }
         }
         datePicker.show(requireActivity().supportFragmentManager, "tag")
     }
 
-    private fun tryAddTodoItem(isNew: Boolean) {
-        val importance = when (binding.importanceToggleGroup.checkedButtonId) {
-            R.id.ImportanceLow -> Importance.LOW
-            R.id.ImportanceMiddle -> Importance.MEDIUM
-            R.id.ImportanceHigh -> Importance.HIGH
-            else -> {
-                Importance.MEDIUM
-            }
-        }
-
-        val dateComplete = if (binding.completeBeforeSwith.isChecked) {
-            viewModel.completeTimeStamp
-        } else {
-            null
-        }
-
+    private fun tryAddTodoItem() {
         with(viewModel.currentItem) {
-            id = viewModel.id
+            importance = when (binding.importanceToggleGroup.checkedButtonId) {
+                R.id.ImportanceLow -> Importance.LOW
+                R.id.ImportanceMiddle -> Importance.MEDIUM
+                R.id.ImportanceHigh -> Importance.HIGH
+                else -> Importance.MEDIUM }
             text = binding.TodoDescribe.text.toString()
-            this.importance = importance
-            dateCreate = System.currentTimeMillis()
-            this.dateComplete = dateComplete
-
-            if (isNew) {
+            dateCreate = if (dateCreate == 0L) System.currentTimeMillis() else dateCreate
+            dateComplete = if (binding.completeBeforeSwith.isChecked) dateComplete else null
+            if (id == "-1") {
                 id = UUID.randomUUID().toString()
                 viewModel.addTodoItem(this)
             } else {
@@ -156,8 +145,6 @@ class AddEditItemFragment : Fragment() {
     }
 
     private fun insertDataFromArgs(todoItem: TodoItem) {
-        viewModel.id = todoItem.id
-
         binding.TodoDescribe.setText(todoItem.text)
         binding.importanceToggleGroup.clearChecked()
 
@@ -169,14 +156,15 @@ class AddEditItemFragment : Fragment() {
 
         todoItem.dateComplete?.let {
             binding.completeBeforeSwith.isChecked = true
-            viewModel.completeTimeStamp = it
             binding.addEditDateTextView.apply {
-                text = LongToString.getDateTime(viewModel.completeTimeStamp).toString()
+                text = LongToString.getDateTime(it).toString()
                 visibility = View.VISIBLE
             }
         }
-
         binding.addEditButtonDelete.isEnabled = true
+    }
+
+    private fun enableDeleteButton(todoItem: TodoItem) {
         binding.addEditButtonDelete.setOnClickListener {
             viewModel.removeTodoItem(todoItem)
             findNavController().navigateUp()
@@ -188,4 +176,3 @@ class AddEditItemFragment : Fragment() {
         super.onDestroyView()
     }
 }
-!

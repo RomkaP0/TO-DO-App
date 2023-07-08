@@ -13,7 +13,6 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
-import com.romkapo.todoapp.core.components.main.MainActivityComponent
 import com.romkapo.todoapp.data.model.BadRequestException
 import com.romkapo.todoapp.data.model.ClientSideException
 import com.romkapo.todoapp.data.model.ItemNotFoundException
@@ -24,6 +23,7 @@ import com.romkapo.todoapp.data.model.Resource.Success
 import com.romkapo.todoapp.data.model.SyncFailedException
 import com.romkapo.todoapp.data.model.UpdateFailedException
 import com.romkapo.todoapp.databinding.ActivityMainBinding
+import com.romkapo.todoapp.di.components.main.MainActivityComponent
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -86,7 +86,6 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.success_update)
         }
     }
-
 
     private fun showToast(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show()

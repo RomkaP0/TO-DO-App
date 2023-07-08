@@ -20,9 +20,9 @@ import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.google.android.material.snackbar.Snackbar
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
-import com.romkapo.todoapp.core.components.list.TodoListItemFragmentComponent
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.FragmentTodoListBinding
+import com.romkapo.todoapp.di.components.list.TodoListItemFragmentComponent
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -79,19 +79,19 @@ class TodoListFragment : Fragment() {
         }
         SwipeRightHelper(
             recyclerView,
-            rvAdapter
+            rvAdapter,
         ) { todoItem -> deleteItem(todoItem) }.createHelper()
     }
 
     private fun provideObservers() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.listTodoItem.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collectLatest {
                     updateRecyclerItems(it)
                     binding.swipeLayout.isRefreshing = false
                 }
         }
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.countOfComplete.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collectLatest {
                     binding.countCompleteTextView.text = getString(R.string.complete, it)

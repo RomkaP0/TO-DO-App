@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.core.components.auth
+package com.romkapo.todoapp.di.components.auth
 
 import javax.inject.Scope
 

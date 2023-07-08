@@ -54,20 +54,18 @@ class TodoListAdapter(
         val currentTodoItem = diffList.currentList[position]
 
         with(holder.binding) {
-            val context = root.context
+            setListeners(binding = this, root.context, currentTodoItem)
 
             todoTextView.text = currentTodoItem.text
             todoTextView.paint.isStrikeThruText = currentTodoItem.isComplete
             isCheckedTodo.isChecked = currentTodoItem.isComplete
             isCheckedTodo.isErrorShown = false
 
-            setListeners(binding = this, context, currentTodoItem, isCheckedTodo.isChecked)
-
             setDataVisibility(todoListDate, currentTodoItem.dateCreate)
             setDataVisibility(todoListModifyDate, currentTodoItem.dateEdit)
             setDataVisibility(todoListCompleteDate, currentTodoItem.dateComplete)
 
-            setImportance(currentTodoItem.importance, this@with, context)
+            setImportance(currentTodoItem.importance, this@with, root.context)
         }
     }
 
@@ -75,12 +73,12 @@ class TodoListAdapter(
         binding: TodoItemBinding,
         context: Context,
         currentTodoItem: TodoItem,
-        isChecked: Boolean
     ) {
         binding.isCheckedTodo.setOnClickListener {
-            currentTodoItem.isComplete = isChecked
+            currentTodoItem.isComplete = binding.isCheckedTodo.isChecked
+            currentTodoItem.dateEdit = System.currentTimeMillis()
             checkboxClickListener(currentTodoItem)
-            binding.todoTextView.paint.isStrikeThruText = isChecked
+            binding.todoTextView.paint.isStrikeThruText = binding.isCheckedTodo.isChecked
             binding.todoTextView.invalidate()
         }
         binding.todoItemLayout.setOnClickListener { editClickListener(currentTodoItem.id) }
@@ -137,4 +135,3 @@ class TodoListAdapter(
         popup.show()
     }
 }
-

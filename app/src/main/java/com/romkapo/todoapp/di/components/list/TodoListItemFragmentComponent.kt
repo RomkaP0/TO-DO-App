@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.core.components.list
+package com.romkapo.todoapp.di.components.list
 
 import com.romkapo.todoapp.presentation.screen.todolistitems.TodoListFragment
 import dagger.Subcomponent

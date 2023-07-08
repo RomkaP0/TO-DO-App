@@ -9,7 +9,7 @@ import com.romkapo.todoapp.data.model.TodoItem
 class SwipeRightHelper(
     private val recyclerView: RecyclerView,
     private val adapter: TodoListAdapter,
-    private val function: (todoItem: TodoItem) -> Unit
+    private val function: (todoItem: TodoItem) -> Unit,
 ) {
     fun createHelper() {
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {

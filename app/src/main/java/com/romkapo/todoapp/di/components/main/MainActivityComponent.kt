@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.core.components.main
+package com.romkapo.todoapp.di.components.main
 
 import com.romkapo.todoapp.presentation.screen.main.MainActivity
 import dagger.Subcomponent

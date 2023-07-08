@@ -14,8 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
-import com.romkapo.todoapp.core.components.auth.AuthFragmentComponent
 import com.romkapo.todoapp.databinding.FragmentAuthBinding
+import com.romkapo.todoapp.di.components.auth.AuthFragmentComponent
 import com.yandex.authsdk.YandexAuthException
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk

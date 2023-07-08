@@ -2,12 +2,13 @@ package com.romkapo.todoapp.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.romkapo.todoapp.core.components.app.AppScope
 import javax.inject.Inject
 import javax.inject.Provider
 
+/* Фабрика вьюмоделей */
+
 class ViewModelFactory @Inject constructor(
-    private val viewModelFactories: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModel>>
+    private val viewModelFactories: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModel>>,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")

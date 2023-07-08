@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.core.modules
+package com.romkapo.todoapp.di.modules
 
 import android.content.Context
 import android.content.SharedPreferences

@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.core.components.edit
+package com.romkapo.todoapp.di.components.edit
 
 import com.romkapo.todoapp.presentation.screen.addedititem.AddEditItemFragment
 import dagger.Subcomponent
