@@ -9,9 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AddEditItemViewModel(private val repository: MainRepository, private val coroutineScope: CoroutineScope) :
-    ViewModel() {
+class AddEditItemViewModel @Inject constructor(
+    private val repository: MainRepository,
+    private val coroutineScope: CoroutineScope
+) : ViewModel() {
     var completeTimeStamp = System.currentTimeMillis()
     var id = ""
 

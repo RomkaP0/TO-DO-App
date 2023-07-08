@@ -1,5 +1,6 @@
 package com.romkapo.todoapp.data.model
 
+/* Sealed набор различных коллбэков сервера*/
 sealed class ApiException : Exception()
 
 object SyncFailedException : ApiException()

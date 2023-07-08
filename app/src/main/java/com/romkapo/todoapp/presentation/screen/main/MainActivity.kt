@@ -3,6 +3,7 @@ package com.romkapo.todoapp.presentation.screen.main
 import android.app.Application
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +24,6 @@ import com.romkapo.todoapp.data.model.Resource.Success
 import com.romkapo.todoapp.data.model.SyncFailedException
 import com.romkapo.todoapp.data.model.UpdateFailedException
 import com.romkapo.todoapp.databinding.ActivityMainBinding
-import com.romkapo.todoapp.utils.ViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,9 +33,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var mainComponent: MainActivityComponent
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         injections()
@@ -99,7 +99,5 @@ class MainActivity : AppCompatActivity() {
             .create()
 
         mainComponent.inject(this)
-
-        viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
     }
 }

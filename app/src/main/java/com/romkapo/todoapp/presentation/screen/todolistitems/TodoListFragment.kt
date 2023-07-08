@@ -4,19 +4,16 @@ import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.VERTICAL
@@ -26,27 +23,24 @@ import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.core.components.list.TodoListItemFragmentComponent
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.FragmentTodoListBinding
-import com.romkapo.todoapp.utils.ViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class TodoListFragment : Fragment() {
-
-    lateinit var rvAdapter: TodoListAdapter
+    private lateinit var rvAdapter: TodoListAdapter
 
     private var _binding: FragmentTodoListBinding? = null
     private val binding get() = _binding!!
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var todoFragmentComponent: TodoListItemFragmentComponent
-    private lateinit var viewModel: TodoItemListViewModel
+    private val viewModel: TodoItemListViewModel by viewModels { viewModelFactory }
 
     override fun onAttach(context: Context) {
-        todoFragmentComponent =
-            (requireContext().applicationContext as Application).appComponent.todoItemListFragmentComponentFactory()
-                .create()
+        todoFragmentComponent = (requireContext().applicationContext as Application)
+            .appComponent.todoItemListFragmentComponentFactory().create()
         todoFragmentComponent.inject(this)
         super.onAttach(context)
     }
@@ -56,10 +50,7 @@ class TodoListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        viewModel = ViewModelProvider(this, viewModelFactory)[TodoItemListViewModel::class.java]
-
         _binding = FragmentTodoListBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -68,24 +59,17 @@ class TodoListFragment : Fragment() {
         binding.swipeLayout.isRefreshing = false
 
         setupRecyclerView(binding.todoRecyclerView)
-        swipeListener(binding.todoRecyclerView)
 
         provideObservers()
-
         viewModel.getAllList()
-
         setupListeners()
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
         rvAdapter = TodoListAdapter(
-            shortClickListener = { todoItem ->
-                navigateToAddEditFragment(todoItem.id)
-            },
-            longClickListener = { todoItem, i -> showMenu(todoItem, i) },
-            checkboxClickListener = { todoItem ->
-                viewModel.editStateTodoItem(todoItem)
-            },
+            editClickListener = { id -> navigateToAddEditFragment(id) },
+            deleteClickListener = { todoItem -> deleteItem(todoItem) },
+            checkboxClickListener = { todoItem -> viewModel.editStateTodoItem(todoItem) },
         )
 
         with(recyclerView) {
@@ -93,6 +77,10 @@ class TodoListFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(DividerItemDecoration(context, VERTICAL))
         }
+        SwipeRightHelper(
+            recyclerView,
+            rvAdapter
+        ) { todoItem -> deleteItem(todoItem) }.createHelper()
     }
 
     private fun provideObservers() {
@@ -111,17 +99,17 @@ class TodoListFragment : Fragment() {
         }
     }
 
-    private fun setupListeners(){
+    private fun setupListeners() {
         binding.navigateToAddFAB.setOnClickListener {
             findNavController().navigate(R.id.action_todoListFragment_to_addEditItem)
         }
-
         with(binding.showUncheckedCheckbox) {
             isChecked = viewModel.showUnchecked
             setOnClickListener {
                 viewModel.changeShow()
             }
         }
+
         binding.swipeLayout.setOnRefreshListener {
             viewModel.refresh()
             binding.swipeLayout.isRefreshing = false
@@ -141,44 +129,6 @@ class TodoListFragment : Fragment() {
         }
     }
 
-    private fun swipeListener(recyclerView: RecyclerView) {
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
-            override fun onMove(
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder,
-            ): Boolean {
-                return false
-            }
-
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val deletedCourse: TodoItem =
-                    rvAdapter.diffList.currentList[viewHolder.adapterPosition]
-                deleteItem(deletedCourse)
-            }
-        }).attachToRecyclerView(recyclerView)
-    }
-
-    private fun showMenu(todoItem: TodoItem, position: Int) {
-        val popup = PopupMenu(context, binding.todoRecyclerView[position])
-        popup.menuInflater.inflate(R.menu.dropdown_item_menu, popup.menu)
-
-        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
-            when (menuItem.itemId) {
-                R.id.itemEdit -> {
-                    navigateToAddEditFragment(todoItem.id)
-                }
-
-                R.id.itemDelete -> {
-                    deleteItem(todoItem)
-                }
-            }
-            return@setOnMenuItemClickListener false
-        }
-
-        popup.show()
-    }
-
     private fun navigateToAddEditFragment(todoItemID: String) {
         findNavController().navigate(
             TodoListFragmentDirections.actionTodoListFragmentToAddEditItem(todoItemID),
@@ -192,16 +142,15 @@ class TodoListFragment : Fragment() {
             binding.todoListConstraintLayout,
             getString(R.string.deleted) + deletedCourse.text,
             Snackbar.LENGTH_LONG,
-        )
-            .setAction(
-                getString(R.string.undo),
-            ) {
-                viewModel.addTodoItem(deletedCourse)
-            }.show()
+        ).setAction(
+            getString(R.string.undo),
+        ) {
+            viewModel.addTodoItem(deletedCourse)
+        }.show()
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         _binding = null
+        super.onDestroyView()
     }
 }

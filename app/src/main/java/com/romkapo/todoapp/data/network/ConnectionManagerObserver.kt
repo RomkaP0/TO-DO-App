@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import com.romkapo.todoapp.data.model.network.NetworkStatus
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -25,10 +26,6 @@ class ConnectionManagerObserver @Inject constructor(
 
             override fun onAvailable(network: Network) {
                 trySend(NetworkStatus.Available)
-            }
-
-            override fun onLost(network: Network) {
-                trySend(NetworkStatus.Unavailable)
             }
         }
 
@@ -51,9 +48,4 @@ inline fun <Result> Flow<NetworkStatus>.map(
         NetworkStatus.Unavailable -> onUnavailable()
         NetworkStatus.Available -> onAvailable()
     }
-}
-
-sealed class NetworkStatus {
-    object Available : NetworkStatus()
-    object Unavailable : NetworkStatus()
 }

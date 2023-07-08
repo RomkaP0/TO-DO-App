@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -20,9 +21,8 @@ import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.core.components.edit.AddEditFragmentComponent
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.databinding.FragmentAddEditItemBinding
-import com.romkapo.todoapp.utils.Convert
 import com.romkapo.todoapp.utils.Importance
-import com.romkapo.todoapp.utils.ViewModelFactory
+import com.romkapo.todoapp.utils.LongToString
 import kotlinx.coroutines.launch
 import java.lang.reflect.InvocationTargetException
 import java.util.UUID
@@ -34,9 +34,9 @@ class AddEditItemFragment : Fragment() {
     private val args by navArgs<AddEditItemFragmentArgs>()
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var addEditFragmentComponent: AddEditFragmentComponent
-    private lateinit var viewModel: AddEditItemViewModel
+    private val viewModel: AddEditItemViewModel by viewModels { viewModelFactory }
 
     override fun onAttach(context: Context) {
         addEditFragmentComponent =
@@ -51,9 +51,7 @@ class AddEditItemFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        viewModel = ViewModelProvider(this, viewModelFactory)[AddEditItemViewModel::class.java]
         _binding = FragmentAddEditItemBinding.inflate(inflater, container, false)
-
         return binding.root
     }
 
@@ -61,21 +59,17 @@ class AddEditItemFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         var isNew = true
-
         provideObservers()
 
         try {
             val itemID = args.todoItemID
-
             viewModel.loadTask(itemID)
-
             isNew = false
         } catch (e: InvocationTargetException) {
             Log.d("NavArgsException", "There aren`t args")
         }
 
-        binding.addEditDateTextView.text = Convert.getDateTime(viewModel.completeTimeStamp)
-
+        binding.addEditDateTextView.text = LongToString.getDateTime(viewModel.completeTimeStamp)
         setupListeners(isNew)
     }
 
@@ -93,7 +87,6 @@ class AddEditItemFragment : Fragment() {
             with(binding.addEditDateTextView) {
                 if (isChecked) {
                     visibility = View.VISIBLE
-
                     setOnClickListener {
                         buildDatePickerDialog()
                     }
@@ -115,7 +108,7 @@ class AddEditItemFragment : Fragment() {
 
     private fun buildDatePickerDialog() {
         val datePicker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText("Укажите дату")
+            .setTitleText(getString(R.string.choose_data))
             .setTheme(R.style.ThemeOverlay_App_DatePicker)
             .setSelection(viewModel.completeTimeStamp)
             .build()
@@ -123,7 +116,7 @@ class AddEditItemFragment : Fragment() {
         datePicker.addOnPositiveButtonClickListener {
             datePicker.selection?.let {
                 viewModel.completeTimeStamp = it
-                binding.addEditDateTextView.text = Convert.getDateTime(it)
+                binding.addEditDateTextView.text = LongToString.getDateTime(it)
             }
         }
         datePicker.show(requireActivity().supportFragmentManager, "tag")
@@ -169,39 +162,30 @@ class AddEditItemFragment : Fragment() {
         binding.importanceToggleGroup.clearChecked()
 
         when (todoItem.importance) {
-            Importance.LOW -> {
-                binding.importanceToggleGroup.check(R.id.ImportanceLow)
-            }
-
-            Importance.HIGH -> {
-                binding.importanceToggleGroup.check(R.id.ImportanceHigh)
-            }
-
-            Importance.MEDIUM -> {
-                binding.importanceToggleGroup.check(R.id.ImportanceMiddle)
-            }
+            Importance.LOW -> binding.importanceToggleGroup.check(R.id.ImportanceLow)
+            Importance.HIGH -> binding.importanceToggleGroup.check(R.id.ImportanceHigh)
+            Importance.MEDIUM -> binding.importanceToggleGroup.check(R.id.ImportanceMiddle)
         }
 
         todoItem.dateComplete?.let {
             binding.completeBeforeSwith.isChecked = true
             viewModel.completeTimeStamp = it
             binding.addEditDateTextView.apply {
-                text = Convert.getDateTime(viewModel.completeTimeStamp).toString()
+                text = LongToString.getDateTime(viewModel.completeTimeStamp).toString()
                 visibility = View.VISIBLE
             }
         }
 
         binding.addEditButtonDelete.isEnabled = true
         binding.addEditButtonDelete.setOnClickListener {
-            viewModel.removeTodoItem(
-                todoItem,
-            )
+            viewModel.removeTodoItem(todoItem)
             findNavController().navigateUp()
         }
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         _binding = null
+        super.onDestroyView()
     }
 }
+!

@@ -29,4 +29,5 @@
     <string name="sync_exc">Ошибка синхронизации, пробуем снова</string>
     <string name="net_exc">Проблема с соединением, пробуем снова</string>
     <string name="update_exc">Ошибка при обновлении</string>
+    <string name="choose_data">Укажите дату</string>
 </resources>

@@ -9,13 +9,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.core.components.auth.AuthFragmentComponent
 import com.romkapo.todoapp.databinding.FragmentAuthBinding
-import com.romkapo.todoapp.utils.ViewModelFactory
 import com.yandex.authsdk.YandexAuthException
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
@@ -30,9 +30,9 @@ class AuthFragment : Fragment() {
     private val binding get() = _binding!!
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var authFragmentComponent: AuthFragmentComponent
-    private lateinit var viewModel: AuthViewModel
+    private val viewModel: AuthViewModel by viewModels { viewModelFactory }
 
     override fun onAttach(context: Context) {
         authFragmentComponent =
@@ -47,8 +47,6 @@ class AuthFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        viewModel = ViewModelProvider(this, viewModelFactory)[AuthViewModel::class.java]
-
         sdk = YandexAuthSdk(requireContext(), YandexAuthOptions(requireContext()))
 
         launcher = registerForActivityResult(YandexSignInActivityResultContract()) { pair ->
@@ -96,7 +94,7 @@ class AuthFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         _binding = null
+        super.onDestroyView()
     }
 }

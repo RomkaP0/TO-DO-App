@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.romkapo.todoapp.data.model.network.UnSyncTodoItem
 
+/* DAO операций для таблицы несинхронизированных данных*/
 @Dao
 interface TodoOperationDAO {
 

@@ -35,14 +35,12 @@ class App : Application() {
 
         super.onCreate()
 
-        val updateInterval = UPDATE_PERIOD // hours
-
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
         val workRequest = PeriodicWorkRequestBuilder<UpdateLocalDataWorker>(
-            updateInterval,
+            UPDATE_PERIOD,
             TimeUnit.HOURS,
         ).setConstraints(constraints).build()
 

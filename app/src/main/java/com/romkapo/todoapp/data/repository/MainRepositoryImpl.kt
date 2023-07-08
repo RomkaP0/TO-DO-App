@@ -159,27 +159,23 @@ class MainRepositoryImpl @Inject constructor(
     }
 
     private suspend fun mergeData(body: TodoItemListResponse): Resource {
-        val revision = body.revision
         val mergedList = body.list.associate { it.id to it.toTodoItem() }.toMutableMap()
-
         for (operation in todoOperationDAO.getUnSyncTodoList()) {
-            val localItemId = operation.id
 
             when (operation.type) {
-                UnSyncAction.ADD.label -> mergedList[localItemId] =
-                    toDoItemDao.getTodoItemById(localItemId)!!
-                UnSyncAction.EDIT.label -> mergedList[localItemId]?.let { netItem ->
-                    mergedList[localItemId] = editTodoUpdate(operation, netItem)
+                UnSyncAction.ADD.label -> mergedList[operation.id] =
+                    toDoItemDao.getTodoItemById(operation.id)!!
+                UnSyncAction.EDIT.label -> mergedList[operation.id]?.let { netItem ->
+                    mergedList[operation.id] = editTodoUpdate(operation, netItem)
                 }
-                UnSyncAction.DELETE.label -> mergedList.remove(localItemId)
+                UnSyncAction.DELETE.label -> mergedList.remove(operation.id)
             }
         }
-
-        appSharedPreferences.putRevisionId(revision)
 
         val merged = mergedList.values.toList()
         toDoItemDao.dropTodoItems()
         toDoItemDao.insertTodoList(merged)
+        appSharedPreferences.putRevisionId(body.revision)
 
         return updateRemoteTasks(merged.map { it.toNetworkItem(deviceId) })
     }
