@@ -80,6 +80,7 @@ class MainRepositoryImpl @Inject constructor(
                 EDIT -> updateTodoItemSafe(syncItem)
                 DELETE -> deleteTodoItemSafe(syncItem)
             }
+            
             if (resultApi.isSuccessful) {
                 appSharedPreferences.putRevisionId(resultApi.body()!!.revision)
             } else {
@@ -162,8 +163,10 @@ class MainRepositoryImpl @Inject constructor(
     private suspend fun mergeData(body: TodoItemListResponse): Resource {
         val revision = body.revision
         val mergedList = body.list.associate { it.id to it.toTodoItem() }.toMutableMap()
+
         for (operation in todoOperationDAO.getUnSyncTodoList()) {
             val localItemId = operation.id
+
             when (operation.type) {
                 ADD.label -> mergedList[localItemId] =
                     toDoItemDao.getTodoItemById(localItemId)!!
@@ -177,9 +180,11 @@ class MainRepositoryImpl @Inject constructor(
         }
 
         appSharedPreferences.putRevisionId(revision)
+
         val merged = mergedList.values.toList()
         toDoItemDao.dropTodoItems()
         toDoItemDao.insertTodoList(merged)
+
         return updateRemoteTasks(merged.map { it.toNetworkItem(deviceId) })
     }
 
