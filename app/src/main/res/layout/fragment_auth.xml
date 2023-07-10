@@ -6,7 +6,6 @@
     android:padding="@dimen/spacing_m">
 
     <TextView
-        android:id="@+id/AuthText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/auth"
@@ -16,7 +15,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/auth_button_laoyut"
         android:layout_width="346dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"

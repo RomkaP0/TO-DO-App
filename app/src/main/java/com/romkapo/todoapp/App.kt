@@ -1,7 +1,7 @@
 package com.romkapo.todoapp
 
 import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
+import android.content.Context
 import androidx.work.Configuration
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -9,42 +9,56 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.romkapo.todoapp.data.network.UpdateLocalDataWorker
+import com.romkapo.todoapp.data.network.UpdateWorkerFactory
+import com.romkapo.todoapp.di.components.app.AppComponent
+import com.romkapo.todoapp.di.components.app.DaggerAppComponent
 import com.romkapo.todoapp.utils.Constants.UPDATE_LOCAL_WORKER_NAME
 import com.romkapo.todoapp.utils.Constants.UPDATE_PERIOD
-import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@HiltAndroidApp
-
-class App : Application(), Configuration.Provider {
+class App : Application() {
+    private var _appComponent: AppComponent? = null
+    val appComponent
+        get() = requireNotNull(_appComponent) {
+            "AppComponent must not be null"
+        }
 
     @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
-    override fun getWorkManagerConfiguration() =
-        Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+    lateinit var serviceFactory: UpdateWorkerFactory
 
     override fun onCreate() {
+        _appComponent = DaggerAppComponent.builder()
+            .context(applicationContext)
+            .build()
+        appComponent.inject(this)
+
         super.onCreate()
 
-        val updateInterval = UPDATE_PERIOD // hours
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val workRequest = PeriodicWorkRequestBuilder<UpdateLocalDataWorker>(
-            updateInterval,
-            TimeUnit.HOURS
-        ).setConstraints(constraints).build()
-
+        WorkManager.initialize(this, setConfiguration())
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             UPDATE_LOCAL_WORKER_NAME,
             ExistingPeriodicWorkPolicy.KEEP,
-            workRequest
+            setWorkRequest(),
         )
     }
+
+    private fun setWorkRequest() = PeriodicWorkRequestBuilder<UpdateLocalDataWorker>(
+        UPDATE_PERIOD,
+        TimeUnit.HOURS,
+    ).setConstraints(setConstraints()).build()
+
+    private fun setConfiguration() = Configuration.Builder()
+        .setWorkerFactory(serviceFactory)
+        .build()
+
+    private fun setConstraints() = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .build()
 }
+
+val Context.appComponent: AppComponent
+    get() = when (this) {
+        is App -> appComponent
+        else -> (applicationContext as App).appComponent
+    }

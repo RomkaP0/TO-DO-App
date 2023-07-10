@@ -1,5 +1,7 @@
 package com.romkapo.todoapp.presentation.screen.auth
 
+import android.app.Application
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,30 +10,43 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.romkapo.todoapp.R
+import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.databinding.FragmentAuthBinding
+import com.romkapo.todoapp.di.components.auth.AuthFragmentComponent
 import com.yandex.authsdk.YandexAuthException
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
-import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-@AndroidEntryPoint
 class AuthFragment : Fragment() {
 
     private lateinit var launcher: ActivityResultLauncher<YandexAuthSdk>
     private lateinit var sdk: YandexAuthSdk
 
-    private val viewModel: AuthViewModel by viewModels()
-
     private var _binding: FragmentAuthBinding? = null
     private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private lateinit var authFragmentComponent: AuthFragmentComponent
+    private val viewModel: AuthViewModel by viewModels { viewModelFactory }
 
+    override fun onAttach(context: Context) {
+        authFragmentComponent =
+            (requireContext().applicationContext as Application).appComponent.authFragmentComponentFactory()
+                .create()
+        authFragmentComponent.inject(this)
+        super.onAttach(context)
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
         sdk = YandexAuthSdk(requireContext(), YandexAuthOptions(requireContext()))
 
         launcher = registerForActivityResult(YandexSignInActivityResultContract()) { pair ->
@@ -74,12 +89,12 @@ class AuthFragment : Fragment() {
         Toast.makeText(
             requireContext(),
             getText(R.string.failed_to_login),
-            Toast.LENGTH_LONG
+            Toast.LENGTH_LONG,
         ).show()
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         _binding = null
+        super.onDestroyView()
     }
 }

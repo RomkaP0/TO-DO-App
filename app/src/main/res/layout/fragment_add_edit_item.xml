@@ -2,20 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/add_edit_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="@dimen/spacing_m"
-    tools:context=".presentation.screen.todoaddedititem.AddEditItemFragment">
+    tools:context=".presentation.screen.addedititem.AddEditItemFragment">
 
     <LinearLayout
-        android:id="@+id/topLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <ImageButton
-            android:id="@+id/addeditButtonClose"
+            android:id="@+id/add_edit_buttonClose"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
             android:backgroundTint="#00000000"
@@ -26,7 +24,7 @@
             app:tint="@color/invert" />
 
         <TextView
-            android:id="@+id/addeditButtonSave"
+            android:id="@+id/add_edit_buttonSave"
             android:layout_width="0dp"
             android:layout_height="@dimen/icon_size"
             android:layout_weight="1"
@@ -160,8 +158,8 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <Button
+                android:id="@+id/add_edit_buttonDelete"
                 style="@style/Widget.Material3.Button.TonalButton"
-                android:id="@+id/addEditDeleteButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/list_background"

@@ -4,6 +4,7 @@ import com.romkapo.todoapp.data.model.network.TodoItemListRequest
 import com.romkapo.todoapp.data.model.network.TodoItemListResponse
 import com.romkapo.todoapp.data.model.network.TodoItemRequest
 import com.romkapo.todoapp.data.model.network.TodoItemResponse
+import com.romkapo.todoapp.utils.Constants.LAST_REVISION
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -23,26 +24,26 @@ interface TodoAPI {
 
     @PATCH("list")
     suspend fun updateList(
-        @Header("X-Last-Known-Revision") revision: Int,
-        @Body body: TodoItemListRequest
+        @Header(LAST_REVISION) revision: Int,
+        @Body body: TodoItemListRequest,
     ): Response<TodoItemListResponse>
 
     @POST("list")
     suspend fun addItem(
-        @Header("X-Last-Known-Revision") revision: Int,
-        @Body newItem: TodoItemRequest
+        @Header(LAST_REVISION) revision: Int,
+        @Body newItem: TodoItemRequest,
     ): Response<TodoItemResponse>
 
     @PUT("list/{id}")
     suspend fun updateItem(
-        @Header("X-Last-Known-Revision") revision: Int,
+        @Header(LAST_REVISION) revision: Int,
         @Path("id") itemId: String,
-        @Body body: TodoItemRequest
+        @Body body: TodoItemRequest,
     ): Response<TodoItemResponse>
 
     @DELETE("list/{id}")
     suspend fun deleteItem(
-        @Header("X-Last-Known-Revision") revision: Int,
+        @Header(LAST_REVISION) revision: Int,
         @Path("id") itemId: String,
     ): Response<TodoItemResponse>
 }

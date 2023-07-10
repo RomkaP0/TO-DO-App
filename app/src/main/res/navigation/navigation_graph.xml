@@ -22,7 +22,7 @@
     </fragment>
     <fragment
         android:id="@+id/addEditFragment"
-        android:name="com.romkapo.todoapp.presentation.screen.todoaddedititem.AddEditItemFragment"
+        android:name="com.romkapo.todoapp.presentation.screen.addedititem.AddEditItemFragment"
         android:label="fragment_add_edit_item"
         tools:layout="@layout/fragment_add_edit_item">
         <action

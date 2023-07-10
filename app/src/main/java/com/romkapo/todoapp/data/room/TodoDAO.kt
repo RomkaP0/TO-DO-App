@@ -10,11 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TodoDAO {
-    @Query("SELECT * FROM todoItems")
+    @Query("SELECT * FROM todoItems ORDER BY dateEdit DESC")
     fun getTodoListFlow(): Flow<List<TodoItem>>
-
-    @Query("SELECT * FROM todoItems")
-    fun getTodoList(): List<TodoItem>
 
     @Query("SELECT * FROM todoItems WHERE id = :id")
     fun getTodoItemById(id: String): TodoItem?

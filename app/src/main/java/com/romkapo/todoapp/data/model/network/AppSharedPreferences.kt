@@ -8,7 +8,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AppSharedPreferences @Inject constructor(
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
 ) {
     private val editor = sharedPreferences.edit()
 
@@ -24,7 +24,5 @@ class AppSharedPreferences @Inject constructor(
         editor.apply()
     }
 
-    fun getRevisionId(): Int {
-        return sharedPreferences.getInt(REVISION_KEY, 0)
-    }
+    fun getRevisionId(): Int = sharedPreferences.getInt(REVISION_KEY, 0)
 }

@@ -4,7 +4,8 @@ import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
 import java.util.Date
 
-object Convert {
+/* Конвертор timestamp в строку*/
+object LongToString {
     @SuppressLint("SimpleDateFormat")
     fun getDateTime(time: Long): String? {
         return try {
