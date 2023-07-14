@@ -1,7 +1,7 @@
 package com.romkapo.todoapp.di.components.list
 
-import androidx.lifecycle.ViewModel
 import com.romkapo.todoapp.di.components.app.ViewModelKeys
+import com.romkapo.todoapp.di.components.common.ViewModelAssistedFactory
 import com.romkapo.todoapp.presentation.screen.todolistitems.TodoItemListViewModel
 import dagger.Binds
 import dagger.Module
@@ -12,5 +12,5 @@ interface TodoListItemModule {
     @Binds
     @IntoMap
     @ViewModelKeys(TodoItemListViewModel::class)
-    fun provideTodoListViewModel(todoItemListViewModel: TodoItemListViewModel): ViewModel
+    fun provideTodoListViewModelFactory(factory: TodoItemListViewModel.Factory): ViewModelAssistedFactory<*>
 }

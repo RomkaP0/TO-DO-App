@@ -7,13 +7,11 @@ import com.romkapo.todoapp.utils.Importance
 @Entity(tableName = "todoItems")
 data class TodoItem(
     @PrimaryKey(autoGenerate = false)
-    var id: String,
-    var text: String,
-    var importance: Importance,
-    var dateCreate: Long,
-    var dateComplete: Long? = null,
-    var dateEdit: Long? = null,
-    var isComplete: Boolean = false,
-) {
-    constructor() : this("-1", "", Importance.MEDIUM, 0L, null, null, false)
-}
+    val id: String,
+    val text: String,
+    val importance: Importance,
+    val dateCreate: Long,
+    val dateComplete: Long? = null,
+    val dateEdit: Long? = null,
+    val isComplete: Boolean = false,
+)

@@ -1,9 +1,10 @@
 package com.romkapo.todoapp.di.components.edit
 
-import com.romkapo.todoapp.presentation.screen.addedititem.AddEditItemFragment
+import com.romkapo.todoapp.di.components.ViewModelFactoryModule
+import com.romkapo.todoapp.di.components.common.ViewModelFactory
 import dagger.Subcomponent
 
-@Subcomponent(modules = [AddEditFragmentModule::class])
+@Subcomponent(modules = [AddEditFragmentModule::class, ViewModelFactoryModule::class])
 @AddEditFragmentScope
 interface AddEditFragmentComponent {
 
@@ -11,5 +12,7 @@ interface AddEditFragmentComponent {
     interface Factory {
         fun create(): AddEditFragmentComponent
     }
-    fun inject(addEditItemFragment: AddEditItemFragment)
+
+    fun getViewModelFactory(): ViewModelFactory
+
 }

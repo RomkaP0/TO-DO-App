@@ -48,6 +48,7 @@
         android:gravity="center"
         android:textSize="14sp"
         app:drawableStartCompat="@drawable/ic_calendar"
+        android:text="gegegegege"
         app:layout_constraintStart_toStartOf="@+id/todoTextView"
         app:layout_constraintTop_toBottomOf="@+id/todoTextView" />
 
@@ -58,6 +59,7 @@
         android:drawablePadding="2dp"
         android:gravity="center"
         android:textSize="14sp"
+        android:text="fefe"
         app:drawableStartCompat="@drawable/edit_note_fill0_wght400_grad0_opsz20"
         app:layout_constraintStart_toStartOf="@+id/todoTextView"
         app:layout_constraintTop_toBottomOf="@+id/todoListDate" />
@@ -69,6 +71,7 @@
         android:layout_height="wrap_content"
         android:drawablePadding="2dp"
         android:gravity="center"
+        android:text="fefef"
         android:textSize="14sp"
         app:drawableStartCompat="@drawable/outline_done_all_24"
         app:layout_constraintStart_toStartOf="@+id/todoTextView"

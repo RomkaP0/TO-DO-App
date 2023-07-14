@@ -1,15 +1,14 @@
 package com.romkapo.todoapp.di.components.auth
 
-import com.romkapo.todoapp.presentation.screen.auth.AuthFragment
 import dagger.Subcomponent
 
-@Subcomponent(modules = [AuthFragmentModule::class])
-@AuthFragmentScope
-interface AuthFragmentComponent {
-
-    @Subcomponent.Factory
-    interface Factory {
-        fun create(): AuthFragmentComponent
-    }
-    fun inject(authFragment: AuthFragment)
-}
+//@Subcomponent(modules = [AuthFragmentModule::class])
+//@AuthFragmentScope
+//interface AuthFragmentComponent {
+//
+//    @Subcomponent.Factory
+//    interface Factory {
+//        fun create(): AuthFragmentComponent
+//    }
+//    fun inject(authFragment: AuthFragment)
+//}

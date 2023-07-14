@@ -7,7 +7,7 @@ import java.util.Date
 /* Конвертор timestamp в строку*/
 object LongToString {
     @SuppressLint("SimpleDateFormat")
-    fun getDateTime(time: Long): String? {
+    fun getDateTime(time: Long): String {
         return try {
             val sdf = SimpleDateFormat("dd/MM/yyyy")
             val netDate = Date(time)

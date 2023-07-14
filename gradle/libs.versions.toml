@@ -11,6 +11,9 @@ appcompat = "1.6.1"
 lifecycle-livedata-ktx = "2.6.1"
 material = "1.10.0-alpha05"
 constraintlayout = "2.1.4"
+material-icons-extended = "1.4.3"
+material-icons-core = "1.4.3"
+material3 = "1.2.0-alpha03"
 navigation = "2.6.0"
 navigation-safe-args-gradle-plugin = "2.6.0"
 room = "2.5.2"
@@ -21,14 +24,25 @@ kotlin-serialaize-json = "1.5.0"
 swiperefreshlayout = "1.2.0-alpha01"
 okhttp = "4.11.0"
 dagger = "2.46.1"
+ui-tooling-preview = "1.4.3"
 work-runtime-ktx = "2.8.1"
 ktlint = "11.4.0"
 
 
 [libraries]
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-ktx" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity-ktx" }
 androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle-livedata-ktx" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle-livedata-ktx" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons-extended" }
+androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "material-icons-core" }
+androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version = "2.7.0-beta02" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
+androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "ui-tooling-preview" }
+androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "ui-tooling-preview" }
+androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "ui-tooling-preview" }
+androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "ui-tooling-preview" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work-runtime-ktx" }
 authsdk = { module = "com.yandex.android:authsdk", version.ref = "authsdk" }
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
