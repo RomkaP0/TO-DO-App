@@ -42,7 +42,8 @@ class AddEditItemViewModel @AssistedInject constructor(
                 deadline = System.currentTimeMillis(),
                 isNew = true,
                 isBottomSheetOpened = false,
-                isHighlight = false
+                isHighlight = false,
+                isDialogShown = false
             )
         )
     var currentItemFlow: StateFlow<AddEditScreenStates> = _currentItemFlow.asStateFlow()
@@ -109,8 +110,9 @@ class AddEditItemViewModel @AssistedInject constructor(
             _currentItemFlow.value.copy(hasDeadline = !_currentItemFlow.value.hasDeadline)
     }
 
-    fun changeDeadline() {
-
+    fun changeDeadline(timeStamp:Long) {
+        _currentItemFlow.value =
+            _currentItemFlow.value.copy(deadline = timeStamp)
     }
 
     fun changeBottomSheetState() {
@@ -138,6 +140,13 @@ class AddEditItemViewModel @AssistedInject constructor(
                     )
             }
         }
+    }
+
+    fun changeStateDialog(){
+        _currentItemFlow.value =
+            _currentItemFlow.value.copy(
+               isDialogShown = !_currentItemFlow.value.isDialogShown
+            )
     }
 
     @AssistedFactory

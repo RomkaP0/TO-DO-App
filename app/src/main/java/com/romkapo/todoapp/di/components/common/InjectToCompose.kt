@@ -10,11 +10,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 public fun Inject(
-    viewModelFactory: ViewModelFactory,
+    composeViewModelFactory: ComposeViewModelFactory,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
-        LocalViewModelFactory provides viewModelFactory,
+        LocalViewModelFactory provides composeViewModelFactory,
         content = content
     )
 }
@@ -30,22 +30,22 @@ inline fun <reified VM : ViewModel> daggerViewModel(): VM {
 
 @Composable
 @PublishedApi
-internal fun getViewModelFactory(): ViewModelFactory {
+internal fun getViewModelFactory(): ComposeViewModelFactory {
     return checkNotNull(LocalViewModelFactory.current) {
-        "No ViewModelFactory was provided via LocalViewModelFactory"
+        "No ComposeViewModelFactory was provided via LocalComposeViewModelFactory"
     }
 }
 
 public object LocalViewModelFactory {
-    private val LocalViewModelFactory =
-        compositionLocalOf<ViewModelFactory?> { null }
+    private val LocalComposeViewModelFactory =
+        compositionLocalOf<ComposeViewModelFactory?> { null }
 
-    public val current: ViewModelFactory?
+    public val current: ComposeViewModelFactory?
         @Composable
-        get() = LocalViewModelFactory.current
+        get() = LocalComposeViewModelFactory.current
 
-    public infix fun provides(viewModelFactory: ViewModelFactory):
-            ProvidedValue<ViewModelFactory?> {
-        return LocalViewModelFactory.provides(viewModelFactory)
+    public infix fun provides(composeViewModelFactory: ComposeViewModelFactory):
+            ProvidedValue<ComposeViewModelFactory?> {
+        return LocalComposeViewModelFactory.provides(composeViewModelFactory)
     }
 }

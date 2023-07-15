@@ -30,6 +30,7 @@ private val LightColorScheme = lightColorScheme(
     tertiary = Aqua,
     surface = Black,
     background = LightGrey,
+    surfaceContainerHigh = LightGrey
 
 
 

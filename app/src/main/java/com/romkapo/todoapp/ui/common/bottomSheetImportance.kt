@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.presentation.screen.addedititem
+package com.romkapo.todoapp.ui.common
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement

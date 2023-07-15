@@ -5,6 +5,6 @@ import androidx.lifecycle.ViewModel
 
 /* Фабрика вьюмоделей */
 
-interface ViewModelFactory {
+interface ComposeViewModelFactory {
     fun <VM : ViewModel> create(modelClass: Class<VM>, handle: SavedStateHandle): VM
 }

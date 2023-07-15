@@ -30,6 +30,7 @@ import com.romkapo.todoapp.utils.Constants.NET_EXCEPTION_UP
 import com.romkapo.todoapp.utils.Constants.NOT_FOUND_EXCEPTION
 import com.romkapo.todoapp.utils.Constants.OK
 import com.romkapo.todoapp.utils.Constants.SYNC_EXCEPTION
+import com.romkapo.todoapp.utils.notificationmanager.NotificationScheduler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,6 +42,8 @@ class MainRepositoryImpl @Inject constructor(
     private val todoOperationDAO: TodoOperationDAO,
     private val todoAPI: TodoAPI,
     private val appSharedPreferences: AppSharedPreferences,
+    private val notificationsScheduler: NotificationScheduler
+
 ) : MainRepository {
     private val _stateRequest = MutableStateFlow<Resource>(Resource.Success)
     override val stateRequest get() = _stateRequest.asStateFlow()
@@ -56,14 +59,18 @@ class MainRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {
+        notificationsScheduler.schedule(todoItem)
         safeCallTodo(todoItem, UnSyncAction.ADD)
     }
 
     override suspend fun updateTodoItem(todoItem: TodoItem) {
+        notificationsScheduler.schedule(todoItem)
+
         safeCallTodo(todoItem, UnSyncAction.EDIT)
     }
 
     override suspend fun deleteTodoItem(todoItem: TodoItem) {
+        notificationsScheduler.cancel(todoItem)
         safeCallTodo(todoItem, UnSyncAction.DELETE)
     }
 
@@ -175,6 +182,7 @@ class MainRepositoryImpl @Inject constructor(
         val merged = mergedList.values.toList()
         toDoItemDao.dropTodoItems()
         toDoItemDao.insertTodoList(merged)
+        updateNotifications(merged)
         appSharedPreferences.putRevisionId(body.revision)
 
         return updateRemoteTasks(merged.map { it.toNetworkItem(deviceId) })
@@ -185,6 +193,12 @@ class MainRepositoryImpl @Inject constructor(
             toDoItemDao.getTodoItemById(operation.id)!!
         } else {
             netItem
+        }
+    }
+    private fun updateNotifications(items: List<TodoItem>) {
+        notificationsScheduler.cancelAll()
+        for (item in items){
+            notificationsScheduler.schedule(item)
         }
     }
 }

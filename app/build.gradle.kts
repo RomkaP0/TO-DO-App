@@ -82,6 +82,9 @@ dependencies {
     implementation(libs.bundles.retrofit)
     implementation(libs.bundles.okhttp)
 
+    implementation(libs.accompanist.permissions)
+
+
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.activity.ktx)
 
