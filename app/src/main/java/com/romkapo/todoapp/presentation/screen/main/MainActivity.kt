@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -42,7 +43,7 @@ import com.romkapo.todoapp.data.model.SyncFailedException
 import com.romkapo.todoapp.data.model.UpdateFailedException
 import com.romkapo.todoapp.di.components.main.MainActivityComponent
 import com.romkapo.todoapp.ui.theme.TodoAppTheme
-import com.romkapo.todoapp.utils.Tet
+import com.romkapo.todoapp.utils.ThemeProvider
 import com.romkapo.todoapp.utils.ThemeMode
 import com.romkapo.todoapp.utils.navigation.AppNavHost
 import kotlinx.coroutines.flow.collectLatest
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
 
             TodoAppTheme(
-                darkTheme = when (Tet.theme.intValue) {
+                darkTheme = when (ThemeProvider.theme.intValue) {
                     ThemeMode.LIGHT.ordinal -> false
                     ThemeMode.DARK.ordinal -> true
                     else -> isSystemInDarkTheme()
@@ -84,10 +85,14 @@ class MainActivity : AppCompatActivity() {
                 if (notifyingState.allPermissionsGranted || VERSION.SDK_INT < VERSION_CODES.S || skipState.value) {
                     viewModel.putStatusNotification(!skipState.value)
                     val navState = rememberNavController()
-                    AppNavHost(navController = navState)
+                    Scaffold(modifier = Modifier.fillMaxSize()) {
+                        AppNavHost(navController = navState, paddingValues = it)
+                    }
                 } else {
                     Column(
-                        modifier = Modifier.fillMaxSize().padding(16.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
                         verticalArrangement = Arrangement.SpaceEvenly,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {

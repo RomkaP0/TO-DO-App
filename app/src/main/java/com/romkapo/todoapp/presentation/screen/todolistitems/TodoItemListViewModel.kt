@@ -87,10 +87,6 @@ class TodoItemListViewModel @AssistedInject constructor(
         }
     }
 
-    fun logOut() {
-        appSharedPreferences.setCurrentToken("")
-    }
-
     override fun onCleared() {
         getDataJob?.cancel()
         super.onCleared()

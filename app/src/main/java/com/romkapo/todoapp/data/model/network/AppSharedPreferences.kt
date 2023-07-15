@@ -6,7 +6,7 @@ import com.romkapo.todoapp.utils.Constants.SHARED_PREFERENCES_NOTIFICATIONS_IDS
 import com.romkapo.todoapp.utils.Constants.SHARED_PREFERENCES_NOTIFICATION_STATUS
 import com.romkapo.todoapp.utils.Constants.THEME_KEY
 import com.romkapo.todoapp.utils.Constants.TOKEN_KEY
-import com.romkapo.todoapp.utils.Tet
+import com.romkapo.todoapp.utils.ThemeProvider
 import com.romkapo.todoapp.utils.ThemeMode
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,7 +36,7 @@ class AppSharedPreferences @Inject constructor(
         editor.putInt(THEME_KEY, theme.ordinal)
         editor.apply()
 
-        Tet.theme.intValue = (theme.ordinal)
+        ThemeProvider.theme.intValue = (theme.ordinal)
     }
 
     fun getTheme(): Int = sharedPreferences.getInt(THEME_KEY, 2)

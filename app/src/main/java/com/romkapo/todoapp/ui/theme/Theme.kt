@@ -2,48 +2,55 @@ package com.romkapo.todoapp.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
 
 private val DarkColorScheme = darkColorScheme(
-    primary = LightBlack,
+    primary = HakiLight,
+    onPrimary = DarkGrey,
+    primaryContainer = Aqua,
     secondary = DarkGrey,
-    tertiary = Aqua
+    tertiary = Aqua,
+    surface = DarkGrey,
+    background = LightBlack,
+    surfaceContainerHigh = DarkGrey,
+    surfaceVariant = DarkGrey
 )
 
+
 private val LightColorScheme = lightColorScheme(
-    primary = Haki,
+    primary = HakiDark,
     onPrimary = LightGrey,
     primaryContainer = Aqua,
     secondary = White,
     tertiary = Aqua,
-    surface = Black,
+    surface = LightGrey,
     background = LightGrey,
-    surfaceContainerHigh = LightGrey
+    surfaceContainerHigh = LightGrey,
+    surfaceVariant = LightGrey
 
-
-
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
 )
 
 @Composable
@@ -76,4 +83,66 @@ fun TodoAppTheme(
         typography = Typography,
         content = content
     )
+}
+
+@Preview
+@Composable
+fun LightPalette() {
+    val colors = mapOf(
+        "primary" to HakiDark,
+        "onPrimary" to LightGrey,
+        "primaryContainer" to Aqua,
+        "secondary" to White,
+        "tertiary" to Aqua,
+        "surface" to LightGrey,
+        "background" to LightGrey,
+        "surfaceContainerHigh" to LightGrey,
+        "surfaceVariant" to Grey
+    )
+    LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+        items(colors.size) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier
+                .size(48.dp)
+                .background(colors.values.toList()[it])) {
+                Text(text = colors.keys.toList()[it])
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun DarkPalette() {
+    val colors = mapOf(
+        "primary" to HakiLight,
+        "onPrimary" to DarkGrey,
+        "primaryContainer" to Aqua,
+        "secondary" to DarkGrey,
+        "tertiary" to Aqua,
+        "surface" to DarkGrey,
+        "background" to LightGrey,
+        "surfaceContainerHigh" to DarkGrey,
+        "surfaceVariant" to Grey
+    )
+    LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+        items(colors.size) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier
+                .size(48.dp)
+                .background(colors.values.toList()[it])) {
+                Text(text = colors.keys.toList()[it])
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Typographies(){
+    Column {
+        Text(style = MaterialTheme.typography.titleLarge, text = "What is it")
+        Text(style = MaterialTheme.typography.titleMedium, text = "What is it")
+        Text(style = MaterialTheme.typography.labelMedium, text = "What is it")
+        Text(style = MaterialTheme.typography.bodyMedium, text = "What is it")
+        Text(style = MaterialTheme.typography.bodySmall, text = "What is it")
+    }
 }

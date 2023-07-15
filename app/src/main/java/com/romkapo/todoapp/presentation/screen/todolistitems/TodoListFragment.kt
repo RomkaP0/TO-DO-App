@@ -23,13 +23,13 @@ import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +48,6 @@ fun TodoListScreen(
     viewModel: TodoItemListViewModel = daggerViewModel(),
 ) {
     val state = viewModel.sampleData.collectAsState()
-    val scope = rememberCoroutineScope()
 
 
     Scaffold(
@@ -86,7 +85,7 @@ fun TodoListScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = stringResource(id = R.string.complete) + " " + state.value.countOfCompleted)
+                Text(style = MaterialTheme.typography.labelMedium, text = stringResource(id = R.string.complete) + " " + state.value.countOfCompleted)
                 EyeCheckBox(isChecked = state.value.isCheckedShown) {
                     viewModel.changeShow()
                 }

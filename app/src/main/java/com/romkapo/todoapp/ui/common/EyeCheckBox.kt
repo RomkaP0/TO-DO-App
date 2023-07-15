@@ -5,6 +5,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.romkapo.todoapp.R
 
 
@@ -25,4 +26,15 @@ fun EyeCheckBox(
     }){
         Icon(imageVector = vectorResource, contentDescription = null)
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun trueEyeButtonPreview() {
+    EyeCheckBox(true, {})
+}
+@Preview(showBackground = true)
+@Composable
+fun falseEyeButtonPreview() {
+    EyeCheckBox(false, {})
 }

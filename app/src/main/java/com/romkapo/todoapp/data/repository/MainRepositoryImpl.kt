@@ -189,7 +189,7 @@ class MainRepositoryImpl @Inject constructor(
     }
 
     private fun editTodoUpdate(operation: UnSyncTodoItem, netItem: TodoItem): TodoItem {
-        return if (!(netItem.dateEdit != null && netItem.dateEdit!! >= operation.timestamp)) {
+        return if (!(netItem.dateEdit != null && netItem.dateEdit >= operation.timestamp)) {
             toDoItemDao.getTodoItemById(operation.id)!!
         } else {
             netItem
@@ -200,5 +200,10 @@ class MainRepositoryImpl @Inject constructor(
         for (item in items){
             notificationsScheduler.schedule(item)
         }
+    }
+
+    override fun deleteAllTodo() {
+        toDoItemDao.dropTodoItems()
+        updateNotifications(emptyList())
     }
 }

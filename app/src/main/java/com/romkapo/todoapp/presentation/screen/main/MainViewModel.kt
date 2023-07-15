@@ -8,7 +8,7 @@ import com.romkapo.todoapp.data.model.network.AppSharedPreferences
 import com.romkapo.todoapp.data.network.ConnectionManagerObserver
 import com.romkapo.todoapp.data.network.map
 import com.romkapo.todoapp.domain.MainRepository
-import com.romkapo.todoapp.utils.Tet
+import com.romkapo.todoapp.utils.ThemeProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +22,7 @@ class MainViewModel @Inject constructor(
     private val appSharedPreferences: AppSharedPreferences
 ) : ViewModel() {
     init {
-        Tet.theme.intValue = appSharedPreferences.getTheme()
+        ThemeProvider.theme.intValue = appSharedPreferences.getTheme()
     }
 
     private val _stateRequest = MutableStateFlow<Resource>(Resource.Success)

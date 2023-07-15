@@ -36,7 +36,6 @@ import androidx.navigation.NavController
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.di.components.common.daggerViewModel
 import com.romkapo.todoapp.ui.common.ModalSheetImportance
-import com.romkapo.todoapp.ui.common.WhiteRoundColumn
 import com.romkapo.todoapp.utils.DateTimePicker
 import com.romkapo.todoapp.utils.LongToString
 
@@ -78,10 +77,11 @@ fun AddEditScreen(
                 viewModel.saveTodoItem()
                 navController.navigate("todo_list")
             }) {
-                Text(text = stringResource(id = R.string.save))
+                Text(style = MaterialTheme.typography.labelMedium, text = stringResource(id = R.string.save))
             }
         }
         OutlinedTextField(
+            textStyle = MaterialTheme.typography.bodyMedium,
             modifier = provideWidthModifier
                 .background(
                     MaterialTheme.colorScheme.secondary,
@@ -101,33 +101,34 @@ fun AddEditScreen(
             value = state.value.text,
             onValueChange = { viewModel.changeText(it) })
 
-        WhiteRoundColumn(modifier = provideWidthModifier) {
+        Column(modifier = provideWidthModifier.background(color = MaterialTheme.colorScheme.secondary,
+            shape = RoundedCornerShape(8.dp))) {
             Row(
-                modifier = provideWidthModifier,
+                modifier = provideWidthModifier.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = stringResource(id = R.string.importance))
+                Text(style = MaterialTheme.typography.bodyMedium, text = stringResource(id = R.string.importance))
                 TextButton(onClick = {
                     viewModel.changeBottomSheetState()
                 }) {
-                    Text(text = state.value.importance, color = textColor.value)
+                    Text(style = MaterialTheme.typography.bodyMedium, text = state.value.importance, color = textColor.value)
                 }
             }
             Divider(modifier = provideWidthModifier.padding(horizontal = 4.dp))
             Row(
-                modifier = provideWidthModifier,
+                modifier = provideWidthModifier.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = stringResource(id = R.string.complete_before))
-                Switch(
+                Text(style = MaterialTheme.typography.bodyMedium, text = stringResource(id = R.string.complete_before))
+                Switch(modifier = Modifier.padding(end = 8.dp),
                     checked = state.value.hasDeadline,
                     onCheckedChange = { viewModel.changeStateDeadline() })
             }
             if (state.value.hasDeadline) {
                 TextButton(onClick = { viewModel.changeStateDialog() }) {
-                    Text(text = LongToString.getDateTime(state.value.deadline))
+                    Text(style = MaterialTheme.typography.bodyMedium, text = LongToString.getDateTime(state.value.deadline))
                 }
             }
         }
@@ -141,7 +142,7 @@ fun AddEditScreen(
                 viewModel.removeTodoItem()
                 navController.navigate("todo_list")
             }) {
-            Text(text = stringResource(id = R.string.delete))
+            Text(style = MaterialTheme.typography.bodyMedium, text = stringResource(id = R.string.delete))
         }
     }
     if (state.value.isBottomSheetOpened) {
@@ -157,3 +158,9 @@ fun AddEditScreen(
             saveTime = { time -> viewModel.changeDeadline(time) })
     }
 }
+
+//@Preview
+//@Composable
+//fun previewAddEditScreen(){
+//    AddEditScreen(viewModel = AddEditItemViewModel(), navController = rememberNavController())
+//}

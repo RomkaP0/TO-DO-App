@@ -9,7 +9,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-public fun Inject(
+fun Inject(
     composeViewModelFactory: ComposeViewModelFactory,
     content: @Composable () -> Unit
 ) {
@@ -36,15 +36,15 @@ internal fun getViewModelFactory(): ComposeViewModelFactory {
     }
 }
 
-public object LocalViewModelFactory {
+object LocalViewModelFactory {
     private val LocalComposeViewModelFactory =
         compositionLocalOf<ComposeViewModelFactory?> { null }
 
-    public val current: ComposeViewModelFactory?
+    val current: ComposeViewModelFactory?
         @Composable
         get() = LocalComposeViewModelFactory.current
 
-    public infix fun provides(composeViewModelFactory: ComposeViewModelFactory):
+    infix fun provides(composeViewModelFactory: ComposeViewModelFactory):
             ProvidedValue<ComposeViewModelFactory?> {
         return LocalComposeViewModelFactory.provides(composeViewModelFactory)
     }

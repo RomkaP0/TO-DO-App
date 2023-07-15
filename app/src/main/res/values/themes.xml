@@ -17,13 +17,4 @@
     <style name="Theme.TODOApp" parent="Base.Theme.TODOApp" />
 
 
-    <style name="Widget.App.Button.OutlinedButton.IconOnly" parent="Widget.Material3.Button.OutlinedButton">
-        <item name="iconSize">12dp</item>
-    </style>
-
-    <style name="ThemeOverlay.App.DatePicker" parent="@style/ThemeOverlay.Material3.MaterialCalendar">
-        <item name="colorPrimary">@color/primaryContainer</item>
-        <item name="colorSurface">@color/background</item>
-    </style>
-
 </resources>

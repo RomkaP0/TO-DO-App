@@ -4,7 +4,11 @@ import AuthScreen
 import android.app.Application
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -21,8 +25,9 @@ import com.romkapo.todoapp.presentation.screen.todolistitems.TodoListScreen
 @Composable
 fun AppNavHost(
     navController: NavHostController,
+    paddingValues: PaddingValues,
 ) {
-    NavHost(navController = navController, startDestination = "auth") {
+    NavHost(modifier = Modifier.fillMaxSize().padding(), navController = navController, startDestination = "auth") {
         composable("todo_list",
             enterTransition = {
                 slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(2000))
