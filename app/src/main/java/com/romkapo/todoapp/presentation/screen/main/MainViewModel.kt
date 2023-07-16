@@ -21,8 +21,13 @@ class MainViewModel @Inject constructor(
     private val repository: MainRepository,
     private val appSharedPreferences: AppSharedPreferences
 ) : ViewModel() {
+    var launchScreen = "auth"
     init {
         ThemeProvider.theme.intValue = appSharedPreferences.getTheme()
+        val token = appSharedPreferences.getCurrentToken()
+        if (!(token == null || token == "")){
+            launchScreen="todo_list"
+        }
     }
 
     private val _stateRequest = MutableStateFlow<Resource>(Resource.Success)

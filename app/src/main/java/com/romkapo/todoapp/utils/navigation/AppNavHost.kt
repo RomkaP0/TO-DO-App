@@ -26,15 +26,34 @@ import com.romkapo.todoapp.presentation.screen.todolistitems.TodoListScreen
 fun AppNavHost(
     navController: NavHostController,
     paddingValues: PaddingValues,
+    launchScreen: String,
 ) {
-    NavHost(modifier = Modifier.fillMaxSize().padding(), navController = navController, startDestination = "auth") {
-        composable("todo_list",
+    NavHost(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+        navController = navController,
+        startDestination = launchScreen
+    ) {
+        composable("todo_list?id={id}",
             enterTransition = {
-                slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(2000))
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
             },
             exitTransition = {
-                slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(2000))
-            }) {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+            arguments = listOf(navArgument("id") {
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
+            })
+        ) {
             val todoFragmentComponent = (LocalContext.current.applicationContext as Application)
                 .appComponent.todoItemListFragmentComponentFactory().create()
             Inject(todoFragmentComponent.getViewModelFactory()) {
@@ -46,15 +65,22 @@ fun AppNavHost(
         composable(
             "add_edit?id={id}",
             enterTransition = {
-                slideIntoContainer(towards = AnimatedContentTransitionScope.SlideDirection.Right, animationSpec = tween(2000))
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
             },
             exitTransition = {
-                slideOutOfContainer(towards = AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(2000))
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
             },
             arguments = listOf(navArgument("id") {
                 type = NavType.StringType
                 nullable = true
-                defaultValue = null}),
+                defaultValue = null
+            }),
             deepLinks = listOf(
                 navDeepLink { uriPattern = "todoapp://add_edit/{id}" }
             )
@@ -68,8 +94,20 @@ fun AppNavHost(
             }
         }
         composable(
-            "settings"
-        ){
+            "settings",
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+        ) {
             val settingsFragmentComponent = (LocalContext.current.applicationContext as Application)
                 .appComponent.settingsFragmentComponentFactory().create()
             Inject(settingsFragmentComponent.getViewModelFactory()) {
@@ -79,8 +117,20 @@ fun AppNavHost(
             }
         }
         composable(
-            "auth"
-        ){
+            "auth",
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(500)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(500)
+                )
+            },
+        ) {
             val authFragmentComponent = (LocalContext.current.applicationContext as Application)
                 .appComponent.authFragmentComponentFactory().create()
             Inject(authFragmentComponent.getViewModelFactory()) {

@@ -1,8 +1,7 @@
 package com.romkapo.todoapp.presentation.screen.main
 
 import android.app.Application
-import android.os.Build.VERSION
-import android.os.Build.VERSION_CODES
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -43,8 +42,8 @@ import com.romkapo.todoapp.data.model.SyncFailedException
 import com.romkapo.todoapp.data.model.UpdateFailedException
 import com.romkapo.todoapp.di.components.main.MainActivityComponent
 import com.romkapo.todoapp.ui.theme.TodoAppTheme
-import com.romkapo.todoapp.utils.ThemeProvider
 import com.romkapo.todoapp.utils.ThemeMode
+import com.romkapo.todoapp.utils.ThemeProvider
 import com.romkapo.todoapp.utils.navigation.AppNavHost
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -82,11 +81,13 @@ class MainActivity : AppCompatActivity() {
                 )
                 val skipState = rememberSaveable { mutableStateOf(false) }
 
-                if (notifyingState.allPermissionsGranted || VERSION.SDK_INT < VERSION_CODES.S || skipState.value) {
+                if (notifyingState.allPermissionsGranted || Build.VERSION.SDK_INT < Build.VERSION_CODES.S || skipState.value) {
                     viewModel.putStatusNotification(!skipState.value)
                     val navState = rememberNavController()
-                    Scaffold(modifier = Modifier.fillMaxSize()) {
-                        AppNavHost(navController = navState, paddingValues = it)
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        AppNavHost(navController = navState, paddingValues = it, launchScreen = viewModel.launchScreen)
                     }
                 } else {
                     Column(
@@ -99,12 +100,12 @@ class MainActivity : AppCompatActivity() {
                         val textToShow = if (notifyingState.shouldShowRationale) {
                             // If the user has denied the permission but the rationale can be shown,
                             // then gently explain why the app requires this permission
-                            "The camera is important for this app. Please grant the permission."
+                            "This permissions are important for this app. Please grant the permission."
                         } else {
                             // If it's the first time the user lands on this feature, or the user
                             // doesn't want to be asked again for this permission, explain that the
                             // permission is required
-                            "Camera permission required for this feature to be available. " +
+                            "Notify is important for notification you. " +
                                     "Please grant the permission"
                         }
                         Text(textToShow)

@@ -63,6 +63,7 @@ dependencies {
 
     //material
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
 
@@ -81,6 +82,7 @@ dependencies {
     implementation(libs.bundles.dagger)
     implementation(libs.bundles.retrofit)
     implementation(libs.bundles.okhttp)
+    implementation(libs.info.bar.compose)
 
     implementation(libs.accompanist.permissions)
 

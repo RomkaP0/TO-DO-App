@@ -22,4 +22,5 @@
     <string name="postpone_for_a_day">Отложить на день</string>
     <string name="notification_text">Your notification is %1$s and importance is %2$s</string>
     <string name="logout">Выйти из аккаунта</string>
+    <string name="low">Низкая</string>
 </resources>

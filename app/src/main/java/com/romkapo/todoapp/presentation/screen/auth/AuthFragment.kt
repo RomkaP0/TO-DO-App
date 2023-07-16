@@ -44,88 +44,85 @@ fun AuthScreen(
     viewModel: AuthViewModel = daggerViewModel()
 ) {
     val sdk = YandexAuthSdk(LocalContext.current, YandexAuthOptions(LocalContext.current))
+    val context = LocalContext.current
 
-    if (!(viewModel.token == null || viewModel.token == "")) {
-        navController.navigate("todo_list")
-        val context = LocalContext.current
-
-        val launcher =
-            rememberLauncherForActivityResult(YandexSignInActivityResultContract()) { pair ->
-                val token = sdk.extractToken(pair.first, pair.second)
-                try {
-                    if (token != null) {
-                        viewModel.putToken(token.value)
-                        navController.navigate("todo_list")
-                    } else {
-                        cantAuthToast(context)
-                    }
-                } catch (e: YandexAuthException) {
+    val launcher =
+        rememberLauncherForActivityResult(YandexSignInActivityResultContract()) { pair ->
+            val token = sdk.extractToken(pair.first, pair.second)
+            try {
+                if (token != null) {
+                    viewModel.putToken(token.value)
+                    navController.navigate("todo_list")
+                } else {
                     cantAuthToast(context)
                 }
+            } catch (e: YandexAuthException) {
+                cantAuthToast(context)
             }
+        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(text = stringResource(id = R.string.auth), style = Typography.titleLarge)
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = stringResource(id = R.string.auth), style = Typography.titleLarge)
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            OutlinedButton(
+                modifier = Modifier.size(298.dp, 44.dp),
+                onClick = { navController.navigate("todo_list") }) {
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(id = R.string.auth_guest)
+                )
+            }
+            Box(
+                contentAlignment = Alignment.Center, modifier = Modifier
+                    .width(270.dp)
+                    .padding(vertical = 16.dp)
             ) {
-                OutlinedButton(
-                    modifier = Modifier.size(298.dp, 44.dp),
-                    onClick = { navController.navigate("todo_list") }) {
-                    Text(
-                        style = MaterialTheme.typography.bodyMedium,
-                        text = stringResource(id = R.string.auth_guest)
-                    )
-                }
-                Box(
-                    contentAlignment = Alignment.Center, modifier = Modifier
-                        .width(270.dp)
-                        .padding(vertical = 16.dp)
-                ) {
-                    Divider()
-                    val color = MaterialTheme.colorScheme.background
-                    Text(
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth(0.2f)
-                            .drawBehind { drawRect(color = color) },
-                        textAlign = TextAlign.Center,
-                        text = stringResource(id = R.string.or)
-                    )
-                }
-                Button(
-                    colors = ButtonDefaults.buttonColors(containerColor = Black),
-                    modifier = Modifier.size(298.dp, 44.dp),
-                    onClick = { launcher.launch(sdk) }) {
+                Divider()
+                val color = MaterialTheme.colorScheme.background
+                Text(
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth(0.2f)
+                        .drawBehind { drawRect(color = color) },
+                    textAlign = TextAlign.Center,
+                    text = stringResource(id = R.string.or)
+                )
+            }
+            Button(
+                colors = ButtonDefaults.buttonColors(containerColor = Black),
+                modifier = Modifier.size(298.dp, 44.dp),
+                onClick = { launcher.launch(sdk) }) {
 
-                    Image(
-                        painter = painterResource(id = R.drawable.yandex_logo),
-                        contentDescription = "icon",
-                        modifier = Modifier
-                            .size(40.dp)
-                    )
-                    Text(
-                        text = "Войти с Яндекс ID",
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 1.43.em,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp)
-                    )
+                Image(
+                    painter = painterResource(id = R.drawable.yandex_logo),
+                    contentDescription = "icon",
+                    modifier = Modifier
+                        .size(40.dp)
+                )
+                Text(
+                    text = "Войти с Яндекс ID",
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 1.43.em,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                )
 
-                }
             }
         }
     }
 }
+
 
 private fun cantAuthToast(context: Context) {
     Toast.makeText(

@@ -1,4 +1,4 @@
-package com.romkapo.todoapp.utils
+package com.romkapo.todoapp.ui.common
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -48,19 +49,27 @@ fun DateTimePicker(timestamp: Long, dismiss: () -> Unit, saveTime: (Long) -> Uni
         ).hour,
         LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).minute
     )
-    Dialog(onDismissRequest = { dismiss() },    properties = DialogProperties(
-        usePlatformDefaultWidth = false
-    )
+    Dialog(
+        onDismissRequest = { dismiss() },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false
+        )
     ) {
         Surface(
-            modifier = Modifier.fillMaxWidth(0.95f)
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
                 .wrapContentHeight(),
             shape = MaterialTheme.shapes.large,
             tonalElevation = AlertDialogDefaults.TonalElevation
         ) {
-            Column(modifier = Modifier.fillMaxWidth().padding(4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 if (isDatePicker.value) {
-                    DatePicker(modifier = Modifier.requiredWidth(360.dp), state = datePickerState)
+                    DatePicker(modifier = Modifier.requiredWidth(360.dp), state = datePickerState, showModeToggle = false)
                 } else {
                     TimePicker(modifier = Modifier, state = timePickerState)
                 }
@@ -75,7 +84,7 @@ fun DateTimePicker(timestamp: Long, dismiss: () -> Unit, saveTime: (Long) -> Uni
                         Text(text = "Отменить")
                     }
                     TextButton(modifier = Modifier.weight(1f, true), onClick = {
-                        saveTime(datePickerState.selectedDateMillis!! + (timePickerState.hour * 3600000L) + (timePickerState.minute * 60000L)-TimeZone.getDefault().rawOffset)
+                        saveTime(datePickerState.selectedDateMillis!! + (timePickerState.hour * 3600000L) + (timePickerState.minute * 60000L) - TimeZone.getDefault().rawOffset)
                         dismiss()
                     }) {
                         Text(text = "Сохранить")
@@ -84,4 +93,10 @@ fun DateTimePicker(timestamp: Long, dismiss: () -> Unit, saveTime: (Long) -> Uni
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun dateTimePickerPreview(){
+    DateTimePicker(timestamp = System.currentTimeMillis(), dismiss = { /*TODO*/ }, saveTime = {})
 }
