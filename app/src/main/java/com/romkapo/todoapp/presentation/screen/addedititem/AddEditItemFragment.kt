@@ -1,178 +1,285 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.romkapo.todoapp.presentation.screen.addedititem
 
-import android.app.Application
-import android.content.Context
-import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import com.google.android.material.datepicker.MaterialDatePicker
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.romkapo.todoapp.R
-import com.romkapo.todoapp.appComponent
-import com.romkapo.todoapp.data.model.TodoItem
-import com.romkapo.todoapp.databinding.FragmentAddEditItemBinding
-import com.romkapo.todoapp.di.components.edit.AddEditFragmentComponent
-import com.romkapo.todoapp.utils.Importance
+import com.romkapo.todoapp.di.components.common.daggerViewModel
+import com.romkapo.todoapp.ui.common.DateTimePicker
 import com.romkapo.todoapp.utils.LongToString
-import kotlinx.coroutines.launch
-import java.lang.reflect.InvocationTargetException
-import java.util.UUID
-import javax.inject.Inject
 
-class AddEditItemFragment : Fragment() {
-    private var _binding: FragmentAddEditItemBinding? = null
-    private val binding get() = _binding!!
-    private val args by navArgs<AddEditItemFragmentArgs>()
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var addEditFragmentComponent: AddEditFragmentComponent
-    private val viewModel: AddEditItemViewModel by viewModels { viewModelFactory }
+@Composable()
+fun AddEditScreen(
+    navController: NavController,
+    viewModel: AddEditItemViewModel = daggerViewModel(),
 
-    override fun onAttach(context: Context) {
-        addEditFragmentComponent =
-            (requireContext().applicationContext as Application).appComponent.addEditFragmentComponentFactory()
-                .create()
-        addEditFragmentComponent.inject(this)
-        super.onAttach(context)
-    }
+    ) {
+    val state = viewModel.currentItemFlow.collectAsState()
+    InitialAddEditContent(
+        state = state,
+        navController = navController,
+        saveTodoItem = { viewModel.saveTodoItem() },
+        changeText = { viewModel.changeText(it) },
+        changeBottomSheetState = { viewModel.changeBottomSheetState() },
+        changeStateDialog = { viewModel.changeStateDialog() },
+        changeStateDeadline = { viewModel.changeStateDeadline() },
+        changeDeadline = { viewModel.changeDeadline(it) },
+        changeImportance = { viewModel.changeImportance(it) })
+}
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        _binding = FragmentAddEditItemBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+@Composable
+fun InitialAddEditContent(
+    state: State<AddEditScreenStates>,
+    navController: NavController,
+    saveTodoItem: () -> Unit,
+    changeText: (String) -> Unit,
+    changeBottomSheetState: () -> Unit,
+    changeStateDeadline: () -> Unit,
+    changeStateDialog: () -> Unit,
+    changeDeadline: (Long) -> Unit,
+    changeImportance: (String) -> Unit,
+) {
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    val textColor = animateColorAsState(
+        targetValue = if (state.value.isHighlight) Color.Red else MaterialTheme.colorScheme.primary,
+        animationSpec = tween(durationMillis = 1000)
+    )
 
-        lifecycleScope.launch {
-            viewModel.currentItemFlow.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect {
-                    viewModel.currentItem = it
-                    enableDeleteButton(it)
-                    insertDataFromArgs(it)
+
+    val provideWidthModifier = Modifier.fillMaxWidth()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
+    ) {
+
+        Row(modifier = provideWidthModifier, horizontalArrangement = Arrangement.SpaceBetween) {
+            IconButton(onClick = { navController.navigateUp() }) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
+                    contentDescription = null
+                )
+            }
+            TextButton(onClick = {
+                saveTodoItem()
+                navController.navigate("todo_list")
+            }) {
+                Text(
+                    style = MaterialTheme.typography.labelMedium,
+                    text = stringResource(id = R.string.save)
+                )
+            }
+        }
+        OutlinedTextField(
+            textStyle = MaterialTheme.typography.bodyMedium,
+            modifier = provideWidthModifier
+                .background(
+                    MaterialTheme.colorScheme.secondary,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .defaultMinSize(
+                    minWidth = OutlinedTextFieldDefaults.MinWidth,
+                    minHeight = OutlinedTextFieldDefaults.MinHeight
+                ),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.secondary
+            ),
+            minLines = 3,
+            maxLines = 3,
+            placeholder = { Text(text = "Название события...") },
+            value = state.value.text,
+            onValueChange = { changeText(it) })
+
+        Column(
+            modifier = provideWidthModifier.background(
+                color = MaterialTheme.colorScheme.secondary,
+                shape = RoundedCornerShape(8.dp)
+            )
+        ) {
+            Row(
+                modifier = provideWidthModifier.padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(id = R.string.importance)
+                )
+                TextButton(onClick = {
+                    changeBottomSheetState()
+                }) {
+                    Text(
+                        style = MaterialTheme.typography.bodyMedium,
+                        text = state.value.importance,
+                        color = textColor.value
+                    )
                 }
+            }
+            Divider(modifier = provideWidthModifier.padding(horizontal = 4.dp))
+            Row(
+                modifier = provideWidthModifier.padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(id = R.string.complete_before)
+                )
+                Switch(modifier = Modifier.padding(end = 8.dp),
+                    checked = state.value.hasDeadline,
+                    onCheckedChange = { changeStateDeadline() })
+            }
+            if (state.value.hasDeadline) {
+                TextButton(onClick = { changeStateDialog() }) {
+                    Text(
+                        style = MaterialTheme.typography.bodyMedium,
+                        text = LongToString.getDateTime(state.value.deadline)
+                    )
+                }
+            }
         }
+        val interactionSource = remember { MutableInteractionSource() }
+        val isPressed by interactionSource.collectIsPressedAsState()
 
-        try {
-            viewModel.loadTask(args.todoItemID)
-        } catch (e: InvocationTargetException) {
-            Log.d("NavArgsException", "There aren`t args")
+        val color = if (isPressed) Color.Red else MaterialTheme.colorScheme.secondary
+        TextButton(
+            modifier = provideWidthModifier.background(
+                MaterialTheme.colorScheme.secondary,
+                shape = RoundedCornerShape(8.dp)
+            ),
+            interactionSource = interactionSource,
+            colors = ButtonDefaults.buttonColors(containerColor = color),
+            enabled = !state.value.isNew,
+            onClick = {
+                navController.navigate("todo_list?id=${state.value.id}")
+            }) {
+            Text(
+                style = MaterialTheme.typography.bodyMedium,
+                text = stringResource(id = R.string.delete)
+            )
         }
-
-        binding.addEditDateTextView.text = LongToString.getDateTime(
-            viewModel.currentItem.dateComplete ?: System.currentTimeMillis(),
-        )
-        setupListeners()
     }
-
-    private fun setupListeners() {
-        binding.addEditButtonClose.setOnClickListener {
-            findNavController().navigateUp()
-        }
-
-        binding.addEditButtonSave.setOnClickListener {
-            tryAddTodoItem()
-            findNavController().navigateUp()
-        }
-
-        binding.completeBeforeSwith.setOnCheckedChangeListener { _, isChecked ->
-            provideCheckChangeLogic(isChecked)
-        }
-    }
-
-    private fun provideCheckChangeLogic(isChecked: Boolean) {
-        val time = viewModel.currentItem.dateComplete ?: System.currentTimeMillis()
-        viewModel.currentItem.dateComplete = time
-        with(binding.addEditDateTextView) {
-            text = LongToString.getDateTime(time)
-            if (isChecked) {
-                visibility = View.VISIBLE
-                setOnClickListener { buildDatePickerDialog(time) }
-            } else {
-                visibility = View.INVISIBLE
+    if (state.value.isBottomSheetOpened) {
+        ModalBottomSheet(
+            onDismissRequest = { changeBottomSheetState() },
+            sheetState = bottomSheetState
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                val modifier = Modifier.fillMaxWidth()
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = modifier.clickable { changeImportance("Низкая"); changeBottomSheetState() },
+                    text = stringResource(R.string.low)
+                )
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = modifier.clickable { changeImportance("Обычная"); changeBottomSheetState() },
+                    text = "Обычная"
+                )
+                Text(
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = modifier.clickable { changeImportance("Высокая"); changeBottomSheetState() },
+                    text = "Высокая"
+                )
             }
         }
     }
+    if (state.value.isDialogShown) {
+        DateTimePicker(
+            timestamp = state.value.deadline,
+            dismiss = { changeStateDialog() },
+            saveTime = { time -> changeDeadline(time) })
+    }
+}
 
-    private fun buildDatePickerDialog(time: Long) {
-        val datePicker = MaterialDatePicker.Builder.datePicker()
-            .setTitleText(getString(R.string.choose_data))
-            .setTheme(R.style.ThemeOverlay_App_DatePicker)
-            .setSelection(time)
-            .build()
 
-        datePicker.addOnPositiveButtonClickListener {
-            datePicker.selection?.let {
-                viewModel.currentItem.dateComplete = it
-                binding.addEditDateTextView.text = LongToString.getDateTime(it)
+/* Превью не показывает переопределенную тему */
+@Preview(showSystemUi = true, showBackground = true)
+@Composable
+fun AddEditScreenPreview() {
+    Surface {
+        MaterialTheme {
+            val state = remember {
+                mutableStateOf(
+                    AddEditScreenStates(
+                        id = "",
+                        text = "Something",
+                        importance = "Обычная",
+                        hasDeadline = true,
+                        dateCreate = 0L,
+                        deadline = System.currentTimeMillis(),
+                        isNew = true,
+                        isBottomSheetOpened = false,
+                        isHighlight = false,
+                        isDialogShown = false
+                    )
+                )
             }
+
+            InitialAddEditContent(
+                state = state,
+                navController = rememberNavController(),
+                saveTodoItem = {},
+                changeText = {},
+                changeBottomSheetState = {},
+                changeStateDeadline = {},
+                changeStateDialog = {},
+                changeDeadline = {},
+                changeImportance = {}
+            )
         }
-        datePicker.show(requireActivity().supportFragmentManager, "tag")
-    }
-
-    private fun tryAddTodoItem() {
-        with(viewModel.currentItem) {
-            importance = when (binding.importanceToggleGroup.checkedButtonId) {
-                R.id.ImportanceLow -> Importance.LOW
-                R.id.ImportanceMiddle -> Importance.MEDIUM
-                R.id.ImportanceHigh -> Importance.HIGH
-                else -> Importance.MEDIUM }
-            text = binding.TodoDescribe.text.toString()
-            dateCreate = if (dateCreate == 0L) System.currentTimeMillis() else dateCreate
-            dateComplete = if (binding.completeBeforeSwith.isChecked) dateComplete else null
-            if (id == "-1") {
-                id = UUID.randomUUID().toString()
-                viewModel.addTodoItem(this)
-            } else {
-                dateEdit = System.currentTimeMillis()
-                viewModel.editTodoItem(this)
-            }
-        }
-    }
-
-    private fun insertDataFromArgs(todoItem: TodoItem) {
-        binding.TodoDescribe.setText(todoItem.text)
-        binding.importanceToggleGroup.clearChecked()
-
-        when (todoItem.importance) {
-            Importance.LOW -> binding.importanceToggleGroup.check(R.id.ImportanceLow)
-            Importance.HIGH -> binding.importanceToggleGroup.check(R.id.ImportanceHigh)
-            Importance.MEDIUM -> binding.importanceToggleGroup.check(R.id.ImportanceMiddle)
-        }
-
-        todoItem.dateComplete?.let {
-            binding.completeBeforeSwith.isChecked = true
-            binding.addEditDateTextView.apply {
-                text = LongToString.getDateTime(it).toString()
-                visibility = View.VISIBLE
-            }
-        }
-        binding.addEditButtonDelete.isEnabled = true
-    }
-
-    private fun enableDeleteButton(todoItem: TodoItem) {
-        binding.addEditButtonDelete.setOnClickListener {
-            viewModel.removeTodoItem(todoItem)
-            findNavController().navigateUp()
-        }
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
     }
 }

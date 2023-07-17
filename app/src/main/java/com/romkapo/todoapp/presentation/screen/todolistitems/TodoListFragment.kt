@@ -1,156 +1,186 @@
+@file:OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
+    ExperimentalMaterialApi::class
+)
+
 package com.romkapo.todoapp.presentation.screen.todolistitems
 
-import android.app.Application
-import android.content.Context
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.VERTICAL
-import com.google.android.material.snackbar.Snackbar
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismiss
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDismissState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.radusalagean.infobarcompose.InfoBar
 import com.romkapo.todoapp.R
-import com.romkapo.todoapp.appComponent
-import com.romkapo.todoapp.data.model.TodoItem
-import com.romkapo.todoapp.databinding.FragmentTodoListBinding
-import com.romkapo.todoapp.di.components.list.TodoListItemFragmentComponent
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import javax.inject.Inject
+import com.romkapo.todoapp.di.components.common.daggerViewModel
+import com.romkapo.todoapp.ui.common.EyeCheckBox
+import com.romkapo.todoapp.ui.common.TodoListItem
+import com.romkapo.todoapp.ui.theme.Typography
 
-class TodoListFragment : Fragment() {
-    private lateinit var rvAdapter: TodoListAdapter
+@Composable
+fun TodoListScreen(
+    navController: NavController,
+    viewModel: TodoItemListViewModel = daggerViewModel(),
+) {
+    val state = viewModel.sampleData.collectAsState()
+    val lazyColumnState = rememberLazyListState()
+    val refreshing by viewModel.isRefreshing.collectAsState()
 
-    private var _binding: FragmentTodoListBinding? = null
-    private val binding get() = _binding!!
+    val pullRefreshState = rememberPullRefreshState(refreshing, { viewModel.refresh() })
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var todoFragmentComponent: TodoListItemFragmentComponent
-    private val viewModel: TodoItemListViewModel by viewModels { viewModelFactory }
 
-    override fun onAttach(context: Context) {
-        todoFragmentComponent = (requireContext().applicationContext as Application)
-            .appComponent.todoItemListFragmentComponentFactory().create()
-        todoFragmentComponent.inject(this)
-        super.onAttach(context)
+    val elevation = remember {
+        derivedStateOf {
+            lazyColumnState.firstVisibleItemIndex != 0
+        }
     }
+    val alpha: Dp by animateDpAsState(if (elevation.value) 16.dp else 0.dp, label = "")
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View {
-        _binding = FragmentTodoListBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    Box(modifier = Modifier
+        .pullRefresh(pullRefreshState)
+        .fillMaxSize()) {
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.swipeLayout.isRefreshing = false
-
-        setupRecyclerView(binding.todoRecyclerView)
-
-        provideObservers()
-        viewModel.getAllList()
-        setupListeners()
-    }
-
-    private fun setupRecyclerView(recyclerView: RecyclerView) {
-        rvAdapter = TodoListAdapter(
-            editClickListener = { id -> navigateToAddEditFragment(id) },
-            deleteClickListener = { todoItem -> deleteItem(todoItem) },
-            checkboxClickListener = { todoItem -> viewModel.editStateTodoItem(todoItem) },
+        Spacer(modifier = Modifier.fillMaxHeight(0.05f))
+        Scaffold(
+            floatingActionButton = {
+                FloatingActionButton(
+                    content = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
+                    onClick = {
+                        navController.navigate("add_edit")
+                    })
+            },
+            floatingActionButtonPosition = FabPosition.End,
+            modifier = Modifier.fillMaxSize(),
         )
-
-        with(recyclerView) {
-            adapter = rvAdapter
-            layoutManager = LinearLayoutManager(context)
-            addItemDecoration(DividerItemDecoration(context, VERTICAL))
-        }
-        SwipeRightHelper(
-            recyclerView,
-            rvAdapter,
-        ) { todoItem -> deleteItem(todoItem) }.createHelper()
-    }
-
-    private fun provideObservers() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.listTodoItem.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collectLatest {
-                    updateRecyclerItems(it)
-                    binding.swipeLayout.isRefreshing = false
+        {
+            Column(
+                modifier = Modifier
+                    .padding(it)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .shadow(alpha)
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    Spacer(modifier = Modifier.fillMaxHeight(0.05f))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.my_tasks),
+                            style = Typography.titleLarge
+                        )
+                        IconButton(onClick = { navController.navigate("settings") }) {
+                            Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                        }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            style = MaterialTheme.typography.labelMedium,
+                            text = stringResource(id = R.string.complete) + " " + state.value.countOfCompleted
+                        )
+                        EyeCheckBox(isChecked = state.value.isCheckedShown) {
+                            viewModel.changeShow()
+                        }
+                    }
                 }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.countOfComplete.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collectLatest {
-                    binding.countCompleteTextView.text = getString(R.string.complete, it)
-                }
-        }
-    }
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp, horizontal = 24.dp)
+                        .clip(shape = RoundedCornerShape(24.dp)),
+                    verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
+                    state = lazyColumnState
+                ) {
+                    items(
+                        items = state.value.todoList,
+                        key = { listItem ->
+                            listItem.id
+                        }) { item ->
+                        val dismissState = rememberDismissState(confirmValueChange = {
+                            viewModel.showSnackBar(item)
+                            true
+                        })
+                        SwipeToDismiss(
+                            directions = setOf(DismissDirection.StartToEnd),
+                            modifier = Modifier.animateItemPlacement(),
+                            state = dismissState,
+                            background = {},
 
-    private fun setupListeners() {
-        binding.navigateToAddFAB.setOnClickListener {
-            findNavController().navigate(R.id.action_todoListFragment_to_addEditItem)
-        }
-        with(binding.showUncheckedCheckbox) {
-            isChecked = viewModel.showUnchecked
-            setOnClickListener {
-                viewModel.changeShow()
+                            dismissContent = {
+                                TodoListItem(item,
+                                    onCheckChanged = {
+                                        viewModel.editStateTodoItem(item.copy(isComplete = !item.isComplete))
+                                    },
+                                    onItemClicked = {
+                                        navController.navigate("add_edit?id=${item.id}")
+                                    })
+                            })
+                    }
+                }
             }
         }
-
-        binding.swipeLayout.setOnRefreshListener {
-            viewModel.refresh()
-            binding.swipeLayout.isRefreshing = false
-        }
-
-        binding.logout.setOnClickListener {
-            viewModel.logOut()
-            findNavController().navigate(R.id.action_todoListFragment_to_authFragment)
-        }
-    }
-
-    private fun updateRecyclerItems(listTodo: List<TodoItem>) {
-        if (binding.showUncheckedCheckbox.isChecked) {
-            rvAdapter.diffList.submitList(listTodo)
-        } else {
-            rvAdapter.diffList.submitList(listTodo.filter { item -> !item.isComplete })
-        }
-    }
-
-    private fun navigateToAddEditFragment(todoItemID: String) {
-        findNavController().navigate(
-            TodoListFragmentDirections.actionTodoListFragmentToAddEditItem(todoItemID),
-        )
-    }
-
-    private fun deleteItem(deletedCourse: TodoItem) {
-        viewModel.removeTodoItem(deletedCourse)
-
-        Snackbar.make(
-            binding.todoListConstraintLayout,
-            getString(R.string.deleted) + deletedCourse.text,
-            Snackbar.LENGTH_LONG,
-        ).setAction(
-            getString(R.string.undo),
+        PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
+        InfoBar(
+            offeredMessage = viewModel.message,
+            slideEffect = viewModel.infoBarSlideEffect,
+            modifier = Modifier.align(
+                Alignment.BottomCenter
+            )
         ) {
-            viewModel.addTodoItem(deletedCourse)
-        }.show()
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        super.onDestroyView()
+            viewModel.message = null
+        }
     }
 }

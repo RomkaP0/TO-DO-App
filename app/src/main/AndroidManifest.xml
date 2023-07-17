@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
 
     <application
         android:name=".App"
@@ -24,6 +27,14 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:scheme="todoapp"
+                    android:host="add_edit"
+                    />
+            </intent-filter>
         </activity>
         <provider
             android:name="androidx.startup.InitializationProvider"
@@ -35,6 +46,14 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
+
+        <receiver
+            android:name=".utils.notificationmanager.NotificationReceiver"
+            android:enabled="true" />
+        <receiver
+            android:name=".utils.notificationmanager.NotificationPostponeReceiver"
+            android:enabled="true" />
+
     </application>
 
 </manifest>

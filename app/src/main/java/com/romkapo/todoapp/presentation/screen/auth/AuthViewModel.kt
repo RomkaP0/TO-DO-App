@@ -1,14 +1,22 @@
 package com.romkapo.todoapp.presentation.screen.auth
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.romkapo.todoapp.data.model.network.AppSharedPreferences
-import javax.inject.Inject
+import com.romkapo.todoapp.di.components.common.ViewModelAssistedFactory
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 
-class AuthViewModel @Inject constructor(
+class AuthViewModel @AssistedInject constructor(
     private val appSharedPreferences: AppSharedPreferences,
+    @Assisted private val handle: SavedStateHandle
 ) : ViewModel() {
     val token = appSharedPreferences.getCurrentToken()
     fun putToken(token: String) {
         appSharedPreferences.setCurrentToken(token)
     }
+
+    @AssistedFactory
+    interface Factory : ViewModelAssistedFactory<AuthViewModel>
 }

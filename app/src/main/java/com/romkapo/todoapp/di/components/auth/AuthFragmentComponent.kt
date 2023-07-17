@@ -1,9 +1,10 @@
 package com.romkapo.todoapp.di.components.auth
 
-import com.romkapo.todoapp.presentation.screen.auth.AuthFragment
+import com.romkapo.todoapp.di.components.ComposeViewModelFactoryModule
+import com.romkapo.todoapp.di.components.common.ComposeViewModelFactory
 import dagger.Subcomponent
 
-@Subcomponent(modules = [AuthFragmentModule::class])
+@Subcomponent(modules = [AuthFragmentModule::class, ComposeViewModelFactoryModule::class])
 @AuthFragmentScope
 interface AuthFragmentComponent {
 
@@ -11,5 +12,5 @@ interface AuthFragmentComponent {
     interface Factory {
         fun create(): AuthFragmentComponent
     }
-    fun inject(authFragment: AuthFragment)
+    fun getViewModelFactory(): ComposeViewModelFactory
 }

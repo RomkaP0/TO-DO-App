@@ -1,13 +1,11 @@
-package com.romkapo.todoapp.utils
+package com.romkapo.todoapp.di.components.common
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import javax.inject.Inject
 import javax.inject.Provider
 
-/* Фабрика вьюмоделей */
-
-class ViewModelFactory @Inject constructor(
+class ActivityViewModelFactory @Inject constructor(
     private val viewModelFactories: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModel>>,
 ) : ViewModelProvider.Factory {
 

@@ -22,11 +22,11 @@ fun TodoItem.toNetworkItem(deviceID: String): ApiTodoItem {
         id = id,
         text = text,
         importance = importance.parseToNetwork(),
-        deadline = if (dateComplete == null) 0L else dateComplete!!,
+        deadline = if (dateComplete == null) 0L else dateComplete,
         done = isComplete,
         color = "",
         createdAt = dateCreate,
-        changedAt = if (dateEdit == null) 0L else dateEdit!!,
+        changedAt = if (dateEdit == null) 0L else dateEdit,
         lastUpdatedBy = deviceID,
     )
 }

@@ -20,4 +20,6 @@ interface MainRepository {
     suspend fun updateRemoteTasks(mergedList: List<ApiTodoItem>): Resource
 
     suspend fun fetchTasks(): Resource
+
+    fun deleteAllTodo()
 }

@@ -1,9 +1,10 @@
 package com.romkapo.todoapp.di.components.list
 
-import com.romkapo.todoapp.presentation.screen.todolistitems.TodoListFragment
+import com.romkapo.todoapp.di.components.ComposeViewModelFactoryModule
+import com.romkapo.todoapp.di.components.common.ComposeViewModelFactory
 import dagger.Subcomponent
 
-@Subcomponent(modules = [TodoListItemModule::class])
+@Subcomponent(modules = [TodoListItemModule::class, ComposeViewModelFactoryModule::class])
 @TodoListItemFragmentScope
 interface TodoListItemFragmentComponent {
 
@@ -11,5 +12,6 @@ interface TodoListItemFragmentComponent {
     interface Factory {
         fun create(): TodoListItemFragmentComponent
     }
-    fun inject(todoItemListFragment: TodoListFragment)
+    fun getViewModelFactory(): ComposeViewModelFactory
+
 }

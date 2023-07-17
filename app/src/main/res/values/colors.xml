@@ -3,9 +3,7 @@
     <color name="background">#F7F6F2</color>
     <color name="secondary">#FFFFFF</color>
     <color name="primary">#F7F6F2</color>
-    <color name="support">#8E8E93</color>
     <color name="tertiary">#6C989F</color>
     <color name="primaryContainer">#839681</color>
-    <color name="invert">#000000</color>
 
 </resources>
