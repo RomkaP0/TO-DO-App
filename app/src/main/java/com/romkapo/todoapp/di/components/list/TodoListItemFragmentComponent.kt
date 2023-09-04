@@ -13,5 +13,4 @@ interface TodoListItemFragmentComponent {
         fun create(): TodoListItemFragmentComponent
     }
     fun getViewModelFactory(): ComposeViewModelFactory
-
 }

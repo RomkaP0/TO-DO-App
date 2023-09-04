@@ -14,5 +14,4 @@ interface SettingsFragmentComponent {
     }
 
     fun getViewModelFactory(): ComposeViewModelFactory
-
 }

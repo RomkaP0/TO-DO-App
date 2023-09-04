@@ -42,7 +42,7 @@ class MainRepositoryImpl @Inject constructor(
     private val todoOperationDAO: TodoOperationDAO,
     private val todoAPI: TodoAPI,
     private val appSharedPreferences: AppSharedPreferences,
-    private val notificationsScheduler: NotificationScheduler
+    private val notificationsScheduler: NotificationScheduler,
 
 ) : MainRepository {
     private val _stateRequest = MutableStateFlow<Resource>(Resource.Success)
@@ -197,7 +197,7 @@ class MainRepositoryImpl @Inject constructor(
     }
     private fun updateNotifications(items: List<TodoItem>) {
         notificationsScheduler.cancelAll()
-        for (item in items){
+        for (item in items) {
             notificationsScheduler.schedule(item)
         }
     }

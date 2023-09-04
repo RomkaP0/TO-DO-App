@@ -33,7 +33,7 @@ fun TodoListItem(todoItem: TodoItem, onCheckChanged: () -> Unit, onItemClicked: 
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.secondary)
             .clickable { onItemClicked() },
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
 
     ) {
         Checkbox(
@@ -47,56 +47,53 @@ fun TodoListItem(todoItem: TodoItem, onCheckChanged: () -> Unit, onItemClicked: 
             Importance.LOW -> Icon(
                 painterResource(id = R.drawable.ic_arrow_down),
                 contentDescription = null,
-                modifier = Modifier.width(8.dp)
+                modifier = Modifier.width(8.dp),
             )
 
             Importance.HIGH -> Icon(
                 painterResource(id = R.drawable.ic_warning),
                 contentDescription = null,
-                modifier = Modifier.width(8.dp)
+                modifier = Modifier.width(8.dp),
             )
 
             else -> Spacer(modifier = Modifier.width(8.dp))
         }
 
-
         Column(
             modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .weight(1f, true),
-            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically)
+            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically),
         ) {
             Text(
                 text = todoItem.text,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
 
             DateTodoItemLine(
                 vectorResource = R.drawable.ic_calendar,
-                subTitle = LongToString.getDateTime(todoItem.dateCreate)
+                subTitle = LongToString.getDateTime(todoItem.dateCreate),
             )
             todoItem.dateEdit?.let {
                 DateTodoItemLine(
                     vectorResource = R.drawable.edit_note_fill0_wght400_grad0_opsz20,
-                    subTitle = LongToString.getDateTime(it)
+                    subTitle = LongToString.getDateTime(it),
                 )
             }
             todoItem.dateComplete?.let {
                 DateTodoItemLine(
                     vectorResource = R.drawable.outline_done_all_24,
-                    subTitle = LongToString.getDateTime(it)
+                    subTitle = LongToString.getDateTime(it),
                 )
             }
-
         }
         Icon(
             painterResource(id = R.drawable.ic_arrow_right),
             contentDescription = null,
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(48.dp),
         )
-
     }
 }
 
@@ -112,8 +109,10 @@ fun TodoListItemPreview() {
                 System.currentTimeMillis(),
                 dateComplete = System.currentTimeMillis(),
                 System.currentTimeMillis(),
-                true
-            ),{},{}
+                true,
+            ),
+            {},
+            {},
         )
         TodoListItem(
             todoItem = TodoItem(
@@ -122,7 +121,9 @@ fun TodoListItemPreview() {
                 Importance.HIGH,
                 System.currentTimeMillis(),
                 System.currentTimeMillis(),
-            ),{},{}
+            ),
+            {},
+            {},
         )
     }
 }

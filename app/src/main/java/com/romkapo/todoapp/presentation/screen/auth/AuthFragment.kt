@@ -41,7 +41,7 @@ import com.yandex.authsdk.YandexAuthSdk
 @Composable
 fun AuthScreen(
     navController: NavController,
-    viewModel: AuthViewModel = daggerViewModel()
+    viewModel: AuthViewModel = daggerViewModel(),
 ) {
     val sdk = YandexAuthSdk(LocalContext.current, YandexAuthOptions(LocalContext.current))
     val context = LocalContext.current
@@ -63,26 +63,28 @@ fun AuthScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         Text(text = stringResource(id = R.string.auth), style = Typography.titleLarge)
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             OutlinedButton(
                 modifier = Modifier.size(298.dp, 44.dp),
-                onClick = { navController.navigate("todo_list") }) {
+                onClick = { navController.navigate("todo_list") },
+            ) {
                 Text(
                     style = MaterialTheme.typography.bodyMedium,
-                    text = stringResource(id = R.string.auth_guest)
+                    text = stringResource(id = R.string.auth_guest),
                 )
             }
             Box(
-                contentAlignment = Alignment.Center, modifier = Modifier
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
                     .width(270.dp)
-                    .padding(vertical = 16.dp)
+                    .padding(vertical = 16.dp),
             ) {
                 Divider()
                 val color = MaterialTheme.colorScheme.background
@@ -93,19 +95,19 @@ fun AuthScreen(
                         .fillMaxWidth(0.2f)
                         .drawBehind { drawRect(color = color) },
                     textAlign = TextAlign.Center,
-                    text = stringResource(id = R.string.or)
+                    text = stringResource(id = R.string.or),
                 )
             }
             Button(
                 colors = ButtonDefaults.buttonColors(containerColor = Black),
                 modifier = Modifier.size(298.dp, 44.dp),
-                onClick = { launcher.launch(sdk) }) {
-
+                onClick = { launcher.launch(sdk) },
+            ) {
                 Image(
                     painter = painterResource(id = R.drawable.yandex_logo),
                     contentDescription = "icon",
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(40.dp),
                 )
                 Text(
                     text = "Войти с Яндекс ID",
@@ -115,14 +117,12 @@ fun AuthScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
+                        .padding(horizontal = 8.dp),
                 )
-
             }
         }
     }
 }
-
 
 private fun cantAuthToast(context: Context) {
     Toast.makeText(

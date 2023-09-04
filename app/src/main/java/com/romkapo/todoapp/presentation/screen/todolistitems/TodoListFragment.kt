@@ -1,6 +1,7 @@
 @file:OptIn(
-    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class,
-    ExperimentalMaterialApi::class
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
+    ExperimentalMaterialApi::class,
 )
 
 package com.romkapo.todoapp.presentation.screen.todolistitems
@@ -38,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -52,7 +54,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.radusalagean.infobarcompose.InfoBar
 import com.romkapo.todoapp.R
 import com.romkapo.todoapp.di.components.common.daggerViewModel
 import com.romkapo.todoapp.ui.common.EyeCheckBox
@@ -70,7 +71,6 @@ fun TodoListScreen(
 
     val pullRefreshState = rememberPullRefreshState(refreshing, { viewModel.refresh() })
 
-
     val elevation = remember {
         derivedStateOf {
             lazyColumnState.firstVisibleItemIndex != 0
@@ -78,10 +78,11 @@ fun TodoListScreen(
     }
     val alpha: Dp by animateDpAsState(if (elevation.value) 16.dp else 0.dp, label = "")
 
-    Box(modifier = Modifier
-        .pullRefresh(pullRefreshState)
-        .fillMaxSize()) {
-
+    Box(
+        modifier = Modifier
+            .pullRefresh(pullRefreshState)
+            .fillMaxSize(),
+    ) {
         Spacer(modifier = Modifier.fillMaxHeight(0.05f))
         Scaffold(
             floatingActionButton = {
@@ -89,20 +90,20 @@ fun TodoListScreen(
                     content = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
                     onClick = {
                         navController.navigate("add_edit")
-                    })
+                    },
+                )
             },
             floatingActionButtonPosition = FabPosition.End,
             modifier = Modifier.fillMaxSize(),
-        )
-        {
+        ) {
             Column(
                 modifier = Modifier
-                    .padding(it)
+                    .padding(it),
             ) {
                 Column(
                     modifier = Modifier
                         .shadow(alpha)
-                        .background(MaterialTheme.colorScheme.background)
+                        .background(MaterialTheme.colorScheme.background),
                 ) {
                     Spacer(modifier = Modifier.fillMaxHeight(0.05f))
                     Row(
@@ -110,11 +111,11 @@ fun TodoListScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = stringResource(id = R.string.my_tasks),
-                            style = Typography.titleLarge
+                            style = Typography.titleLarge,
                         )
                         IconButton(onClick = { navController.navigate("settings") }) {
                             Icon(imageVector = Icons.Default.Settings, contentDescription = null)
@@ -125,11 +126,11 @@ fun TodoListScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             style = MaterialTheme.typography.labelMedium,
-                            text = stringResource(id = R.string.complete) + " " + state.value.countOfCompleted
+                            text = stringResource(id = R.string.complete) + " " + state.value.countOfCompleted,
                         )
                         EyeCheckBox(isChecked = state.value.isCheckedShown) {
                             viewModel.changeShow()
@@ -142,13 +143,14 @@ fun TodoListScreen(
                         .padding(vertical = 16.dp, horizontal = 24.dp)
                         .clip(shape = RoundedCornerShape(24.dp)),
                     verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
-                    state = lazyColumnState
+                    state = lazyColumnState,
                 ) {
                     items(
                         items = state.value.todoList,
                         key = { listItem ->
                             listItem.id
-                        }) { item ->
+                        },
+                    ) { item ->
                         val dismissState = rememberDismissState(confirmValueChange = {
                             viewModel.showSnackBar(item)
                             true
@@ -160,27 +162,41 @@ fun TodoListScreen(
                             background = {},
 
                             dismissContent = {
-                                TodoListItem(item,
+                                TodoListItem(
+                                    item,
                                     onCheckChanged = {
                                         viewModel.editStateTodoItem(item.copy(isComplete = !item.isComplete))
                                     },
                                     onItemClicked = {
                                         navController.navigate("add_edit?id=${item.id}")
-                                    })
-                            })
+                                    },
+                                )
+                            },
+                        )
                     }
                 }
             }
         }
         PullRefreshIndicator(refreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
-        InfoBar(
-            offeredMessage = viewModel.message,
-            slideEffect = viewModel.infoBarSlideEffect,
-            modifier = Modifier.align(
-                Alignment.BottomCenter
-            )
-        ) {
-            viewModel.message = null
+        if (viewModel.message.value != "") {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .shadow(elevation = 8.dp)
+                    .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp))
+                    .align(Alignment.BottomCenter),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = viewModel.message.value,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                TextButton(onClick = { /*TODO*/ }) {
+                    Text(text = "Вернуть")
+                }
+            }
         }
     }
 }

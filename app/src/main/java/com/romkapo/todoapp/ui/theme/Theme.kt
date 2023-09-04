@@ -26,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 
-
 private val DarkColorScheme = darkColorScheme(
     primary = HakiLight,
     onPrimary = DarkGrey,
@@ -36,9 +35,8 @@ private val DarkColorScheme = darkColorScheme(
     surface = DarkGrey,
     background = LightBlack,
     surfaceContainerHigh = DarkGrey,
-    surfaceVariant = DarkGrey
+    surfaceVariant = DarkGrey,
 )
-
 
 private val LightColorScheme = lightColorScheme(
     primary = HakiDark,
@@ -49,7 +47,7 @@ private val LightColorScheme = lightColorScheme(
     surface = LightGrey,
     background = LightGrey,
     surfaceContainerHigh = LightGrey,
-    surfaceVariant = LightGrey
+    surfaceVariant = LightGrey,
 
 )
 
@@ -58,7 +56,7 @@ fun TodoAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -81,7 +79,7 @@ fun TodoAppTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }
 
@@ -97,13 +95,16 @@ fun LightPalette() {
         "surface" to LightGrey,
         "background" to LightGrey,
         "surfaceContainerHigh" to LightGrey,
-        "surfaceVariant" to Grey
+        "surfaceVariant" to Grey,
     )
     LazyVerticalGrid(columns = GridCells.Fixed(3)) {
         items(colors.size) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier
-                .size(48.dp)
-                .background(colors.values.toList()[it])) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(colors.values.toList()[it]),
+            ) {
                 Text(text = colors.keys.toList()[it])
             }
         }
@@ -122,13 +123,16 @@ fun DarkPalette() {
         "surface" to DarkGrey,
         "background" to LightGrey,
         "surfaceContainerHigh" to DarkGrey,
-        "surfaceVariant" to Grey
+        "surfaceVariant" to Grey,
     )
     LazyVerticalGrid(columns = GridCells.Fixed(3)) {
         items(colors.size) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier
-                .size(48.dp)
-                .background(colors.values.toList()[it])) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(colors.values.toList()[it]),
+            ) {
                 Text(text = colors.keys.toList()[it])
             }
         }
@@ -137,7 +141,7 @@ fun DarkPalette() {
 
 @Preview(showBackground = true)
 @Composable
-fun Typographies(){
+fun Typographies() {
     Column {
         Text(style = MaterialTheme.typography.titleLarge, text = "What is it")
         Text(style = MaterialTheme.typography.titleMedium, text = "What is it")

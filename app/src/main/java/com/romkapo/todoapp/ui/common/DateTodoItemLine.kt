@@ -20,7 +20,7 @@ fun DateTodoItemLine(vectorResource: Int, subTitle: String) {
         Icon(
             imageVector = ImageVector.vectorResource(id = vectorResource),
             null,
-            modifier = Modifier.padding(end = 4.dp)
+            modifier = Modifier.padding(end = 4.dp),
         )
         Text(text = subTitle, style = MaterialTheme.typography.bodySmall)
     }

@@ -15,7 +15,7 @@ data class TodoItem(
     val dateComplete: Long? = null,
     val dateEdit: Long? = null,
     val isComplete: Boolean = false,
-){
+) {
     override fun toString(): String {
         val gson = Gson()
         return gson.toJson(this)

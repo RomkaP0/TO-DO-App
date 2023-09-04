@@ -33,32 +33,35 @@ fun AppNavHost(
             .fillMaxSize()
             .padding(paddingValues),
         navController = navController,
-        startDestination = launchScreen
+        startDestination = launchScreen,
     ) {
-        composable("todo_list?id={id}",
+        composable(
+            "todo_list?id={id}",
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
-            arguments = listOf(navArgument("id") {
-                type = NavType.StringType
-                nullable = true
-                defaultValue = null
-            })
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+            ),
         ) {
             val todoFragmentComponent = (LocalContext.current.applicationContext as Application)
                 .appComponent.todoItemListFragmentComponentFactory().create()
             Inject(todoFragmentComponent.getViewModelFactory()) {
                 TodoListScreen(
-                    navController
+                    navController,
                 )
             }
         }
@@ -67,29 +70,31 @@ fun AppNavHost(
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
-            arguments = listOf(navArgument("id") {
-                type = NavType.StringType
-                nullable = true
-                defaultValue = null
-            }),
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
+            ),
             deepLinks = listOf(
-                navDeepLink { uriPattern = "todoapp://add_edit/{id}" }
-            )
+                navDeepLink { uriPattern = "todoapp://add_edit/{id}" },
+            ),
         ) {
             val addEditFragmentComponent = (LocalContext.current.applicationContext as Application)
                 .appComponent.addEditFragmentComponentFactory().create()
             Inject(composeViewModelFactory = addEditFragmentComponent.getViewModelFactory()) {
                 AddEditScreen(
-                    navController
+                    navController,
                 )
             }
         }
@@ -98,13 +103,13 @@ fun AppNavHost(
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
         ) {
@@ -112,7 +117,7 @@ fun AppNavHost(
                 .appComponent.settingsFragmentComponentFactory().create()
             Inject(settingsFragmentComponent.getViewModelFactory()) {
                 SettingsScreen(
-                    navController
+                    navController,
                 )
             }
         }
@@ -121,13 +126,13 @@ fun AppNavHost(
             enterTransition = {
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                    animationSpec = tween(500)
+                    animationSpec = tween(500),
                 )
             },
         ) {
@@ -135,7 +140,7 @@ fun AppNavHost(
                 .appComponent.authFragmentComponentFactory().create()
             Inject(authFragmentComponent.getViewModelFactory()) {
                 AuthScreen(
-                    navController
+                    navController,
                 )
             }
         }

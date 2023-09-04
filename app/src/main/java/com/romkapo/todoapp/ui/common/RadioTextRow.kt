@@ -13,11 +13,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RadioTextRow(state:Boolean, text:String, onClick:()->Unit){
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp), verticalAlignment = Alignment.CenterVertically){
-        RadioButton(selected = state, onClick = { onClick()})
+fun RadioTextRow(state: Boolean, text: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(selected = state, onClick = { onClick() })
         Text(style = MaterialTheme.typography.bodyMedium, text = text)
     }
 }
@@ -27,6 +30,7 @@ fun RadioTextRow(state:Boolean, text:String, onClick:()->Unit){
 fun radioTextRowPreview() {
     RadioTextRow(state = false, text = "fgge", {})
 }
+
 @Preview(showBackground = true)
 @Composable
 fun checkRadioTextRowPreview() {

@@ -19,14 +19,14 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     networkStatusTracker: ConnectionManagerObserver,
     private val repository: MainRepository,
-    private val appSharedPreferences: AppSharedPreferences
+    private val appSharedPreferences: AppSharedPreferences,
 ) : ViewModel() {
     var launchScreen = "auth"
     init {
         ThemeProvider.theme.intValue = appSharedPreferences.getTheme()
         val token = appSharedPreferences.getCurrentToken()
-        if (!(token == null || token == "")){
-            launchScreen="todo_list"
+        if (!(token == null || token == "")) {
+            launchScreen = "todo_list"
         }
     }
 
@@ -51,5 +51,5 @@ class MainViewModel @Inject constructor(
     }
     fun getStatusNotifications() = appSharedPreferences.getNotificationStatus()
 
-    fun putStatusNotification(status : Boolean) = appSharedPreferences.putNotificationStatus(status)
+    fun putStatusNotification(status: Boolean) = appSharedPreferences.putNotificationStatus(status)
 }
