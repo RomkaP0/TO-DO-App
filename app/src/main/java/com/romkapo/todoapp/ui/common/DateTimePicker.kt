@@ -45,28 +45,28 @@ fun DateTimePicker(timestamp: Long, dismiss: () -> Unit, saveTime: (Long) -> Uni
     val timePickerState = rememberTimePickerState(
         LocalDateTime.ofInstant(
             Instant.ofEpochMilli(timestamp),
-            ZoneId.systemDefault()
+            ZoneId.systemDefault(),
         ).hour,
-        LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).minute
+        LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault()).minute,
     )
     Dialog(
         onDismissRequest = { dismiss() },
         properties = DialogProperties(
-            usePlatformDefaultWidth = false
-        )
+            usePlatformDefaultWidth = false,
+        ),
     ) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth(0.95f)
                 .wrapContentHeight(),
             shape = MaterialTheme.shapes.large,
-            tonalElevation = AlertDialogDefaults.TonalElevation
+            tonalElevation = AlertDialogDefaults.TonalElevation,
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if (isDatePicker.value) {
                     DatePicker(modifier = Modifier.requiredWidth(360.dp), state = datePickerState, showModeToggle = false)
@@ -77,7 +77,7 @@ fun DateTimePicker(timestamp: Long, dismiss: () -> Unit, saveTime: (Long) -> Uni
                     IconButton(onClick = { isDatePicker.value = !isDatePicker.value }) {
                         Icon(
                             imageVector = if (isDatePicker.value) Icons.Default.AccessTime else Icons.Default.CalendarToday,
-                            contentDescription = null
+                            contentDescription = null,
                         )
                     }
                     TextButton(modifier = Modifier.weight(1f, true), onClick = { dismiss() }) {
@@ -97,6 +97,6 @@ fun DateTimePicker(timestamp: Long, dismiss: () -> Unit, saveTime: (Long) -> Uni
 
 @Preview
 @Composable
-fun dateTimePickerPreview(){
+fun dateTimePickerPreview() {
     DateTimePicker(timestamp = System.currentTimeMillis(), dismiss = { /*TODO*/ }, saveTime = {})
 }

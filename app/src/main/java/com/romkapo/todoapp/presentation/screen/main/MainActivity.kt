@@ -59,25 +59,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainComponent: MainActivityComponent
     private val viewModel: MainViewModel by viewModels { viewModelFactory }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         injections()
         super.onCreate(savedInstanceState)
 
         setContent {
-
             TodoAppTheme(
                 darkTheme = when (ThemeProvider.theme.intValue) {
                     ThemeMode.LIGHT.ordinal -> false
                     ThemeMode.DARK.ordinal -> true
                     else -> isSystemInDarkTheme()
-                }
+                },
             ) {
                 val notifyingState = rememberMultiplePermissionsState(
                     listOf(
                         android.Manifest.permission.POST_NOTIFICATIONS,
-                        android.Manifest.permission.SCHEDULE_EXACT_ALARM
-                    )
+                        android.Manifest.permission.SCHEDULE_EXACT_ALARM,
+                    ),
                 )
                 val skipState = rememberSaveable { mutableStateOf(false) }
 
@@ -95,7 +93,7 @@ class MainActivity : AppCompatActivity() {
                             .fillMaxSize()
                             .padding(16.dp),
                         verticalArrangement = Arrangement.SpaceEvenly,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         val textToShow = if (notifyingState.shouldShowRationale) {
                             // If the user has denied the permission but the rationale can be shown,
@@ -106,12 +104,12 @@ class MainActivity : AppCompatActivity() {
                             // doesn't want to be asked again for this permission, explain that the
                             // permission is required
                             "Notify is important for notification you. " +
-                                    "Please grant the permission"
+                                "Please grant the permission"
                         }
                         Text(textToShow)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            horizontalArrangement = Arrangement.SpaceEvenly,
                         ) {
                             Button(onClick = { notifyingState.launchMultiplePermissionRequest() }) {
                                 Text("Request permission")
@@ -124,17 +122,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-//        binding = ActivityMainBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//
+
         initInternetMonitoring()
         viewModel.listenStateRequest()
-//
-//        val navHostFragment =
-//            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-//        navController = navHostFragment.navController
     }
-
 
     private fun initInternetMonitoring() {
         lifecycleScope.launch {

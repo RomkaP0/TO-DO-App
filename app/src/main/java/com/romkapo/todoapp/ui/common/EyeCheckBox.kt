@@ -8,22 +8,19 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.romkapo.todoapp.R
 
-
 @Composable
 fun EyeCheckBox(
-    isChecked:Boolean,
-    onClick: ()->Unit
+    isChecked: Boolean,
+    onClick: () -> Unit,
 ) {
-
-    val vectorResource = if (isChecked){
+    val vectorResource = if (isChecked) {
         ImageVector.vectorResource(id = R.drawable.show_unchecked_icon)
-    }
-    else{
+    } else {
         ImageVector.vectorResource(id = R.drawable.hide_unchecked_icon)
     }
     IconButton(onClick = {
         onClick()
-    }){
+    }) {
         Icon(imageVector = vectorResource, contentDescription = null)
     }
 }
@@ -33,6 +30,7 @@ fun EyeCheckBox(
 fun trueEyeButtonPreview() {
     EyeCheckBox(true, {})
 }
+
 @Preview(showBackground = true)
 @Composable
 fun falseEyeButtonPreview() {

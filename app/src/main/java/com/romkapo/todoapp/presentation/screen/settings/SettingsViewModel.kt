@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 class SettingsViewModel @AssistedInject constructor(
     private val repository: MainRepository,
     private val appSharedPreferences: AppSharedPreferences,
-    @Assisted private val handle: SavedStateHandle
+    @Assisted private val handle: SavedStateHandle,
 ) : ViewModel() {
 
     fun setTheme(themeMode: ThemeMode) {

@@ -14,5 +14,4 @@ interface AddEditFragmentComponent {
     }
 
     fun getViewModelFactory(): ComposeViewModelFactory
-
 }

@@ -31,7 +31,6 @@ interface AppComponent {
 
     fun inject(application: App)
 
-
     @Component.Builder
     interface Builder {
         @BindsInstance

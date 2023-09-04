@@ -6,8 +6,8 @@ import com.romkapo.todoapp.utils.Constants.SHARED_PREFERENCES_NOTIFICATIONS_IDS
 import com.romkapo.todoapp.utils.Constants.SHARED_PREFERENCES_NOTIFICATION_STATUS
 import com.romkapo.todoapp.utils.Constants.THEME_KEY
 import com.romkapo.todoapp.utils.Constants.TOKEN_KEY
-import com.romkapo.todoapp.utils.ThemeProvider
 import com.romkapo.todoapp.utils.ThemeMode
+import com.romkapo.todoapp.utils.ThemeProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,7 +16,6 @@ class AppSharedPreferences @Inject constructor(
     private val sharedPreferences: SharedPreferences,
 ) {
     private val editor = sharedPreferences.edit()
-
 
     fun setCurrentToken(token: String) {
         editor.putString(TOKEN_KEY, token)
@@ -32,7 +31,7 @@ class AppSharedPreferences @Inject constructor(
 
     fun getRevisionId(): Int = sharedPreferences.getInt(REVISION_KEY, 0)
 
-    fun setTheme(theme:ThemeMode){
+    fun setTheme(theme: ThemeMode) {
         editor.putInt(THEME_KEY, theme.ordinal)
         editor.apply()
 
@@ -41,10 +40,10 @@ class AppSharedPreferences @Inject constructor(
 
     fun getTheme(): Int = sharedPreferences.getInt(THEME_KEY, 2)
 
-
     fun putNotificationStatus(status: Boolean) {
-        if (status) editor.putString(SHARED_PREFERENCES_NOTIFICATION_STATUS, "yes")
-        else editor.putString(SHARED_PREFERENCES_NOTIFICATION_STATUS, "no")
+        if (status) {
+            editor.putString(SHARED_PREFERENCES_NOTIFICATION_STATUS, "yes")
+        } else editor.putString(SHARED_PREFERENCES_NOTIFICATION_STATUS, "no")
 
         editor.apply()
     }
@@ -78,5 +77,4 @@ class AppSharedPreferences @Inject constructor(
         return sharedPreferences.getString(SHARED_PREFERENCES_NOTIFICATIONS_IDS, "").toString()
             .trim()
     }
-
 }

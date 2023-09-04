@@ -22,7 +22,7 @@ import java.util.UUID
 class AddEditItemViewModel @AssistedInject constructor(
     private val repository: MainRepository,
     private val coroutineScope: CoroutineScope,
-    @Assisted private val handle: SavedStateHandle
+    @Assisted private val handle: SavedStateHandle,
 ) : ViewModel() {
 
     init {
@@ -31,7 +31,7 @@ class AddEditItemViewModel @AssistedInject constructor(
         }
     }
 
-     private var _currentItemFlow =
+    private var _currentItemFlow =
         MutableStateFlow(
             AddEditScreenStates(
                 id = UUID.randomUUID().toString(),
@@ -43,12 +43,12 @@ class AddEditItemViewModel @AssistedInject constructor(
                 isNew = true,
                 isBottomSheetOpened = false,
                 isHighlight = false,
-                isDialogShown = false
-            )
+                isDialogShown = false,
+            ),
         )
-     var currentItemFlow: StateFlow<AddEditScreenStates> = _currentItemFlow.asStateFlow()
+    var currentItemFlow: StateFlow<AddEditScreenStates> = _currentItemFlow.asStateFlow()
 
-     fun loadTask(id: String) {
+    fun loadTask(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.getTodoItem(id)?.let {
                 _currentItemFlow.value = _currentItemFlow.value.copy(
@@ -63,14 +63,14 @@ class AddEditItemViewModel @AssistedInject constructor(
                     hasDeadline = it.dateComplete != null,
                     deadline = it.dateComplete ?: System.currentTimeMillis(),
                     isNew = false,
-                    isHighlight = it.importance == Importance.HIGH
+                    isHighlight = it.importance == Importance.HIGH,
                 )
                 showHighlight(it.importance == Importance.HIGH)
             }
         }
     }
 
-     fun saveTodoItem() = coroutineScope.launch(Dispatchers.IO) {
+    fun saveTodoItem() = coroutineScope.launch(Dispatchers.IO) {
         if (_currentItemFlow.value.isNew) {
             repository.addTodoItem(getTodoItemFromState())
         } else {
@@ -78,7 +78,7 @@ class AddEditItemViewModel @AssistedInject constructor(
         }
     }
 
-     fun getTodoItemFromState(): TodoItem {
+    fun getTodoItemFromState(): TodoItem {
         val state = _currentItemFlow.value
         return TodoItem(
             id = state.id,
@@ -91,59 +91,58 @@ class AddEditItemViewModel @AssistedInject constructor(
             },
             dateCreate = if (state.dateCreate == 0L) System.currentTimeMillis() else state.dateCreate,
             dateComplete = if (state.hasDeadline) state.deadline else null,
-            dateEdit = if (state.isNew) null else System.currentTimeMillis()
+            dateEdit = if (state.isNew) null else System.currentTimeMillis(),
         )
     }
 
-     fun changeText(string: String) {
+    fun changeText(string: String) {
         _currentItemFlow.value = _currentItemFlow.value.copy(text = string)
     }
 
-     fun changeStateDeadline() {
+    fun changeStateDeadline() {
         _currentItemFlow.value =
             _currentItemFlow.value.copy(hasDeadline = !_currentItemFlow.value.hasDeadline)
     }
 
-     fun changeDeadline(timeStamp:Long) {
+    fun changeDeadline(timeStamp: Long) {
         _currentItemFlow.value =
             _currentItemFlow.value.copy(deadline = timeStamp)
     }
 
-     fun changeBottomSheetState() {
+    fun changeBottomSheetState() {
         _currentItemFlow.value =
             _currentItemFlow.value.copy(isBottomSheetOpened = !_currentItemFlow.value.isBottomSheetOpened)
     }
 
-     fun changeImportance(importance: String) {
+    fun changeImportance(importance: String) {
         val highlightState = importance == "Высокая"
         _currentItemFlow.value =
             _currentItemFlow.value.copy(
                 importance = importance,
-                isHighlight = highlightState
+                isHighlight = highlightState,
             )
         showHighlight(highlightState)
     }
 
-     fun showHighlight(highlightState: Boolean) {
+    fun showHighlight(highlightState: Boolean) {
         if (highlightState) {
             viewModelScope.launch {
                 delay(1500L)
                 _currentItemFlow.value =
                     _currentItemFlow.value.copy(
-                        isHighlight = false
+                        isHighlight = false,
                     )
             }
         }
     }
 
-     fun changeStateDialog(){
+    fun changeStateDialog() {
         _currentItemFlow.value =
             _currentItemFlow.value.copy(
-               isDialogShown = !_currentItemFlow.value.isDialogShown
+                isDialogShown = !_currentItemFlow.value.isDialogShown,
             )
     }
 
     @AssistedFactory
     interface Factory : ViewModelAssistedFactory<AddEditItemViewModel>
 }
-

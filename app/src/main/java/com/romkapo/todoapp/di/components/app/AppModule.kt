@@ -18,13 +18,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
 @Module(
-    includes = [DatabaseModule::class, NetworkModule::class, SharedPrefModule::class,NotificationSchedulerModule::class],
+    includes = [DatabaseModule::class, NetworkModule::class, SharedPrefModule::class, NotificationSchedulerModule::class],
     subcomponents = [
 //        AuthFragmentComponent::class,
         TodoListItemFragmentComponent::class,
         AddEditFragmentComponent::class,
         MainActivityComponent::class,
-        SettingsFragmentComponent::class
+        SettingsFragmentComponent::class,
 
     ],
 )

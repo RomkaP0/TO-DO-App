@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.navigation.safe.args)
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.kotlin.serialize)
     alias(libs.plugins.ktlint)
 }
@@ -32,6 +32,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -49,25 +50,26 @@ android {
         getByName("main").java.srcDirs("build/generated/source/navigation-args")
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.6"
+        kotlinCompilerExtensionVersion = "1.5.1"
     }
 }
 
 dependencies {
-    //noinspection KaptUsageInsteadOfKsp
-    kapt(libs.room.compiler)
+    val composeBom = "androidx.compose:compose-bom:2023.05.01"
+
+    ksp(libs.room.compiler)
     kapt(libs.bundles.dagger.compiler)
 
-    implementation(platform("androidx.compose:compose-bom:2023.05.01"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.05.01"))
+    implementation(platform(composeBom))
+    androidTestImplementation(platform(composeBom))
 
-    //material
+    // material
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
 
-    //compose_integration
+    // compose_integration
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
@@ -86,8 +88,6 @@ dependencies {
 
     implementation(libs.accompanist.permissions)
 
-
-    implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.activity.ktx)
 
     implementation(libs.androidx.swiperefreshlayout)
@@ -99,18 +99,13 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
 
-    implementation(libs.constraintlayout)
-
     implementation(libs.room.runtime)
     implementation(libs.room)
 
     implementation(libs.kotlin.serialaize.json)
 
-
-    implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation (libs.androidx.navigation.compose)
-
+    implementation(libs.androidx.navigation.compose)
 
     implementation(libs.authsdk)
 

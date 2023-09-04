@@ -12,20 +12,18 @@ import javax.inject.Inject
 
 class NotificationSchedulerImpl @Inject constructor(
     private val context: Context,
-    private val sharedPreferences: AppSharedPreferences
+    private val sharedPreferences: AppSharedPreferences,
 ) : NotificationScheduler {
 
     private val alarmManager = context.getSystemService(AlarmManager::class.java)
 
-
     override fun schedule(item: TodoItem) {
         if (item.dateComplete != null) {
             if (
-                item.dateComplete >= System.currentTimeMillis()
-                && !item.isComplete
-                && sharedPreferences.getNotificationStatus() == true
+                item.dateComplete >= System.currentTimeMillis() &&
+                !item.isComplete &&
+                sharedPreferences.getNotificationStatus() == true
             ) {
-
                 val intent = Intent(context, NotificationReceiver::class.java).apply {
                     putExtra(TAG_NOTIFICATION_TASK, item.toString())
                 }
@@ -43,8 +41,8 @@ class NotificationSchedulerImpl @Inject constructor(
                             context,
                             item.id.hashCode(),
                             intent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                        ),
                     )
                 }
             }
@@ -58,8 +56,8 @@ class NotificationSchedulerImpl @Inject constructor(
                 context,
                 item.id.hashCode(),
                 Intent(context, NotificationReceiver::class.java),
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            ),
         )
     }
 
@@ -71,8 +69,8 @@ class NotificationSchedulerImpl @Inject constructor(
                     context,
                     task_id.hashCode(),
                     Intent(context, NotificationReceiver::class.java),
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                ),
             )
         }
     }

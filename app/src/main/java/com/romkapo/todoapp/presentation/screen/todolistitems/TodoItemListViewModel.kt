@@ -1,15 +1,10 @@
 package com.romkapo.todoapp.presentation.screen.todolistitems
 
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.radusalagean.infobarcompose.InfoBarMessage
-import com.radusalagean.infobarcompose.InfoBarSlideEffect
 import com.romkapo.todoapp.data.model.TodoItem
 import com.romkapo.todoapp.di.components.common.ViewModelAssistedFactory
 import com.romkapo.todoapp.domain.MainRepository
@@ -29,9 +24,8 @@ import kotlinx.coroutines.launch
 
 class TodoItemListViewModel @AssistedInject constructor(
     private val repository: MainRepository,
-    @Assisted private val handle: SavedStateHandle
-) :
-    ViewModel() {
+    @Assisted private val handle: SavedStateHandle,
+) : ViewModel() {
     private var getDataJob: Job? = null
     private var updateDataJob: Job? = null
     private var _sampleData = MutableStateFlow(TodoScreenStates(emptyList(), emptyList(), true, 0))
@@ -39,15 +33,7 @@ class TodoItemListViewModel @AssistedInject constructor(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
-    var message: InfoBarMessage? by mutableStateOf(null)
-    var isFirstSnack: Boolean by mutableStateOf(true)
-    val infoBarSlideEffect: InfoBarSlideEffect by derivedStateOf {
-        if (isFirstSnack)
-            InfoBarSlideEffect.FROM_BOTTOM
-        else
-            InfoBarSlideEffect.NONE
-    }
-
+    val message = mutableStateOf("")
 
     var job: Job? = null
         private set
@@ -66,7 +52,8 @@ class TodoItemListViewModel @AssistedInject constructor(
                 _sampleData.update {
                     _sampleData.value.copy(
                         todoFullList = items,
-                        countOfCompleted = items.count { it.isComplete })
+                        countOfCompleted = items.count { it.isComplete },
+                    )
                 }
                 changeShownList(_sampleData.value.isCheckedShown)
                 if (id != null) {
@@ -89,12 +76,12 @@ class TodoItemListViewModel @AssistedInject constructor(
             if (isChecked) {
                 state.copy(
                     todoList = state.todoFullList,
-                    isCheckedShown = isChecked
+                    isCheckedShown = isChecked,
                 )
             } else {
                 state.copy(
                     todoList = state.todoFullList.filter { !it.isComplete },
-                    isCheckedShown = isChecked
+                    isCheckedShown = isChecked,
                 )
             }
         }
@@ -122,37 +109,25 @@ class TodoItemListViewModel @AssistedInject constructor(
 
     fun showSnackBar(item: TodoItem) = viewModelScope.launch {
         val named = mutableIntStateOf(5)
-        isFirstSnack = true
         job?.let {
             if (it.isActive) {
+                message.value = ""
                 job!!.cancel()
-                message = null
             }
         }
         job = viewModelScope.launch {
             removeTodoItem(item)
             while (job!!.isActive) {
-                message = InfoBarMessage(
-                    text = "${named.intValue} Удаление ${item.text}",
-                    displayTimeSeconds = 1,
-                    action = "Return",
-                    onAction = {
-                        addTodoItem(item)
-                        message=null
-                        job!!.cancel()
-                    }
-                )
+                message.value = "${named.intValue} Удаление ${item.text}"
                 delay(1000L)
                 named.intValue -= 1
                 if (named.intValue == 0) {
-                    message = null
-                    isFirstSnack = false
+                    message.value = ""
                     job!!.cancel()
                 }
             }
         }
     }
-
 
     override fun onCleared() {
         getDataJob?.cancel()

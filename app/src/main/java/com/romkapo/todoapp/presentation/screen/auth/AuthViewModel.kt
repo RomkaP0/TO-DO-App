@@ -10,7 +10,7 @@ import dagger.assisted.AssistedInject
 
 class AuthViewModel @AssistedInject constructor(
     private val appSharedPreferences: AppSharedPreferences,
-    @Assisted private val handle: SavedStateHandle
+    @Assisted private val handle: SavedStateHandle,
 ) : ViewModel() {
     val token = appSharedPreferences.getCurrentToken()
     fun putToken(token: String) {

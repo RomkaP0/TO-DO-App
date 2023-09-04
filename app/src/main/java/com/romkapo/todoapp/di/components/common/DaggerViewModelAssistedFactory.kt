@@ -6,7 +6,7 @@ import javax.inject.Inject
 import javax.inject.Provider
 
 class DaggerViewModelAssistedFactory @Inject constructor(
-    private val assistedFactoryMap: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModelAssistedFactory<*>>>
+    private val assistedFactoryMap: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModelAssistedFactory<*>>>,
 ) : ComposeViewModelFactory {
 
     @Suppress("UNCHECKED_CAST")

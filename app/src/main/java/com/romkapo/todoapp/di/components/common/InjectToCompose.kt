@@ -11,11 +11,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun Inject(
     composeViewModelFactory: ComposeViewModelFactory,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
         LocalViewModelFactory provides composeViewModelFactory,
-        content = content
+        content = content,
     )
 }
 
@@ -44,8 +44,7 @@ object LocalViewModelFactory {
         @Composable
         get() = LocalComposeViewModelFactory.current
 
-    infix fun provides(composeViewModelFactory: ComposeViewModelFactory):
-            ProvidedValue<ComposeViewModelFactory?> {
+    infix fun provides(composeViewModelFactory: ComposeViewModelFactory): ProvidedValue<ComposeViewModelFactory?> {
         return LocalComposeViewModelFactory.provides(composeViewModelFactory)
     }
 }

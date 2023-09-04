@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 
-
 class NotificationReceiver : BroadcastReceiver() {
 
     @Inject
@@ -36,11 +35,10 @@ class NotificationReceiver : BroadcastReceiver() {
             val gson = Gson()
             val task = gson.fromJson(
                 intent.getStringExtra(Constants.TAG_NOTIFICATION_TASK),
-                TodoItem::class.java
+                TodoItem::class.java,
             )
 
             coroutineScope.launch(Dispatchers.IO) {
-
                 val manager =
                     context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -48,8 +46,8 @@ class NotificationReceiver : BroadcastReceiver() {
                     NotificationChannel(
                         Constants.NOTIFICATION_CHANNEL_ID,
                         Constants.NOTIFICATION_CHANNEL_NAME,
-                        NotificationManager.IMPORTANCE_HIGH
-                    )
+                        NotificationManager.IMPORTANCE_HIGH,
+                    ),
                 )
 
                 val notification =
@@ -60,16 +58,16 @@ class NotificationReceiver : BroadcastReceiver() {
                             context.getString(
                                 R.string.notification_text,
                                 task.text,
-                                task.importance.toString().lowercase(Locale.ROOT)
-                            )
+                                task.importance.toString().lowercase(Locale.ROOT),
+                            ),
                         )
                         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                         .addAction(
                             NotificationCompat.Action(
                                 R.drawable.ic_arrow_right,
                                 context.getString(R.string.postpone_for_a_day),
-                                postponeIntent(context, task)
-                            )
+                                postponeIntent(context, task),
+                            ),
                         )
                         .setContentIntent(deepLinkIntent(context, task.id))
                         .build()
@@ -82,16 +80,15 @@ class NotificationReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun deepLinkIntent(context: Context, newTaskArg: String): PendingIntent{
+    private fun deepLinkIntent(context: Context, newTaskArg: String): PendingIntent {
         val intent = Intent(
             Intent.ACTION_VIEW,
             Uri.parse("todoapp://add_edit/$newTaskArg"),
             context,
-            MainActivity::class.java
+            MainActivity::class.java,
         )
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
     }
-
 
     private fun postponeIntent(context: Context, item: TodoItem): PendingIntent =
         PendingIntent.getBroadcast(
@@ -99,10 +96,10 @@ class NotificationReceiver : BroadcastReceiver() {
             item.id.hashCode(),
             Intent(
                 context,
-                NotificationPostponeReceiver::class.java
+                NotificationPostponeReceiver::class.java,
             ).apply {
                 putExtra(Constants.TAG_NOTIFICATION_TASK, item.toString())
             },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 }

@@ -50,13 +50,12 @@ import com.romkapo.todoapp.di.components.common.daggerViewModel
 import com.romkapo.todoapp.ui.common.DateTimePicker
 import com.romkapo.todoapp.utils.LongToString
 
-
 @Composable()
 fun AddEditScreen(
     navController: NavController,
     viewModel: AddEditItemViewModel = daggerViewModel(),
 
-    ) {
+) {
     val state = viewModel.currentItemFlow.collectAsState()
     InitialAddEditContent(
         state = state,
@@ -67,7 +66,8 @@ fun AddEditScreen(
         changeStateDialog = { viewModel.changeStateDialog() },
         changeStateDeadline = { viewModel.changeStateDeadline() },
         changeDeadline = { viewModel.changeDeadline(it) },
-        changeImportance = { viewModel.changeImportance(it) })
+        changeImportance = { viewModel.changeImportance(it) },
+    )
 }
 
 @Composable
@@ -83,28 +83,26 @@ fun InitialAddEditContent(
     changeImportance: (String) -> Unit,
 ) {
     val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
+        skipPartiallyExpanded = true,
     )
 
     val textColor = animateColorAsState(
         targetValue = if (state.value.isHighlight) Color.Red else MaterialTheme.colorScheme.primary,
-        animationSpec = tween(durationMillis = 1000)
+        animationSpec = tween(durationMillis = 1000),
     )
-
 
     val provideWidthModifier = Modifier.fillMaxWidth()
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
+        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
     ) {
-
         Row(modifier = provideWidthModifier, horizontalArrangement = Arrangement.SpaceBetween) {
             IconButton(onClick = { navController.navigateUp() }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
-                    contentDescription = null
+                    contentDescription = null,
                 )
             }
             TextButton(onClick = {
@@ -113,7 +111,7 @@ fun InitialAddEditContent(
             }) {
                 Text(
                     style = MaterialTheme.typography.labelMedium,
-                    text = stringResource(id = R.string.save)
+                    text = stringResource(id = R.string.save),
                 )
             }
         }
@@ -122,36 +120,37 @@ fun InitialAddEditContent(
             modifier = provideWidthModifier
                 .background(
                     MaterialTheme.colorScheme.secondary,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
                 )
                 .defaultMinSize(
                     minWidth = OutlinedTextFieldDefaults.MinWidth,
-                    minHeight = OutlinedTextFieldDefaults.MinHeight
+                    minHeight = OutlinedTextFieldDefaults.MinHeight,
                 ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.secondary
+                unfocusedBorderColor = MaterialTheme.colorScheme.secondary,
             ),
             minLines = 3,
             maxLines = 3,
             placeholder = { Text(text = "Название события...") },
             value = state.value.text,
-            onValueChange = { changeText(it) })
+            onValueChange = { changeText(it) },
+        )
 
         Column(
             modifier = provideWidthModifier.background(
                 color = MaterialTheme.colorScheme.secondary,
-                shape = RoundedCornerShape(8.dp)
-            )
+                shape = RoundedCornerShape(8.dp),
+            ),
         ) {
             Row(
                 modifier = provideWidthModifier.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     style = MaterialTheme.typography.bodyMedium,
-                    text = stringResource(id = R.string.importance)
+                    text = stringResource(id = R.string.importance),
                 )
                 TextButton(onClick = {
                     changeBottomSheetState()
@@ -159,7 +158,7 @@ fun InitialAddEditContent(
                     Text(
                         style = MaterialTheme.typography.bodyMedium,
                         text = state.value.importance,
-                        color = textColor.value
+                        color = textColor.value,
                     )
                 }
             }
@@ -167,21 +166,23 @@ fun InitialAddEditContent(
             Row(
                 modifier = provideWidthModifier.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     style = MaterialTheme.typography.bodyMedium,
-                    text = stringResource(id = R.string.complete_before)
+                    text = stringResource(id = R.string.complete_before),
                 )
-                Switch(modifier = Modifier.padding(end = 8.dp),
+                Switch(
+                    modifier = Modifier.padding(end = 8.dp),
                     checked = state.value.hasDeadline,
-                    onCheckedChange = { changeStateDeadline() })
+                    onCheckedChange = { changeStateDeadline() },
+                )
             }
             if (state.value.hasDeadline) {
                 TextButton(onClick = { changeStateDialog() }) {
                     Text(
                         style = MaterialTheme.typography.bodyMedium,
-                        text = LongToString.getDateTime(state.value.deadline)
+                        text = LongToString.getDateTime(state.value.deadline),
                     )
                 }
             }
@@ -193,46 +194,47 @@ fun InitialAddEditContent(
         TextButton(
             modifier = provideWidthModifier.background(
                 MaterialTheme.colorScheme.secondary,
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
             ),
             interactionSource = interactionSource,
             colors = ButtonDefaults.buttonColors(containerColor = color),
             enabled = !state.value.isNew,
             onClick = {
                 navController.navigate("todo_list?id=${state.value.id}")
-            }) {
+            },
+        ) {
             Text(
                 style = MaterialTheme.typography.bodyMedium,
-                text = stringResource(id = R.string.delete)
+                text = stringResource(id = R.string.delete),
             )
         }
     }
     if (state.value.isBottomSheetOpened) {
         ModalBottomSheet(
             onDismissRequest = { changeBottomSheetState() },
-            sheetState = bottomSheetState
+            sheetState = bottomSheetState,
         ) {
             Column(
                 Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 val modifier = Modifier.fillMaxWidth()
                 Text(
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = modifier.clickable { changeImportance("Низкая"); changeBottomSheetState() },
-                    text = stringResource(R.string.low)
+                    text = stringResource(R.string.low),
                 )
                 Text(
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = modifier.clickable { changeImportance("Обычная"); changeBottomSheetState() },
-                    text = "Обычная"
+                    text = "Обычная",
                 )
                 Text(
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = modifier.clickable { changeImportance("Высокая"); changeBottomSheetState() },
-                    text = "Высокая"
+                    text = "Высокая",
                 )
             }
         }
@@ -241,10 +243,10 @@ fun InitialAddEditContent(
         DateTimePicker(
             timestamp = state.value.deadline,
             dismiss = { changeStateDialog() },
-            saveTime = { time -> changeDeadline(time) })
+            saveTime = { time -> changeDeadline(time) },
+        )
     }
 }
-
 
 /* Превью не показывает переопределенную тему */
 @Preview(showSystemUi = true, showBackground = true)
@@ -264,8 +266,8 @@ fun AddEditScreenPreview() {
                         isNew = true,
                         isBottomSheetOpened = false,
                         isHighlight = false,
-                        isDialogShown = false
-                    )
+                        isDialogShown = false,
+                    ),
                 )
             }
 
@@ -278,7 +280,7 @@ fun AddEditScreenPreview() {
                 changeStateDeadline = {},
                 changeStateDialog = {},
                 changeDeadline = {},
-                changeImportance = {}
+                changeImportance = {},
             )
         }
     }
