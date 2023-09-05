@@ -11,11 +11,11 @@ androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 appcompat = "1.6.1"
 lifecycle-livedata-ktx = "2.6.1"
-material = "1.10.0-alpha05"
-material-compose = "1.5.0-rc01"
+material = "1.10.0-alpha06"
+material-compose = "1.5.0"
 ksp = "1.9.0-1.0.12"
-material3 = "1.2.0-alpha04"
-navigation = "2.6.0"
+material3 = "1.2.0-alpha06"
+navigation = "2.7.1"
 room = "2.5.2"
 retrofit = "2.9.0"
 gson = "2.10.1"
@@ -23,11 +23,11 @@ gson-converter = "2.9.0"
 kotlin-serialaize-json = "1.5.0"
 swiperefreshlayout = "1.2.0-alpha01"
 okhttp = "4.11.0"
-dagger = "2.46.1"
-symbol-processing-api = "1.9.0-1.0.11"
-ui-tooling-preview = "1.4.3"
+dagger = "2.47"
+ui-tooling-preview = "1.5.0"
 work-runtime-ktx = "2.8.1"
 ktlint = "11.4.0"
+datastore = "1.0.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
@@ -38,7 +38,7 @@ androidx-material-icons-extended = { module = "androidx.compose.material:materia
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "material-compose" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material-compose" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version = "2.7.0-rc01" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 androidx-swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefreshlayout" }
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "ui-tooling-preview" }
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "ui-tooling-preview" }
@@ -62,6 +62,7 @@ dagger-android-support = { group = "com.google.dagger", name = "dagger-android-s
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
 dagger-android-compiler = { group = "com.google.dagger", name = "dagger-android-processor", version.ref = "dagger" }
 
+datastore = {group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore"}
 
 room = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }

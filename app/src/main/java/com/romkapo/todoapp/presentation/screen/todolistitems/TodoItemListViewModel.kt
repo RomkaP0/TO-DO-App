@@ -34,9 +34,9 @@ class TodoItemListViewModel @AssistedInject constructor(
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
     val message = mutableStateOf("")
+    private var deletedTodoItem:TodoItem? = null
 
-    var job: Job? = null
-        private set
+    private var job: Job? = null
     var id: String? = handle["id"]
 
     init {
@@ -87,8 +87,10 @@ class TodoItemListViewModel @AssistedInject constructor(
         }
     }
 
-    private fun addTodoItem(todoItem: TodoItem) = viewModelScope.launch(Dispatchers.IO) {
-        repository.addTodoItem(todoItem)
+    fun addTodoItem() = viewModelScope.launch(Dispatchers.IO) {
+        message.value = ""
+        job?.cancel()
+        deletedTodoItem?.let { repository.addTodoItem(it) }
     }
 
     private fun removeTodoItem(todoItem: TodoItem) = viewModelScope.launch(Dispatchers.IO) {
@@ -116,6 +118,7 @@ class TodoItemListViewModel @AssistedInject constructor(
             }
         }
         job = viewModelScope.launch {
+            deletedTodoItem = item
             removeTodoItem(item)
             while (job!!.isActive) {
                 message.value = "${named.intValue} Удаление ${item.text}"

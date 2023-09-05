@@ -85,7 +85,11 @@ class MainActivity : AppCompatActivity() {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
                     ) {
-                        AppNavHost(navController = navState, paddingValues = it, launchScreen = viewModel.launchScreen)
+                        AppNavHost(
+                            navController = navState,
+                            paddingValues = it,
+                            launchScreen = viewModel.launchScreen
+                        )
                     }
                 } else {
                     Column(
@@ -104,7 +108,7 @@ class MainActivity : AppCompatActivity() {
                             // doesn't want to be asked again for this permission, explain that the
                             // permission is required
                             "Notify is important for notification you. " +
-                                "Please grant the permission"
+                                    "Please grant the permission"
                         }
                         Text(textToShow)
                         Row(
@@ -141,25 +145,24 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.stateRequest.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collectLatest {
-                    showToast(classifyResult(it))
+                    if (it is Error) {
+                        showToast(classifyResult(it))
+                    }
                 }
         }
     }
 
-    private fun classifyResult(result: Resource): String {
-        return if (result is Error) {
-            when (result.exception) {
-                SyncFailedException -> getString(R.string.sync_exc)
-                ItemNotFoundException -> getString(R.string.not_found_exc)
-                BadRequestException -> getString(R.string.bad_exc)
-                ClientSideException -> getString(R.string.client_exc)
-                NetworkException -> getString(R.string.net_exc)
-                UpdateFailedException -> getString(R.string.update_exc)
-            }
-        } else {
-            getString(R.string.success_update)
+    private fun classifyResult(result: Error): String {
+        return when (result.exception) {
+            SyncFailedException -> getString(R.string.sync_exc)
+            ItemNotFoundException -> getString(R.string.not_found_exc)
+            BadRequestException -> getString(R.string.bad_exc)
+            ClientSideException -> getString(R.string.client_exc)
+            NetworkException -> getString(R.string.net_exc)
+            UpdateFailedException -> getString(R.string.update_exc)
         }
     }
+
 
     private fun showToast(text: String) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show()

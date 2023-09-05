@@ -37,7 +37,7 @@ fun SettingsScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.Top),
     ) {
-        IconButton(onClick = { navController.navigateUp() }) {
+        IconButton(onClick = { navController.navigate("todo_list") }) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
                 contentDescription = null,
