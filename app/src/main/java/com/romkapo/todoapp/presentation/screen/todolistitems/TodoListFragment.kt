@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -30,6 +31,7 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -152,9 +154,15 @@ fun TodoListScreen(
                         },
                     ) { item ->
                         val dismissState = rememberDismissState(confirmValueChange = {
-                            viewModel.showSnackBar(item)
-                            true
-                        })
+                            if (it == DismissValue.DismissedToEnd) {
+                                viewModel.showSnackBar(item)
+                                true
+                            } else {
+                                false
+                            }
+                        },
+                            positionalThreshold = {250.dp.value}
+                        )
                         SwipeToDismiss(
                             directions = setOf(DismissDirection.StartToEnd),
                             modifier = Modifier.animateItemPlacement(),
@@ -183,17 +191,20 @@ fun TodoListScreen(
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
                     .shadow(elevation = 8.dp)
-                    .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp))
+                    .background(
+                        MaterialTheme.colorScheme.background,
+                        shape = RoundedCornerShape(8.dp)
+                    )
                     .align(Alignment.BottomCenter),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
+                    modifier = Modifier.padding(start = 8.dp),
                     text = viewModel.message.value,
-                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                 )
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = { viewModel.addTodoItem() }) {
                     Text(text = "Вернуть")
                 }
             }

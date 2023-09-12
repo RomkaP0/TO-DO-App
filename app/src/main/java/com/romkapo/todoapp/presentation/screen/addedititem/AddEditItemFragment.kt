@@ -99,7 +99,7 @@ fun InitialAddEditContent(
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
     ) {
         Row(modifier = provideWidthModifier, horizontalArrangement = Arrangement.SpaceBetween) {
-            IconButton(onClick = { navController.navigateUp() }) {
+            IconButton(onClick = { navController.navigate("todo_list") }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
                     contentDescription = null,
@@ -193,11 +193,11 @@ fun InitialAddEditContent(
         val color = if (isPressed) Color.Red else MaterialTheme.colorScheme.secondary
         TextButton(
             modifier = provideWidthModifier.background(
-                MaterialTheme.colorScheme.secondary,
+                color,
                 shape = RoundedCornerShape(8.dp),
             ),
             interactionSource = interactionSource,
-            colors = ButtonDefaults.buttonColors(containerColor = color),
+//            colors = ButtonDefaults.buttonColors(containerColor = color),
             enabled = !state.value.isNew,
             onClick = {
                 navController.navigate("todo_list?id=${state.value.id}")
@@ -218,22 +218,20 @@ fun InitialAddEditContent(
                 Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                val modifier = Modifier.fillMaxWidth()
                 Text(
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = modifier.clickable { changeImportance("Низкая"); changeBottomSheetState() },
+                    modifier = Modifier.clickable { changeImportance("Низкая"); changeBottomSheetState() }.padding(8.dp),
                     text = stringResource(R.string.low),
                 )
                 Text(
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = modifier.clickable { changeImportance("Обычная"); changeBottomSheetState() },
+                    modifier = Modifier.clickable { changeImportance("Обычная"); changeBottomSheetState() }.padding(8.dp),
                     text = "Обычная",
                 )
                 Text(
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = modifier.clickable { changeImportance("Высокая"); changeBottomSheetState() },
+                    modifier = Modifier.clickable { changeImportance("Высокая"); changeBottomSheetState() }.padding(8.dp),
                     text = "Высокая",
                 )
             }
