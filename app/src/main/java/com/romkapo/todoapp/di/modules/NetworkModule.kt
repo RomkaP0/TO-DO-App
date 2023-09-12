@@ -45,7 +45,8 @@ interface NetworkModule {
             okHttpClient: OkHttpClient,
         ): TodoAPI {
             return Retrofit.Builder()
-                .baseUrl("https://beta.mrdekk.ru/todobackend/")
+//                .baseUrl("https://beta.mrdekk.ru/todobackend/")
+                .baseUrl("http://10.0.2.2:3000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build()

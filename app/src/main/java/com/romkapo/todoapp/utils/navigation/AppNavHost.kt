@@ -69,13 +69,13 @@ fun AppNavHost(
             "add_edit?id={id}",
             enterTransition = {
                 slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
                     animationSpec = tween(500),
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
                     animationSpec = tween(500),
                 )
             },
@@ -102,13 +102,13 @@ fun AppNavHost(
             "settings",
             enterTransition = {
                 slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
                     animationSpec = tween(500),
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
                     animationSpec = tween(500),
                 )
             },
@@ -125,13 +125,13 @@ fun AppNavHost(
             "auth",
             enterTransition = {
                 slideIntoContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
                     animationSpec = tween(500),
                 )
             },
             exitTransition = {
                 slideOutOfContainer(
-                    towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                    towards = AnimatedContentTransitionScope.SlideDirection.Right,
                     animationSpec = tween(500),
                 )
             },
