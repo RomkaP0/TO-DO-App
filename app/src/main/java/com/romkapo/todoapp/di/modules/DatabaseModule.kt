@@ -2,9 +2,9 @@ package com.romkapo.todoapp.di.modules
 
 import android.content.Context
 import androidx.room.Room
-import com.romkapo.todoapp.data.room.AppDatabase
-import com.romkapo.todoapp.data.room.TodoDAO
-import com.romkapo.todoapp.data.room.TodoOperationDAO
+import com.romkapo.todoapp.domain.room.AppDatabase
+import com.romkapo.todoapp.domain.room.TodoDAO
+import com.romkapo.todoapp.domain.room.TodoOperationDAO
 import dagger.Module
 import dagger.Provides
 

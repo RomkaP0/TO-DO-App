@@ -2,7 +2,7 @@ package com.romkapo.todoapp.di.modules
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.romkapo.todoapp.data.model.network.AppSharedPreferences
+import com.romkapo.todoapp.data.network.AppSharedPreferences
 import com.romkapo.todoapp.utils.Constants
 import dagger.Module
 import dagger.Provides

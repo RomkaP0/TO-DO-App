@@ -8,8 +8,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.romkapo.todoapp.data.network.UpdateLocalDataWorker
-import com.romkapo.todoapp.data.network.UpdateWorkerFactory
+import com.romkapo.todoapp.domain.network.UpdateLocalDataWorker
+import com.romkapo.todoapp.domain.network.UpdateWorkerFactory
 import com.romkapo.todoapp.di.components.app.AppComponent
 import com.romkapo.todoapp.di.components.app.DaggerAppComponent
 import com.romkapo.todoapp.utils.Constants.UPDATE_LOCAL_WORKER_NAME

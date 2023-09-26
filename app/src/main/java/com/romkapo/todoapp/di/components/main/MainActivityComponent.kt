@@ -1,7 +1,7 @@
 package com.romkapo.todoapp.di.components.main
 
 import com.romkapo.todoapp.di.components.ActivityViewModelFactoryModule
-import com.romkapo.todoapp.presentation.screen.main.MainActivity
+import com.romkapo.todoapp.ui.screen.main.MainActivity
 import dagger.Subcomponent
 
 @Subcomponent(modules = [MainActivityModule::class, ActivityViewModelFactoryModule::class])

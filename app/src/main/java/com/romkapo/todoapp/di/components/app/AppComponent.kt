@@ -7,8 +7,8 @@ import com.romkapo.todoapp.di.components.edit.AddEditFragmentComponent
 import com.romkapo.todoapp.di.components.list.TodoListItemFragmentComponent
 import com.romkapo.todoapp.di.components.main.MainActivityComponent
 import com.romkapo.todoapp.di.components.settings.SettingsFragmentComponent
-import com.romkapo.todoapp.utils.notificationmanager.NotificationPostponeReceiver
-import com.romkapo.todoapp.utils.notificationmanager.NotificationReceiver
+import com.romkapo.todoapp.domain.notificationmanager.NotificationPostponeReceiver
+import com.romkapo.todoapp.domain.notificationmanager.NotificationReceiver
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Qualifier

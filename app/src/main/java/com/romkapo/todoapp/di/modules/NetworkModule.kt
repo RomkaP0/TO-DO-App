@@ -1,9 +1,9 @@
 package com.romkapo.todoapp.di.modules
 
 import android.content.Context
-import com.romkapo.todoapp.data.network.AuthInterceptor
-import com.romkapo.todoapp.data.network.ConnectionManagerObserver
-import com.romkapo.todoapp.data.network.TodoAPI
+import com.romkapo.todoapp.domain.network.AuthInterceptor
+import com.romkapo.todoapp.domain.network.ConnectionManagerObserver
+import com.romkapo.todoapp.domain.network.TodoAPI
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable

@@ -1,7 +1,7 @@
 package com.romkapo.todoapp.di.modules
 
-import com.romkapo.todoapp.utils.notificationmanager.NotificationScheduler
-import com.romkapo.todoapp.utils.notificationmanager.NotificationSchedulerImpl
+import com.romkapo.todoapp.domain.notificationmanager.NotificationScheduler
+import com.romkapo.todoapp.domain.notificationmanager.NotificationSchedulerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Reusable

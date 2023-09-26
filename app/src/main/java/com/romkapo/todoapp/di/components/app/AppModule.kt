@@ -1,7 +1,7 @@
 package com.romkapo.todoapp.di.components.app
 
 import android.content.Context
-import com.romkapo.todoapp.data.repository.MainRepositoryImpl
+import com.romkapo.todoapp.domain.repository.MainRepositoryImpl
 import com.romkapo.todoapp.di.components.edit.AddEditFragmentComponent
 import com.romkapo.todoapp.di.components.list.TodoListItemFragmentComponent
 import com.romkapo.todoapp.di.components.main.MainActivityComponent
@@ -10,7 +10,7 @@ import com.romkapo.todoapp.di.modules.DatabaseModule
 import com.romkapo.todoapp.di.modules.NetworkModule
 import com.romkapo.todoapp.di.modules.NotificationSchedulerModule
 import com.romkapo.todoapp.di.modules.SharedPrefModule
-import com.romkapo.todoapp.domain.MainRepository
+import com.romkapo.todoapp.domain.repository.MainRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

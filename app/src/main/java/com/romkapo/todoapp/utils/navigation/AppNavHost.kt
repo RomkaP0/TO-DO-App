@@ -18,9 +18,9 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.romkapo.todoapp.appComponent
 import com.romkapo.todoapp.di.components.common.Inject
-import com.romkapo.todoapp.presentation.screen.addedititem.AddEditScreen
-import com.romkapo.todoapp.presentation.screen.settings.SettingsScreen
-import com.romkapo.todoapp.presentation.screen.todolistitems.TodoListScreen
+import com.romkapo.todoapp.ui.screen.addedititem.AddEditScreen
+import com.romkapo.todoapp.ui.screen.settings.SettingsScreen
+import com.romkapo.todoapp.ui.screen.todolistitems.TodoListScreen
 
 @Composable
 fun AppNavHost(

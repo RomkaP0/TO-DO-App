@@ -22,7 +22,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.romkapo.todoapp.R
-import com.romkapo.todoapp.data.model.TodoItem
+import com.romkapo.todoapp.data.local.TodoItem
 import com.romkapo.todoapp.utils.Importance
 import com.romkapo.todoapp.utils.LongToString
 
